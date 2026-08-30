@@ -1,6 +1,6 @@
-- [ ] Buat schema.ts untuk projects.
-- [ ] Jalankan Drizzle push ke Turso.
-- [ ] Isi dummy data via seed-database.ts.
-- [ ] Buat Endpoint GET /api/projects.
-- [ ] Setup Elysia Eden di Frontend.
-- [ ] Hubungkan UI ProjectSlider dengan API Eden.
+- [x] Buat schema.ts untuk projects.
+- [x] Jalankan Drizzle push ke Turso.
+- [x] Isi dummy data via seed-database.ts.
+- [x] Buat Endpoint GET /api/projects.
+- [x] Setup Elysia Eden di Frontend.
+- [x] Hubungkan UI ProjectSlider dengan API Eden.
