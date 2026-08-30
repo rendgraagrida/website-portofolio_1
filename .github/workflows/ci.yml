@@ -25,13 +25,13 @@ jobs:
         working-directory: ./frontend
         run: bun install
 
-      - name: Frontend Type Check
-        working-directory: ./frontend
-        run: bun run tsc --noEmit
-
       - name: Install Backend Dependencies
         working-directory: ./backend
         run: bun install
+
+      - name: Frontend Type Check
+        working-directory: ./frontend
+        run: bun run tsc --noEmit
 
       - name: Backend Type Check
         working-directory: ./backend
