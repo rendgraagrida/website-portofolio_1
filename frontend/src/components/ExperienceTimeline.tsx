@@ -28,10 +28,23 @@ export const ExperienceTimeline: React.FC = () => {
               {/* Company & Role Header */}
               <div className="mb-6">
                 <h3 className="text-2xl font-bold text-tuku-dark">{exp.role}</h3>
-                <div className="flex flex-col md:flex-row md:items-center text-earth-800 mt-2 gap-2 md:gap-6 font-medium">
-                  <div className="flex items-center gap-2">
-                    <Briefcase size={18} className="text-tuku-brown" />
-                    <span>{exp.company}</span>
+                <div className="flex flex-col md:flex-row md:items-start text-earth-800 mt-2 gap-2 md:gap-6 font-medium">
+                  <div className="flex items-start gap-2">
+                    <Briefcase size={18} className="text-tuku-brown mt-0.5" />
+                    <div className="flex flex-col">
+                      {exp.companyUrl ? (
+                        <a href={exp.companyUrl} target="_blank" rel="noopener noreferrer" className="hover:text-tuku-brown transition-colors underline decoration-tuku-brown/30 underline-offset-4">
+                          {exp.company}
+                        </a>
+                      ) : (
+                        <span>{exp.company}</span>
+                      )}
+                      {exp.companyHighlight && (
+                        <span className="text-sm font-normal text-earth-500 mt-1 max-w-lg leading-snug">
+                          {exp.companyHighlight}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar size={18} className="text-tuku-brown" />

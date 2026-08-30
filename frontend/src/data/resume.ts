@@ -12,6 +12,8 @@ export interface Experience {
   id: string;
   role: string;
   company: string;
+  companyUrl?: string;
+  companyHighlight?: string;
   period: string;
   jobDesks: JobDesk[];
 }
@@ -21,6 +23,8 @@ export const experiences: Experience[] = [
     id: 'telkomsigma-tech-lead',
     role: 'Tech Lead',
     company: 'PT. SIGMA CIPTA CARAKA (TELKOMSIGMA)',
+    companyUrl: 'https://www.telkomsigma.co.id/',
+    companyHighlight: 'Perusahaan IT terdepan di Indonesia penyedia solusi infrastruktur, cloud, dan integrasi sistem berskala enterprise.',
     period: 'August 2025 – December 2026',
     jobDesks: [
       {
@@ -108,6 +112,8 @@ export const experiences: Experience[] = [
     id: 'telkomsigma-devops',
     role: 'Dev-Ops',
     company: 'PT. SIGMA CIPTA CARAKA (TELKOMSIGMA)',
+    companyUrl: 'https://www.telkomsigma.co.id/',
+    companyHighlight: 'Perusahaan IT terdepan di Indonesia penyedia solusi infrastruktur, cloud, dan integrasi sistem berskala enterprise.',
     period: 'August 2017 – August 2025',
     jobDesks: [
       {
@@ -187,6 +193,8 @@ export const experiences: Experience[] = [
     id: 'putra-sejati',
     role: 'Engineer',
     company: 'PT. PUTRA SEJATI INDOMAKMUR',
+    companyUrl: 'https://psi-oilservices.com/',
+    companyHighlight: 'Perusahaan penyedia jasa layanan eksplorasi dan produksi minyak bumi terkemuka.',
     period: 'Juli 2016 – Juli 2017',
     jobDesks: [
       {
