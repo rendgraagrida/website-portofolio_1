@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import TechGrid from '../components/TechGrid.astro';
 import { Hero } from '../components/Hero';
+import { ExperienceTimeline } from '../components/ExperienceTimeline';
 import { ProjectSlider } from '../components/ProjectSlider';
 import { ContactForm } from '../components/ContactForm';
 ---
@@ -12,6 +13,7 @@ import { ContactForm } from '../components/ContactForm';
   <Navbar />
   <main class="flex-grow">
     <Hero />
+    <ExperienceTimeline client:visible />
     <ProjectSlider client:visible />
     <TechGrid />
     <ContactForm client:visible />
