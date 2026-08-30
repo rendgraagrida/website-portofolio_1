@@ -1,7 +1,6 @@
 {
   "name": "website-portofolio",
   "private": true,
-  "workspaces": ["frontend", "backend"],
   "scripts": {
     "dev:frontend": "cd frontend && bun run dev",
     "dev:backend": "cd backend && bun run dev",

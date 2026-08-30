@@ -21,12 +21,17 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install All Dependencies (Workspace)
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
         run: bun install
 
       - name: Frontend Type Check
         working-directory: ./frontend
         run: bun run tsc --noEmit
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: bun install
 
       - name: Backend Type Check
         working-directory: ./backend
