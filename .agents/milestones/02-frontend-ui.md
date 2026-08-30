@@ -1,0 +1,4 @@
+- [ ] Navbar & Footer.
+- [ ] Hero Sapaan.
+- [ ] Project Slider.
+- [ ] Tech Grid.

@@ -1,0 +1,2 @@
+- [ ] Setup Unit Test akhir.
+- [ ] Deploy Vercel (FE) & Koyeb (BE).

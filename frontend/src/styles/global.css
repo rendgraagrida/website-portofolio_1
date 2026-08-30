@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-earth-100: #f4f1ea;
+  --color-earth-200: #e3dcc8;
+  --color-earth-500: #8c7b65;
+  --color-earth-800: #4a3f35;
+  --color-earth-900: #2d261e;
+  
+  --color-tuku-cream: #F5F5DC;
+  --color-tuku-brown: #8B4513;
+  --color-tuku-dark: #3E2723;
+}
+
+@layer base {
+  body {
+    @apply bg-earth-100 text-earth-900 antialiased;
+  }
+}

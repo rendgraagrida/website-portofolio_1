@@ -1,0 +1,3 @@
+- [ ] Skema DB Proyek.
+- [ ] Endpoint Eden.
+- [ ] Form Kontak (Resend/Email).

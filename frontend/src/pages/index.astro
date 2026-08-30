@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Navbar } from '../components/Navbar';
+import { Hero } from '../components/Hero';
+import { ProjectSlider } from '../components/ProjectSlider';
+import { TechGrid } from '../components/TechGrid';
+import { Footer } from '../components/Footer';
+---
+
+<Layout title="Tetangga Baru - Web Portofolio">
+  <Navbar client:load />
+  <main class="flex-grow">
+    <Hero />
+    <ProjectSlider client:visible />
+    <TechGrid client:visible />
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,9 @@
+{
+  "name": "website-portofolio",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd frontend && bun run dev",
+    "dev:backend": "cd backend && bun run dev",
+    "check-env": "bun run .agents/tools/check-env.ts"
+  }
+}
