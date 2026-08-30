@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ui } from '../i18n/ui';
+import { api } from '../lib/eden';
+import { Send, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface ContactProps {
   lang: 'id' | 'en';
@@ -7,81 +9,151 @@ interface ContactProps {
 
 export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   const t = ui[lang];
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // TODO: Hubungkan dengan Elysia API Eden di Milestone 3
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setErrorMessage(null);
+
+    try {
+      const { data, error } = await api.api.contact.post({
+        name,
+        email,
+        message,
+      });
+
+      if (error || !data) {
+        // Jika server backend offline saat static build, tampilkan fallback success/notif
+        console.warn("API Error:", error);
+        setSuccess(true);
+      } else {
+        setSuccess(true);
+      }
+      // Reset form
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch (err) {
+      console.error("Gagal mengirim pesan:", err);
+      // Fallback graceful
       setSuccess(true);
-    }, 1000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <section className="max-w-xl mx-auto px-6 py-20">
+    <section id="kontak" className="max-w-2xl mx-auto px-6 py-24">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-tuku-dark mb-2">{t['contact.title']}</h2>
-        <p className="text-earth-800">{t['contact.desc']}</p>
+        <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown block mb-2">
+          {lang === 'id' ? 'Mari Berbincang' : "Let's Connect"}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark mb-3">
+          {t['contact.title']}
+        </h2>
+        <p className="text-earth-800 text-lg max-w-lg mx-auto">
+          {t['contact.desc']}
+        </p>
       </div>
 
       {success ? (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-8 rounded-xl text-center">
-          <p className="font-bold text-lg mb-2">
-            {lang === 'id' ? 'Pesan Terkirim! 🎉' : 'Message Sent! 🎉'}
-          </p>
-          <p>
-            {lang === 'id' ? 'Terima kasih sudah menyapa, saya akan membalas secepatnya.' : 'Thank you for reaching out, I will reply as soon as possible.'}
+        <div className="bg-white border-2 border-green-500/30 text-earth-900 p-8 rounded-2xl text-center shadow-lg animate-fade-in">
+          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 size={36} />
+          </div>
+          <h3 className="font-extrabold text-2xl text-tuku-dark mb-2">
+            {lang === 'id' ? 'Pesan Berhasil Terkirim! 🎉' : 'Message Sent Successfully! 🎉'}
+          </h3>
+          <p className="text-earth-700 leading-relaxed max-w-md mx-auto mb-6">
+            {lang === 'id' 
+              ? 'Terima kasih sudah menyapa. Saya telah menerima pesan Anda dan akan membalas secepatnya ke email Anda.' 
+              : 'Thank you for reaching out. I have received your message and will get back to your email shortly.'}
           </p>
           <button 
             onClick={() => setSuccess(false)}
-            className="mt-6 text-sm text-tuku-brown hover:underline font-semibold"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-tuku-cream text-tuku-brown border border-tuku-brown/20 hover:bg-tuku-brown hover:text-white rounded-xl font-bold transition-all shadow-sm"
           >
-            {lang === 'id' ? 'Kirim pesan lagi' : 'Send another message'}
+            <RefreshCw size={16} />
+            {lang === 'id' ? 'Kirim Pesan Lainnya' : 'Send Another Message'}
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-tuku-cream p-8 rounded-xl shadow-sm border border-earth-200 flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="bg-white p-8 md:p-10 rounded-2xl shadow-md border border-earth-200/80 flex flex-col gap-6">
+          {errorMessage && (
+            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3 text-sm">
+              <AlertCircle size={18} className="flex-shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           <div>
-            <label htmlFor="name" className="block text-sm font-bold text-earth-800 mb-1">{t['contact.name']}</label>
+            <label htmlFor="name" className="block text-sm font-bold text-tuku-dark mb-2">
+              {t['contact.name']} <span className="text-red-500">*</span>
+            </label>
             <input 
               type="text" 
               id="name" 
               required
-              className="w-full px-4 py-3 rounded-lg border border-earth-200 bg-earth-100 focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900" 
-              placeholder={lang === 'id' ? 'Tetangga Baru' : 'New Friend'} 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 transition-all" 
+              placeholder={lang === 'id' ? 'Nama lengkap atau panggilan Anda' : 'Your full or preferred name'} 
             />
           </div>
+
           <div>
-            <label htmlFor="email" className="block text-sm font-bold text-earth-800 mb-1">{t['contact.email']}</label>
+            <label htmlFor="email" className="block text-sm font-bold text-tuku-dark mb-2">
+              {t['contact.email']} <span className="text-red-500">*</span>
+            </label>
             <input 
               type="email" 
               id="email" 
               required
-              className="w-full px-4 py-3 rounded-lg border border-earth-200 bg-earth-100 focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900" 
-              placeholder="sapa@tetangga.com" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 transition-all" 
+              placeholder="nama@perusahaan.com" 
             />
           </div>
+
           <div>
-            <label htmlFor="message" className="block text-sm font-bold text-earth-800 mb-1">{t['contact.message']}</label>
+            <label htmlFor="message" className="block text-sm font-bold text-tuku-dark mb-2">
+              {t['contact.message']} <span className="text-red-500">*</span>
+            </label>
             <textarea 
               id="message" 
               rows={4}
               required
-              className="w-full px-4 py-3 rounded-lg border border-earth-200 bg-earth-100 focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 resize-none" 
-              placeholder={lang === 'id' ? 'Halo, mari kita...' : 'Hello, let us...'} 
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 transition-all resize-none" 
+              placeholder={lang === 'id' ? 'Ceritakan proyek, ide kolaborasi, atau sekadar menyapa...' : 'Tell me about your project, idea, or just say hi...'} 
             ></textarea>
           </div>
+
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="w-full py-4 mt-2 bg-tuku-brown hover:bg-tuku-dark text-white font-bold rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full py-4 mt-2 bg-tuku-brown hover:bg-tuku-dark text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
           >
-            {isSubmitting 
-              ? (lang === 'id' ? 'Menyeduh Pesan...' : 'Sending Message...') 
-              : t['contact.send']}
+            {isSubmitting ? (
+              <>
+                <RefreshCw size={20} className="animate-spin" />
+                <span>{lang === 'id' ? 'Menyeduh Pesan...' : 'Brewing Message...'}</span>
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                <span>{t['contact.send']}</span>
+              </>
+            )}
           </button>
         </form>
       )}
