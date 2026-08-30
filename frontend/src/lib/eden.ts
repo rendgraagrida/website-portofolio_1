@@ -1,5 +1,5 @@
 // Dynamic Base URL mendukung environment variable di Vercel/Production maupun Localhost
-const BASE_URL = (import.meta.env.PUBLIC_API_URL as string | undefined) || 'http://localhost:3000';
+const BASE_URL = (import.meta.env.PUBLIC_API_URL as string | undefined) || 'http://localhost:3001';
 
 export interface ContactPayload {
   name: string;
