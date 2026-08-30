@@ -6,19 +6,21 @@ import TechGrid from '../../components/TechGrid.astro';
 import { Hero } from '../../components/Hero';
 import { ExperienceTimeline } from '../../components/ExperienceTimeline';
 import { ProjectSlider } from '../../components/ProjectSlider';
+import { CoverLetterGenerator } from '../../components/CoverLetterGenerator';
 import { ContactForm } from '../../components/ContactForm';
 import { getLangFromUrl } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 ---
 
-<Layout title="Tetangga Baru - Web Portofolio">
+<Layout title="Rendgra Agrida - Software Engineer & Tech Lead Portfolio">
   <Navbar />
   <main class="flex-grow">
     <Hero lang={lang} />
     <ExperienceTimeline lang={lang} client:visible />
     <ProjectSlider lang={lang} client:visible />
     <TechGrid />
+    <CoverLetterGenerator lang={lang} client:visible />
     <ContactForm lang={lang} client:visible />
   </main>
   <Footer />

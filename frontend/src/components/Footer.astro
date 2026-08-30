@@ -1,30 +1,57 @@
 ---
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { personalProfile } from '../data/resume';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const year = new Date().getFullYear();
 ---
 
-<footer id="kontak" class="bg-tuku-dark text-earth-200 py-12 mt-auto">
-  <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-    <div class="text-center md:text-left">
-      <h3 class="text-2xl font-bold text-tuku-cream mb-2">{t('footer.title')}</h3>
-      <div class="text-earth-200/80 max-w-sm">
-        <p>📍 Bandung, West Java, Indonesia</p>
-        <p>📞 (+62) 811-222-9811</p>
-        <p>✉️ <a href="mailto:rendgraagrida@gmail.com" class="hover:text-tuku-cream">rendgraagrida@gmail.com</a></p>
-      </div>
-    </div>
+<footer class="bg-tuku-dark text-earth-200 py-16 mt-auto border-t border-earth-800">
+  <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+    
     <div>
-      <h4 class="font-bold text-lg mb-4 text-tuku-cream">{t('footer.socials')}</h4>
-      <div class="flex flex-col space-y-2 text-earth-200">
-        <a href="#" class="hover:text-tuku-cream transition-colors">LinkedIn</a>
-        <a href="#" class="hover:text-tuku-cream transition-colors">JobStreet</a>
+      <h3 class="text-2xl font-bold text-tuku-cream mb-2">{t('footer.title')}</h3>
+      <div class="text-earth-300 space-y-1 text-sm">
+        <p>📍 {personalProfile.location}</p>
+        <p>📞 {personalProfile.phone}</p>
+        <p>✉️ <a href={`mailto:${personalProfile.email}`} class="hover:text-tuku-cream text-tuku-brown underline">{personalProfile.email}</a></p>
       </div>
     </div>
+
+    <div>
+      <h4 class="font-bold text-base mb-3 text-tuku-cream uppercase tracking-wider">{t('footer.socials')}</h4>
+      <div class="flex flex-wrap md:flex-col gap-3 text-sm text-earth-200">
+        <a 
+          href={personalProfile.socials.linkedin} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="hover:text-tuku-cream transition-colors flex items-center gap-2 underline decoration-tuku-brown/40"
+        >
+          <span>LinkedIn (rendgra-a)</span> ↗
+        </a>
+        <a 
+          href={personalProfile.socials.jobstreet} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="hover:text-tuku-cream transition-colors flex items-center gap-2 underline decoration-tuku-brown/40"
+        >
+          <span>JobStreet (rendgra-agrida)</span> ↗
+        </a>
+        <a 
+          href={personalProfile.socials.github} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="hover:text-tuku-cream transition-colors flex items-center gap-2 underline decoration-tuku-brown/40"
+        >
+          <span>GitHub (rendgraagrida)</span> ↗
+        </a>
+      </div>
+    </div>
+
   </div>
-  <div class="max-w-5xl mx-auto px-6 mt-12 pt-8 border-t border-earth-800 text-center text-sm text-earth-500">
-    &copy; {year} {t('footer.made')}
+
+  <div class="max-w-5xl mx-auto px-6 mt-12 pt-8 border-t border-earth-800/60 text-center text-xs text-earth-500">
+    &copy; {year} Rendgra Agrida. {t('footer.made')}
   </div>
 </footer>

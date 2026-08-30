@@ -1,0 +1,6 @@
+- [x] Tambahkan data profil resmi Rendgra Agrida (LinkedIn, Jobstreet, Kontak, Ringkasan) ke `resume.ts`.
+- [x] Bangun komponen interaktif `CoverLetterGenerator.tsx` (Personalisasi Nama Perusahaan, Role, dan Fokus Keahlian).
+- [x] Buat fitur 1-Click Copy, Download TXT, dan Print PDF pada generator cover letter.
+- [x] Bangun halaman resume ATS-friendly siap cetak `/cv` dan `/en/cv`.
+- [x] Hubungkan tautan resmi LinkedIn dan Jobstreet di Hero, Navbar, dan Footer.
+- [x] Sematkan generator cover letter di halaman utama `index.astro` dan `en/index.astro`.

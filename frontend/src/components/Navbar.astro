@@ -1,42 +1,43 @@
 ---
-import { Coffee } from 'lucide-react';
+import { Coffee, FileText } from 'lucide-react';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const oppositeLang = lang === 'id' ? 'en' : 'id';
 const toggleUrl = lang === 'id' ? '/en/' : '/';
+const cvUrl = lang === 'id' ? '/cv' : '/en/cv';
 ---
 
 <header class="sticky top-0 z-50 bg-tuku-cream/90 backdrop-blur-md border-b border-earth-200">
-  <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-    <div class="flex items-center gap-2 text-tuku-dark font-bold text-xl">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href={lang === 'id' ? '/' : '/en/'} class="flex items-center gap-2 text-tuku-dark font-extrabold text-xl">
       <Coffee className="text-tuku-brown" />
       <span>Rendgra.<span class="text-tuku-brown">Dev</span></span>
-    </div>
+    </a>
+
     <div class="flex items-center gap-4">
-      <div class="hidden md:flex items-center space-x-8 text-earth-800 font-medium">
+      <nav class="hidden md:flex items-center space-x-6 text-earth-800 font-bold text-sm">
         <a href="#pengalaman" class="hover:text-tuku-brown transition-colors">{t('nav.experience')}</a>
         <a href="#proyek" class="hover:text-tuku-brown transition-colors">{t('nav.projects')}</a>
         <a href="#stack" class="hover:text-tuku-brown transition-colors">{t('nav.stack')}</a>
-        <a href="#kontak" class="bg-tuku-brown hover:bg-tuku-dark text-earth-100 px-5 py-2 rounded-full transition-colors">
+        <a href="#cover-letter" class="text-tuku-brown hover:underline transition-colors flex items-center gap-1">
+          <span>✨</span> {t('nav.coverLetter')}
+        </a>
+        <a href={cvUrl} class="hover:text-tuku-brown transition-colors flex items-center gap-1">
+          <FileText size={15} />
+          <span>{t('nav.cv')}</span>
+        </a>
+        <a href="#kontak" class="bg-tuku-brown hover:bg-tuku-dark text-earth-100 px-4 py-2 rounded-xl transition-colors shadow-sm">
           {t('nav.contact')}
         </a>
-      </div>
+      </nav>
       
       {/* Language Toggle (Always Visible) */}
-      <a href={toggleUrl} class="flex items-center px-3 py-1 bg-white border border-earth-200 rounded-full hover:border-tuku-brown transition-colors text-sm font-bold shadow-sm">
+      <a href={toggleUrl} class="flex items-center px-3 py-1.5 bg-white border border-earth-200 rounded-xl hover:border-tuku-brown transition-colors text-xs font-extrabold shadow-sm">
         <span class={lang === 'id' ? 'text-tuku-brown' : 'text-earth-400'}>ID</span>
         <span class="mx-1 text-earth-300">|</span>
         <span class={lang === 'en' ? 'text-tuku-brown' : 'text-earth-400'}>EN</span>
       </a>
-
-      {/* Mobile Menu Button */}
-      <button class="md:hidden text-tuku-dark p-2 -mr-2">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
-      </button>
     </div>
   </div>
 </header>

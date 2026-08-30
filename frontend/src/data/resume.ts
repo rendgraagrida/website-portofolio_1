@@ -24,6 +24,62 @@ export interface Experience {
   jobDesks: JobDesk[];
 }
 
+export interface PersonalProfile {
+  name: string;
+  title: BilingualString;
+  location: string;
+  email: string;
+  phone: string;
+  summary: BilingualString;
+  socials: {
+    linkedin: string;
+    jobstreet: string;
+    github: string;
+  };
+  skills: {
+    category: BilingualString;
+    items: string[];
+  }[];
+}
+
+export const personalProfile: PersonalProfile = {
+  name: 'Rendgra Agrida',
+  title: {
+    id: 'DevOps Engineer & Database Specialist | Tech Lead',
+    en: 'DevOps Engineer & Database Specialist | Technical Lead'
+  },
+  location: 'Bandung, West Java, Indonesia',
+  email: 'rendgraagrida@gmail.com',
+  phone: '(+62) 811-222-9811',
+  summary: {
+    id: 'Profesional IT berpengalaman lebih dari 8 tahun dalam arsitektur database skala enterprise (Oracle, Siebel CRM, LibSQL), otomatisasi data berbasis Python, DevOps CI/CD, serta kepemimpinan teknis proyek lintas divisi.',
+    en: 'Seasoned IT professional with 8+ years of expertise in enterprise-scale database architecture (Oracle, Siebel CRM, LibSQL), Python-driven data automation, DevOps CI/CD pipelines, and cross-functional technical leadership.'
+  },
+  socials: {
+    linkedin: 'https://www.linkedin.com/in/rendgra-a-04a141129/',
+    jobstreet: 'https://id.jobstreet.com/id/profiles/rendgra-agrida-618h19mh5x',
+    github: 'https://github.com/rendgraagrida'
+  },
+  skills: [
+    {
+      category: { id: 'Database & Data Eng', en: 'Database & Data Eng' },
+      items: ['Oracle Database', 'Siebel CRM', 'SQL / PL-SQL Tuning', 'LibSQL / SQLite', 'Drizzle ORM', 'Data Migration']
+    },
+    {
+      category: { id: 'DevOps & Cloud', en: 'DevOps & Cloud' },
+      items: ['Linux Administration', 'Shell / Bash Scripting', 'GitHub Actions (CI/CD)', 'Docker', 'Vercel & Koyeb']
+    },
+    {
+      category: { id: 'Pemrograman & Automasi', en: 'Programming & Automation' },
+      items: ['Python (Data Extraction & OCR)', 'TypeScript', 'Bun / Node.js', 'Elysia API', 'React & Astro']
+    },
+    {
+      category: { id: 'Kepemimpinan & Tata Kelola', en: 'Leadership & Governance' },
+      items: ['Technical Project Planning', 'Cross-Team Coordination', 'Requirement Engineering', 'IT Documentation']
+    }
+  ]
+};
+
 export const experiences: Experience[] = [
   {
     id: 'telkomsigma-tech-lead',
