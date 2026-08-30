@@ -25,5 +25,9 @@
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "@elysiajs/cors": "^1.4.2",
+    "elysia": "^1.4.30"
   }
 }

@@ -1,4 +1,4 @@
-- [ ] Jalankan Type Check & Unit Test.
-- [ ] Buat Dockerfile Backend.
-- [ ] Deploy Frontend ke Vercel.
-- [ ] Deploy Backend ke Koyeb/Render.
+- [x] Jalankan Type Check & Unit Test.
+- [x] Buat Dockerfile Backend.
+- [x] Deploy Frontend ke Vercel.
+- [x] Deploy Backend ke Koyeb/Render.
