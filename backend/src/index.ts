@@ -1,5 +1,7 @@
 import { Elysia } from 'elysia';
 import { cors } from '@elysiajs/cors';
+import { config } from 'dotenv';
+config({ path: '../.env' });
 import { db } from './db';
 import { projects } from './db/schema';
 

@@ -1,38 +1,42 @@
 import { db } from '../../backend/src/db';
 import { projects } from '../../backend/src/db/schema';
 
-const dummyProjects = [
+const myExperiences = [
   { 
-    title: 'Kopi Kenangan App', 
-    description: 'Aplikasi pemesanan kopi yang memudahkan harimu.', 
-    techStack: 'React Native',
+    title: 'Python Data Automation', 
+    description: 'Mengotomatisasi ekstraksi, pembersihan, dan pelaporan data Data Acquisition Unit (DAU) menggunakan Python, meningkatkan efisiensi dan keakuratan analisis data operasional.', 
+    techStack: 'Python, Data Analysis',
     imageUrl: ''
   },
   { 
-    title: 'Toserba Online', 
-    description: 'E-commerce lokal yang membumi dan merakyat.', 
-    techStack: 'Astro + Elysia',
+    title: 'Oracle Database & Siebel CRM Admin', 
+    description: 'Mengelola, memelihara, dan melakukan troubleshooting infrastruktur database skala enterprise untuk mendukung operasi bisnis Telkom Enterprise.', 
+    techStack: 'Oracle DB, Siebel CRM, Linux',
     imageUrl: ''
   },
   { 
-    title: 'POS Kasir', 
-    description: 'Sistem point of sales untuk warung tetangga.', 
-    techStack: 'Vue + Go',
+    title: 'Data Management & Migration', 
+    description: 'Menulis SQL kompleks untuk validasi data, migrasi, dan rekonsiliasi lintas platform antara sistem IndiHome, Tcares, dan Telkomsel.', 
+    techStack: 'SQL, PL/SQL',
     imageUrl: ''
   },
   { 
-    title: 'Buku Tamu Digital', 
-    description: 'Pencatatan tamu lebih praktis.', 
-    techStack: 'Next.js',
+    title: 'Technical Leadership & Planning', 
+    description: 'Mengoordinasikan resource IT, menyusun arsitektur sistem, dan memastikan kelancaran pengiriman proyek lintas divisi dengan dokumentasi teknis standar tinggi.', 
+    techStack: 'Tech Lead, IT Governance',
     imageUrl: ''
   },
 ];
 
 async function seed() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Menghapus data lama...');
   try {
-    await db.insert(projects).values(dummyProjects);
-    console.log('✅ Berhasil menyisipkan dummy data proyek!');
+    // Kosongkan tabel (Hati-hati: Hanya untuk Development/SQLite)
+    await db.delete(projects);
+    
+    console.log('🌱 Memasukkan pengalaman kerja nyata...');
+    await db.insert(projects).values(myExperiences);
+    console.log('✅ Berhasil menyisipkan data pengalaman Rendgra Agrida!');
   } catch (error) {
     console.error('❌ Gagal seed:', error);
   }
