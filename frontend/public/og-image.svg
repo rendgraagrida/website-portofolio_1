@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D2420" />
+      <stop offset="100%" stop-color="#1A1412" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3D322C" />
+      <stop offset="100%" stop-color="#2A221E" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D7CCC8" />
+      <stop offset="50%" stop-color="#A1887F" />
+      <stop offset="100%" stop-color="#8D6E63" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
+
+  <!-- Subtle grid pattern -->
+  <g stroke="#ffffff" stroke-opacity="0.03" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="315" x2="1200" y2="315" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+    <line x1="0" y1="525" x2="1200" y2="525" />
+    <line x1="200" y1="0" x2="200" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+    <line x1="1000" y1="0" x2="1000" y2="630" />
+  </g>
+
+  <!-- Main Central Card -->
+  <rect x="80" y="75" width="1040" height="480" rx="28" fill="url(#cardGrad)" stroke="#795548" stroke-width="2" stroke-opacity="0.4" filter="url(#shadow)" />
+
+  <!-- Top Badge -->
+  <rect x="140" y="130" width="280" height="38" rx="19" fill="#795548" fill-opacity="0.3" stroke="#8D6E63" stroke-width="1.5" />
+  <text x="280" y="155" fill="#D7CCC8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="1.5">
+    PORTFOLIO &amp; SHOWCASE
+  </text>
+
+  <!-- Main Name Title -->
+  <text x="140" y="240" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="58" font-weight="900" letter-spacing="-1">
+    Rendgra Agrida
+  </text>
+
+  <!-- Subtitle / Role -->
+  <text x="140" y="295" fill="url(#goldGrad)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="800" letter-spacing="0.5">
+    Software Engineer &amp; Tech Lead | DevOps Specialist
+  </text>
+
+  <!-- Description paragraph -->
+  <text x="140" y="350" fill="#BCAAA4" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="400">
+    8+ Tahun Pengalaman Enterprise IT • Telkomsigma • PT Putra Sejati Indomakmur
+  </text>
+  <text x="140" y="380" fill="#BCAAA4" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="400">
+    Oracle Database Administration • Python Automation • CI/CD Pipelines • Elysia
+  </text>
+
+  <!-- Skill Badges -->
+  <g transform="translate(140, 440)">
+    <rect x="0" y="0" width="130" height="42" rx="12" fill="#241B17" stroke="#795548" stroke-width="1" />
+    <text x="65" y="26" fill="#EFEBE9" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">🛢️ Oracle DB</text>
+
+    <rect x="145" y="0" width="150" height="42" rx="12" fill="#241B17" stroke="#795548" stroke-width="1" />
+    <text x="220" y="26" fill="#EFEBE9" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">🐍 Python Auto</text>
+
+    <rect x="310" y="0" width="140" height="42" rx="12" fill="#241B17" stroke="#795548" stroke-width="1" />
+    <text x="380" y="26" fill="#EFEBE9" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">🚀 CI/CD &amp; Git</text>
+
+    <rect x="465" y="0" width="140" height="42" rx="12" fill="#241B17" stroke="#795548" stroke-width="1" />
+    <text x="535" y="26" fill="#EFEBE9" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">🐧 Linux Admin</text>
+
+    <rect x="620" y="0" width="160" height="42" rx="12" fill="#241B17" stroke="#795548" stroke-width="1" />
+    <text x="700" y="26" fill="#EFEBE9" font-family="sans-serif" font-size="14" font-weight="700" text-anchor="middle">⚡ Bun &amp; Elysia</text>
+  </g>
+
+  <!-- Right Logo Accent -->
+  <circle cx="1000" cy="220" r="45" fill="#795548" fill-opacity="0.25" stroke="#A1887F" stroke-width="2" />
+  <text x="1000" y="235" font-size="40" text-anchor="middle">☕</text>
+</svg>

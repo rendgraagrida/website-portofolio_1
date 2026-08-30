@@ -1,0 +1,5 @@
+- [x] Buat visual banner OpenGraph beresolusi tinggi 1200x630px di `frontend/public/og-image.svg`.
+- [x] Pasang tag OpenGraph (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`) di `Layout.astro`.
+- [x] Pasang tag Twitter Card (`summary_large_image`) untuk preview di X/Twitter.
+- [x] Tambahkan canonical URL, meta author, keywords, dan `theme-color` `#795548`.
+- [x] Pastikan preview kartu sosial tampil memukau saat dibagikan ke LinkedIn, WhatsApp, dan Telegram.

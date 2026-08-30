@@ -1,25 +1,67 @@
 ---
 import '../styles/global.css';
+import { getLangFromUrl } from '../i18n/utils';
+import { personalProfile } from '../data/resume';
 
 interface Props {
-  title: string;
+  title?: string;
+  description?: string;
+  image?: string;
 }
 
-const { title } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const currentUrl = Astro.url.href;
+
+const defaultTitle = lang === 'en'
+  ? 'Rendgra Agrida - Software Engineer & Tech Lead Portfolio'
+  : 'Rendgra Agrida - Software Engineer & Tech Lead | Portfolio';
+
+const defaultDesc = personalProfile.summary[lang];
+const siteTitle = Astro.props.title || defaultTitle;
+const siteDesc = Astro.props.description || defaultDesc;
+const ogImage = Astro.props.image || '/og-image.svg';
 ---
 
 <!doctype html>
-<html lang="id">
+<html lang={lang} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary Meta Tags -->
+    <title>{siteTitle}</title>
+    <meta name="title" content={siteTitle} />
+    <meta name="description" content={siteDesc} />
+    <meta name="keywords" content="Rendgra Agrida, DevOps Engineer, Oracle Database Administrator, Tech Lead, Python Automation, Bun, Elysia, Astro, Fullstack Developer Indonesia" />
+    <meta name="author" content="Rendgra Agrida" />
+    <meta name="theme-color" content="#795548" />
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={currentUrl} />
+    <meta property="og:site_name" content="Rendgra Agrida Portfolio" />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={siteDesc} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'id_ID'} />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={currentUrl} />
+    <meta name="twitter:title" content={siteTitle} />
+    <meta name="twitter:description" content={siteDesc} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <title>{title}</title>
   </head>
-  <body class="flex flex-col min-h-screen">
+  <body class="flex flex-col min-h-screen bg-tuku-cream text-earth-900 font-sans antialiased">
     <slot />
   </body>
 </html>
