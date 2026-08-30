@@ -1,0 +1,7 @@
+- [x] Buat file otomatisasi CI/CD di `.github/workflows/ci.yml` dengan trigger push, PR, dan manual dispatch.
+- [x] Selesaikan seluruh issue CI/CD dan pastikan seluruh test di GitHub Actions berjalan 100% HIJAU.
+- [x] Tambahkan inisialisasi skema database test otomatis di runner GitHub Actions.
+- [x] Buat panduan master onboarding AI di `.agents/README.md`.
+- [x] Tambahkan standar struktur respon API seragam di `.agents/rules/backend-rules.md`.
+- [x] Tambahkan standar manajemen state Nano Stores di `.agents/rules/frontend-rules.md`.
+- [x] Perbarui SOP Dev Loop di `.agents/workflows/01-dev-loop.md` dengan kewajiban pengecekan port lokal.

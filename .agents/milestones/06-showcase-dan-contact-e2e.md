@@ -1,0 +1,6 @@
+- [x] Tambahkan 5 data repositori GitHub nyata (Trade Apps, AutoTesseract, Frontend Pelacak, Caro Projects, Website Portofolio) ke seed database.
+- [x] Perbarui komponen `ProjectSlider.tsx` agar menyertakan tombol link langsung ke GitHub, badge stack teknologi, dan fallback data andal.
+- [x] Buat skema tabel `messages` di Drizzle ORM (`backend/src/db/schema.ts`).
+- [x] Bangun endpoint `POST /api/contact` di Elysia dengan validasi ketat TypeBox (Anti-XSS).
+- [x] Hubungkan formulir kontak `ContactForm.tsx` di Frontend secara real-time ke backend.
+- [x] Pindahkan port backend portofolio ke `3001` untuk mencegah bentrok dengan port `3000` di komputer lokal.
