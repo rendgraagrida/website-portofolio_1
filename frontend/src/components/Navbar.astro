@@ -1,5 +1,5 @@
 ---
-import { Coffee } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
@@ -7,28 +7,28 @@ const t = useTranslations(lang);
 const toggleUrl = lang === 'id' ? '/en/' : '/';
 ---
 
-<header class="sticky top-0 z-50 bg-tuku-cream/90 backdrop-blur-md border-b border-earth-200">
+<header class="sticky top-0 z-50 bg-brand-cream/90 backdrop-blur-md border-b border-earth-200">
   <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-    <a href={lang === 'id' ? '/' : '/en/'} class="flex items-center gap-2 text-tuku-dark font-extrabold text-xl">
-      <Coffee className="text-tuku-brown" />
-      <span>Rendgra.<span class="text-tuku-brown">Dev</span></span>
+    <a href={lang === 'id' ? '/' : '/en/'} class="flex items-center gap-2 text-brand-dark font-extrabold text-xl">
+      <Terminal className="text-brand-brown" size={22} />
+      <span>Rendgra.<span class="text-brand-brown">Dev</span></span>
     </a>
 
     <div class="flex items-center gap-4">
       <nav class="hidden md:flex items-center space-x-6 text-earth-800 font-bold text-sm">
-        <a href="#pengalaman" class="hover:text-tuku-brown transition-colors">{t('nav.experience')}</a>
-        <a href="#proyek" class="hover:text-tuku-brown transition-colors">{t('nav.projects')}</a>
-        <a href="#stack" class="hover:text-tuku-brown transition-colors">{t('nav.stack')}</a>
-        <a href="#kontak" class="bg-tuku-brown hover:bg-tuku-dark text-earth-100 px-4 py-2 rounded-xl transition-colors shadow-sm">
+        <a href="#pengalaman" class="hover:text-brand-brown transition-colors">{t('nav.experience')}</a>
+        <a href="#proyek" class="hover:text-brand-brown transition-colors">{t('nav.projects')}</a>
+        <a href="#stack" class="hover:text-brand-brown transition-colors">{t('nav.stack')}</a>
+        <a href="#kontak" class="bg-brand-brown hover:bg-brand-dark text-earth-100 px-4 py-2 rounded-xl transition-colors shadow-sm">
           {t('nav.contact')}
         </a>
       </nav>
       
       {/* Language Toggle (Always Visible) */}
-      <a href={toggleUrl} class="flex items-center px-3 py-1.5 bg-white border border-earth-200 rounded-xl hover:border-tuku-brown transition-colors text-xs font-extrabold shadow-sm">
-        <span class={lang === 'id' ? 'text-tuku-brown' : 'text-earth-400'}>ID</span>
+      <a href={toggleUrl} class="flex items-center px-3 py-1.5 bg-white border border-earth-200 rounded-xl hover:border-brand-brown transition-colors text-xs font-extrabold shadow-sm">
+        <span class={lang === 'id' ? 'text-brand-brown' : 'text-earth-400'}>ID</span>
         <span class="mx-1 text-earth-300">|</span>
-        <span class={lang === 'en' ? 'text-tuku-brown' : 'text-earth-400'}>EN</span>
+        <span class={lang === 'en' ? 'text-brand-brown' : 'text-earth-400'}>EN</span>
       </a>
     </div>
   </div>

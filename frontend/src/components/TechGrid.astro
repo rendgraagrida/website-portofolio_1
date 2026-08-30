@@ -4,7 +4,6 @@ import { getLangFromUrl, useTranslations } from '../i18n/utils';
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// Komponen TechGrid Statis
 const mockTechs = [
   { name: 'Python', icon: '🐍' },
   { name: 'Oracle DB', icon: '🛢️' },
@@ -19,14 +18,14 @@ const mockTechs = [
 
 <section id="stack" class="max-w-5xl mx-auto px-6 py-20">
   <div class="mb-12 text-center">
-    <h2 class="text-3xl font-bold text-tuku-dark mb-4">{t('stack.title')}</h2>
+    <h2 class="text-3xl font-bold text-brand-dark mb-4">{t('stack.title')}</h2>
     <p class="text-earth-800 max-w-xl mx-auto">
       {t('stack.desc')}
     </p>
   </div>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
     {mockTechs.map((tech) => (
-      <div class="flex flex-col items-center justify-center p-8 bg-tuku-cream rounded-xl shadow-sm border border-earth-200 hover:shadow-md transition-shadow">
+      <div class="flex flex-col items-center justify-center p-8 bg-brand-cream rounded-xl shadow-sm border border-earth-200 hover:shadow-md transition-shadow">
         <span class="text-4xl mb-4">{tech.icon}</span>
         <span class="font-bold text-earth-800">{tech.name}</span>
       </div>

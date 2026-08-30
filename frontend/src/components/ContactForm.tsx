@@ -30,19 +30,16 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
       });
 
       if (error || !data) {
-        // Jika server backend offline saat static build, tampilkan fallback success/notif
         console.warn("API Error:", error);
         setSuccess(true);
       } else {
         setSuccess(true);
       }
-      // Reset form
       setName('');
       setEmail('');
       setMessage('');
     } catch (err) {
       console.error("Gagal mengirim pesan:", err);
-      // Fallback graceful
       setSuccess(true);
     } finally {
       setIsSubmitting(false);
@@ -52,10 +49,10 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   return (
     <section id="kontak" className="max-w-2xl mx-auto px-6 py-24">
       <div className="text-center mb-10">
-        <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown block mb-2">
+        <span className="text-sm font-bold uppercase tracking-wider text-brand-brown block mb-2">
           {lang === 'id' ? 'Mari Berbincang' : "Let's Connect"}
         </span>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark mb-3">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark mb-3">
           {t['contact.title']}
         </h2>
         <p className="text-earth-800 text-lg max-w-lg mx-auto">
@@ -68,7 +65,7 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
           <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 size={36} />
           </div>
-          <h3 className="font-extrabold text-2xl text-tuku-dark mb-2">
+          <h3 className="font-extrabold text-2xl text-brand-dark mb-2">
             {lang === 'id' ? 'Pesan Berhasil Terkirim! 🎉' : 'Message Sent Successfully! 🎉'}
           </h3>
           <p className="text-earth-700 leading-relaxed max-w-md mx-auto mb-6">
@@ -78,7 +75,7 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
           </p>
           <button 
             onClick={() => setSuccess(false)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-tuku-cream text-tuku-brown border border-tuku-brown/20 hover:bg-tuku-brown hover:text-white rounded-xl font-bold transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-cream text-brand-brown border border-brand-brown/20 hover:bg-brand-brown hover:text-white rounded-xl font-bold transition-all shadow-sm"
           >
             <RefreshCw size={16} />
             {lang === 'id' ? 'Kirim Pesan Lainnya' : 'Send Another Message'}
@@ -94,7 +91,7 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-bold text-tuku-dark mb-2">
+            <label htmlFor="name" className="block text-sm font-bold text-brand-dark mb-2">
               {t['contact.name']} <span className="text-red-500">*</span>
             </label>
             <input 
@@ -103,13 +100,13 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 transition-all" 
+              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 transition-all" 
               placeholder={lang === 'id' ? 'Nama lengkap atau panggilan Anda' : 'Your full or preferred name'} 
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-bold text-tuku-dark mb-2">
+            <label htmlFor="email" className="block text-sm font-bold text-brand-dark mb-2">
               {t['contact.email']} <span className="text-red-500">*</span>
             </label>
             <input 
@@ -118,13 +115,13 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 transition-all" 
+              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 transition-all" 
               placeholder="nama@perusahaan.com" 
             />
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-bold text-tuku-dark mb-2">
+            <label htmlFor="message" className="block text-sm font-bold text-brand-dark mb-2">
               {t['contact.message']} <span className="text-red-500">*</span>
             </label>
             <textarea 
@@ -133,7 +130,7 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
               required
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 transition-all resize-none" 
+              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 transition-all resize-none" 
               placeholder={lang === 'id' ? 'Ceritakan proyek, ide kolaborasi, atau sekadar menyapa...' : 'Tell me about your project, idea, or just say hi...'} 
             ></textarea>
           </div>
@@ -141,12 +138,12 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="w-full py-4 mt-2 bg-tuku-brown hover:bg-tuku-dark text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
+            className="w-full py-4 mt-2 bg-brand-brown hover:bg-brand-dark text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
           >
             {isSubmitting ? (
               <>
                 <RefreshCw size={20} className="animate-spin" />
-                <span>{lang === 'id' ? 'Menyeduh Pesan...' : 'Brewing Message...'}</span>
+                <span>{lang === 'id' ? 'Mengirim Pesan...' : 'Sending Message...'}</span>
               </>
             ) : (
               <>

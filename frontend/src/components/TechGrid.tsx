@@ -39,11 +39,11 @@ export const TechGrid: React.FC<TechGridProps> = ({ lang }) => {
     <div id="stack" className="py-12">
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-10 text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tuku-brown/10 text-tuku-brown text-xs font-bold mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-brown/10 text-brand-brown text-xs font-bold mb-3">
             <Cpu size={15} />
             <span>Tech Stack Overview</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-tuku-dark mb-3 tracking-tight">
+          <h2 className="text-3xl font-extrabold text-brand-dark mb-3 tracking-tight">
             {t['stack.title']}
           </h2>
           <p className="text-earth-800 leading-relaxed text-sm md:text-base">
@@ -55,12 +55,12 @@ export const TechGrid: React.FC<TechGridProps> = ({ lang }) => {
           {techItems.map((tech, index) => (
             <div 
               key={index}
-              className="bg-white p-5 rounded-2xl border border-earth-200/90 shadow-sm hover:shadow-md hover:border-tuku-brown/40 transition-all duration-300 flex flex-col items-center text-center group"
+              className="bg-white p-5 rounded-2xl border border-earth-200/90 shadow-sm hover:shadow-md hover:border-brand-brown/40 transition-all duration-300 flex flex-col items-center text-center group"
             >
               <span className="text-3xl md:text-4xl mb-3 group-hover:scale-110 transition-transform">
                 {tech.icon}
               </span>
-              <h3 className="font-extrabold text-sm md:text-base text-tuku-dark mb-1 group-hover:text-tuku-brown transition-colors">
+              <h3 className="font-extrabold text-sm md:text-base text-brand-dark mb-1 group-hover:text-brand-brown transition-colors">
                 {tech.name}
               </h3>
               <span className="text-xs text-earth-600 font-semibold bg-earth-100/70 px-2.5 py-0.5 rounded-full mt-auto">

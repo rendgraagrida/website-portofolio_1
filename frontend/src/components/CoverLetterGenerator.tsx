@@ -149,16 +149,16 @@ Bandung, West Java, Indonesia
   };
 
   return (
-    <section id="cover-letter" className="py-24 bg-tuku-cream border-t border-earth-200">
+    <section id="cover-letter" className="py-24 bg-brand-cream border-t border-earth-200">
       <div className="max-w-6xl mx-auto px-6">
         
         {/* Header Section */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-tuku-brown/10 text-tuku-brown text-sm font-bold mb-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-brown/10 text-brand-brown text-sm font-bold mb-3">
             <Sparkles size={16} />
             <span>{t['coverLetter.badge']}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark mb-3 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark mb-3 tracking-tight">
             {t['coverLetter.title']}
           </h2>
           <p className="text-earth-800 text-lg leading-relaxed">
@@ -170,8 +170,8 @@ Bandung, West Java, Indonesia
           
           {/* Controls / Inputs Form (5 cols) */}
           <div className="lg:col-span-5 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-earth-200 flex flex-col gap-5">
-            <div className="flex items-center gap-2 text-tuku-dark font-extrabold pb-3 border-b border-earth-100">
-              <Building size={20} className="text-tuku-brown" />
+            <div className="flex items-center gap-2 text-brand-dark font-extrabold pb-3 border-b border-earth-100">
+              <Building size={20} className="text-brand-brown" />
               <span>{lang === 'id' ? 'Kustomisasi Sasaran Lamaran' : 'Customize Target Job'}</span>
             </div>
 
@@ -185,7 +185,7 @@ Bandung, West Java, Indonesia
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder={t['coverLetter.companyPlaceholder']}
-                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 font-medium transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 font-medium transition-all"
               />
             </div>
 
@@ -199,7 +199,7 @@ Bandung, West Java, Indonesia
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder={t['coverLetter.rolePlaceholder']}
-                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 font-medium transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 font-medium transition-all"
               />
             </div>
 
@@ -211,7 +211,7 @@ Bandung, West Java, Indonesia
                 id="target-focus"
                 value={focus}
                 onChange={(e) => setFocus(e.target.value as FocusArea)}
-                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-tuku-brown text-earth-900 font-medium transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 font-medium transition-all"
               >
                 <option value="devops">DevOps, Cloud & Linux Server Admin</option>
                 <option value="database">Enterprise Oracle Database & Siebel CRM</option>
@@ -222,7 +222,7 @@ Bandung, West Java, Indonesia
             </div>
 
             <div className="pt-2 text-xs text-earth-600 bg-earth-100/60 p-3.5 rounded-xl flex items-start gap-2">
-              <UserCheck size={16} className="text-tuku-brown flex-shrink-0 mt-0.5" />
+              <UserCheck size={16} className="text-brand-brown flex-shrink-0 mt-0.5" />
               <span>
                 {lang === 'id' 
                   ? 'Cover letter otomatis ini dirangkai menggunakan data riwayat kerja nyata Anda di Telkomsigma dan PT Putra Sejati Indomakmur.'
@@ -235,15 +235,15 @@ Bandung, West Java, Indonesia
           <div className="lg:col-span-7 bg-white rounded-2xl shadow-md border border-earth-200 overflow-hidden flex flex-col">
             {/* Top Toolbar */}
             <div className="bg-earth-100 px-6 py-4 border-b border-earth-200 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 font-bold text-tuku-dark text-sm">
-                <FileText size={18} className="text-tuku-brown" />
+              <div className="flex items-center gap-2 font-bold text-brand-dark text-sm">
+                <FileText size={18} className="text-brand-brown" />
                 <span>{t['coverLetter.previewTitle']}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-tuku-brown hover:text-white border border-earth-200 rounded-lg text-xs font-bold text-earth-800 transition-all shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-brown hover:text-white border border-earth-200 rounded-lg text-xs font-bold text-earth-800 transition-all shadow-sm"
                 >
                   {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
                   <span>{copied ? t['coverLetter.copied'] : t['coverLetter.copyBtn']}</span>
@@ -251,7 +251,7 @@ Bandung, West Java, Indonesia
 
                 <button
                   onClick={handleDownloadTxt}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-tuku-brown hover:text-white border border-earth-200 rounded-lg text-xs font-bold text-earth-800 transition-all shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-brown hover:text-white border border-earth-200 rounded-lg text-xs font-bold text-earth-800 transition-all shadow-sm"
                   title="Download .TXT"
                 >
                   <Download size={14} />
@@ -260,7 +260,7 @@ Bandung, West Java, Indonesia
 
                 <button
                   onClick={handlePrint}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-tuku-brown hover:bg-tuku-dark text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-brown hover:bg-brand-dark text-white rounded-lg text-xs font-bold transition-all shadow-sm"
                   title="Print PDF"
                 >
                   <Printer size={14} />
@@ -270,14 +270,14 @@ Bandung, West Java, Indonesia
             </div>
 
             {/* Letter Content Preview */}
-            <div className="p-6 md:p-8 overflow-y-auto max-h-[500px] bg-slate-50/50 font-serif text-earth-900 leading-relaxed text-sm md:text-base selection:bg-tuku-brown/20 whitespace-pre-line border-b border-earth-100">
+            <div className="p-6 md:p-8 overflow-y-auto max-h-[500px] bg-slate-50/50 font-serif text-earth-900 leading-relaxed text-sm md:text-base selection:bg-brand-brown/20 whitespace-pre-line border-b border-earth-100">
               {generatedLetter}
             </div>
 
             {/* Footer status */}
             <div className="px-6 py-3 bg-white text-xs text-earth-500 flex justify-between items-center">
               <span>{lang === 'id' ? 'Format Standar Profesional HR & ATS' : 'HR & ATS Compliant Format'}</span>
-              <span className="font-semibold text-tuku-brown">{company}</span>
+              <span className="font-semibold text-brand-brown">{company}</span>
             </div>
           </div>
 

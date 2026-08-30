@@ -86,11 +86,11 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
                 onClick={() => handleTabClick(tab.key)}
                 className={`flex-1 min-w-[140px] md:min-w-0 py-3.5 px-4 md:px-5 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center justify-center gap-2 focus:outline-none select-none ${
                   isActive
-                    ? 'bg-tuku-brown text-white shadow-md transform scale-[1.02]'
-                    : 'text-earth-700 hover:text-tuku-brown hover:bg-white/60'
+                    ? 'bg-brand-brown text-white shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-brand-brown hover:bg-white/60'
                 }`}
               >
-                <span className={isActive ? 'text-white' : 'text-tuku-brown'}>
+                <span className={isActive ? 'text-white' : 'text-brand-brown'}>
                   {tab.icon}
                 </span>
                 <span className="truncate">{tab.label}</span>

@@ -7,26 +7,26 @@ const t = useTranslations(lang);
 const year = new Date().getFullYear();
 ---
 
-<footer class="bg-tuku-dark text-earth-200 py-16 mt-auto border-t border-earth-800">
+<footer class="bg-brand-dark text-earth-200 py-16 mt-auto border-t border-earth-800">
   <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
     
     <div>
-      <h3 class="text-2xl font-bold text-tuku-cream mb-2">{t('footer.title')}</h3>
+      <h3 class="text-2xl font-bold text-brand-cream mb-2">{t('footer.title')}</h3>
       <div class="text-earth-300 space-y-1 text-sm">
         <p>📍 {personalProfile.location}</p>
         <p>📞 {personalProfile.phone}</p>
-        <p>✉️ <a href={`mailto:${personalProfile.email}`} class="hover:text-tuku-cream text-tuku-brown underline">{personalProfile.email}</a></p>
+        <p>✉️ <a href={`mailto:${personalProfile.email}`} class="hover:text-brand-cream text-brand-brown underline">{personalProfile.email}</a></p>
       </div>
     </div>
 
     <div>
-      <h4 class="font-bold text-base mb-3 text-tuku-cream uppercase tracking-wider">{t('footer.socials')}</h4>
+      <h4 class="font-bold text-base mb-3 text-brand-cream uppercase tracking-wider">{t('footer.socials')}</h4>
       <div class="flex flex-wrap md:flex-col gap-3 text-sm text-earth-200">
         <a 
           href={personalProfile.socials.linkedin} 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="hover:text-tuku-cream transition-colors flex items-center gap-2 underline decoration-tuku-brown/40"
+          class="hover:text-brand-cream transition-colors flex items-center gap-2 underline decoration-brand-brown/40"
         >
           <span>LinkedIn (rendgra-a)</span> ↗
         </a>
@@ -34,7 +34,7 @@ const year = new Date().getFullYear();
           href={personalProfile.socials.jobstreet} 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="hover:text-tuku-cream transition-colors flex items-center gap-2 underline decoration-tuku-brown/40"
+          class="hover:text-brand-cream transition-colors flex items-center gap-2 underline decoration-brand-brown/40"
         >
           <span>JobStreet (rendgra-agrida)</span> ↗
         </a>
@@ -42,7 +42,7 @@ const year = new Date().getFullYear();
           href={personalProfile.socials.github} 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="hover:text-tuku-cream transition-colors flex items-center gap-2 underline decoration-tuku-brown/40"
+          class="hover:text-brand-cream transition-colors flex items-center gap-2 underline decoration-brand-brown/40"
         >
           <span>GitHub (rendgraagrida)</span> ↗
         </a>
@@ -52,6 +52,6 @@ const year = new Date().getFullYear();
   </div>
 
   <div class="max-w-5xl mx-auto px-6 mt-12 pt-8 border-t border-earth-800/60 text-center text-xs text-earth-500">
-    &copy; {year} Rendgra Agrida. All rights reserved.
+    &copy; {year} Rendgra Agrida. {t('footer.made')}
   </div>
 </footer>

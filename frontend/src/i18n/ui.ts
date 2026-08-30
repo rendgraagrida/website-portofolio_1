@@ -58,7 +58,7 @@ export const ui = {
     
     'footer.title': 'Mari Ngobrol!',
     'footer.socials': 'Profil Karir & Jejaring',
-    'footer.made': 'Dibuat dengan cinta dan kopi Tuku.',
+    'footer.made': 'Hak Cipta Dilindungi.',
   },
   en: {
     'nav.home': 'Home',
@@ -112,6 +112,6 @@ export const ui = {
 
     'footer.title': 'Let\'s Talk!',
     'footer.socials': 'Career Profiles & Socials',
-    'footer.made': 'Made with love and Tuku coffee.',
+    'footer.made': 'All rights reserved.',
   },
 } as const;

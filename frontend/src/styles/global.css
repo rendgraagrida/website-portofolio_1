@@ -9,9 +9,12 @@
   --color-earth-800: #4a3f35;
   --color-earth-900: #2d261e;
   
-  --color-tuku-cream: #F5F5DC;
-  --color-tuku-brown: #8B4513;
-  --color-tuku-dark: #3E2723;
+  --color-brand-cream: #F5F5DC;
+  --color-brand-brown: #8B4513;
+  --color-brand-dark: #3E2723;
+  
+  /* Alias untuk backward-compatibility */
+  --color-brand-primary: #8B4513;
 }
 
 @layer base {

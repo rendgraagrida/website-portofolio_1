@@ -1,7 +1,7 @@
 import React from 'react';
 import { ui } from '../i18n/ui';
 import { personalProfile } from '../data/resume';
-import { FileText, Sparkles, ExternalLink, ArrowRight } from 'lucide-react';
+import { FileText, Sparkles, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   lang: 'id' | 'en';
@@ -36,7 +36,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
       
       {/* Top Greeting Badge & Social Links */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <span className="inline-block py-1.5 px-4 rounded-full bg-tuku-cream text-tuku-brown text-sm font-bold border border-tuku-brown/20 shadow-sm">
+        <span className="inline-block py-1.5 px-4 rounded-full bg-brand-cream text-brand-brown text-sm font-bold border border-brand-brown/20 shadow-sm">
           {t['hero.greeting']}
         </span>
 
@@ -45,7 +45,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
             href={personalProfile.socials.linkedin} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="p-2 bg-white hover:bg-tuku-brown hover:text-white text-earth-700 border border-earth-200 rounded-full transition-all shadow-sm"
+            className="p-2 bg-white hover:bg-brand-brown hover:text-white text-earth-700 border border-earth-200 rounded-full transition-all shadow-sm"
             title="LinkedIn Profile"
           >
             <LinkedinIcon size={16} />
@@ -54,7 +54,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
             href={personalProfile.socials.jobstreet} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="p-2 bg-white hover:bg-tuku-brown hover:text-white text-earth-700 border border-earth-200 rounded-full transition-all shadow-sm"
+            className="p-2 bg-white hover:bg-brand-brown hover:text-white text-earth-700 border border-earth-200 rounded-full transition-all shadow-sm"
             title="JobStreet Profile"
           >
             <JobstreetIcon size={16} />
@@ -63,7 +63,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
             href={personalProfile.socials.github} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="p-2 bg-white hover:bg-tuku-brown hover:text-white text-earth-700 border border-earth-200 rounded-full transition-all shadow-sm"
+            className="p-2 bg-white hover:bg-brand-brown hover:text-white text-earth-700 border border-earth-200 rounded-full transition-all shadow-sm"
             title="GitHub Profile"
           >
             <GithubIcon size={16} />
@@ -71,9 +71,9 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
         </div>
       </div>
 
-      <h1 className="text-4xl md:text-6xl font-extrabold text-tuku-dark leading-tight mb-6 tracking-tight">
+      <h1 className="text-4xl md:text-6xl font-extrabold text-brand-dark leading-tight mb-6 tracking-tight">
         {t['hero.title']} <br className="hidden md:block" />
-        <span className="text-tuku-brown">{t['hero.titleHighlight']}</span>
+        <span className="text-brand-brown">{t['hero.titleHighlight']}</span>
       </h1>
 
       <p className="text-lg md:text-xl text-earth-800 max-w-2xl leading-relaxed mb-10">
@@ -84,7 +84,7 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
       <div className="flex flex-wrap items-center gap-4">
         <a 
           href="#proyek" 
-          className="inline-flex items-center gap-2 bg-tuku-brown hover:bg-tuku-dark text-earth-100 font-bold py-4 px-8 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 bg-brand-brown hover:bg-brand-dark text-earth-100 font-bold py-4 px-8 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
         >
           <span>{t['hero.cta']}</span>
           <ArrowRight size={18} />
@@ -92,15 +92,15 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
 
         <a 
           href={cvPath}
-          className="inline-flex items-center gap-2 bg-white hover:bg-earth-50 text-tuku-dark border-2 border-earth-300 font-bold py-3.5 px-6 rounded-xl shadow-sm hover:shadow transition-all"
+          className="inline-flex items-center gap-2 bg-white hover:bg-earth-50 text-brand-dark border-2 border-earth-300 font-bold py-3.5 px-6 rounded-xl shadow-sm hover:shadow transition-all"
         >
-          <FileText size={18} className="text-tuku-brown" />
+          <FileText size={18} className="text-brand-brown" />
           <span>{t['hero.downloadCv']}</span>
         </a>
 
         <a 
           href="#cover-letter"
-          className="inline-flex items-center gap-2 bg-tuku-cream hover:bg-earth-200 text-tuku-brown border border-tuku-brown/20 font-bold py-3.5 px-6 rounded-xl shadow-sm transition-all"
+          className="inline-flex items-center gap-2 bg-brand-cream hover:bg-earth-200 text-brand-brown border border-brand-brown/20 font-bold py-3.5 px-6 rounded-xl shadow-sm transition-all"
         >
           <Sparkles size={18} />
           <span>{t['hero.generateLetter']}</span>

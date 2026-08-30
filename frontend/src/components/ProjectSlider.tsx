@@ -108,14 +108,14 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
       <div className="max-w-6xl mx-auto px-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 bg-tuku-brown/10 text-tuku-brown rounded-lg">
+            <div className="p-2 bg-brand-brown/10 text-brand-brown rounded-lg">
               <FolderGit2 size={22} />
             </div>
-            <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown">
+            <span className="text-sm font-bold uppercase tracking-wider text-brand-brown">
               GitHub Projects Showcase
             </span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark tracking-tight">
             {t['projects.title']}
           </h2>
           <p className="text-earth-800 text-base md:text-lg max-w-2xl mt-2 leading-relaxed">
@@ -128,14 +128,14 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
           <button 
             id="swiper-prev-btn" 
             aria-label="Previous Slide"
-            className="p-3 bg-white hover:bg-tuku-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
+            className="p-3 bg-white hover:bg-brand-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
           >
             <ChevronLeft size={20} />
           </button>
           <button 
             id="swiper-next-btn" 
             aria-label="Next Slide"
-            className="p-3 bg-white hover:bg-tuku-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
+            className="p-3 bg-white hover:bg-brand-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
           >
             <ChevronRight size={20} />
           </button>
@@ -190,17 +190,17 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-tuku-cream">
-                          <Code size={36} className="text-tuku-brown/40" />
+                        <div className="w-full h-full flex items-center justify-center bg-brand-cream">
+                          <Code size={36} className="text-brand-brown/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-tuku-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                      <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                         {project.githubUrl && (
                           <a
                             href={project.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-tuku-brown/90 hover:bg-tuku-brown px-3 py-1.5 rounded-lg shadow transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-brown/90 hover:bg-brand-brown px-3 py-1.5 rounded-lg shadow transition-colors"
                           >
                             <GithubIcon size={14} />
                             <span>{lang === 'id' ? 'Buka di GitHub' : 'View on GitHub'}</span>
@@ -210,7 +210,7 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-bold text-tuku-dark mb-2 group-hover:text-tuku-brown transition-colors">
+                    <h3 className="text-xl font-bold text-brand-dark mb-2 group-hover:text-brand-brown transition-colors">
                       {displayTitle}
                     </h3>
                     
@@ -223,7 +223,7 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                         {project.techStack?.split(',').map((tech, i) => (
                           <span 
                             key={i} 
-                            className="inline-block text-xs font-semibold text-tuku-brown bg-tuku-brown/10 px-2.5 py-1 rounded-md"
+                            className="inline-block text-xs font-semibold text-brand-brown bg-brand-brown/10 px-2.5 py-1 rounded-md"
                           >
                             {tech.trim()}
                           </span>
@@ -235,7 +235,7 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-between text-xs font-bold text-earth-700 hover:text-tuku-brown bg-earth-50 hover:bg-earth-100/80 px-3 py-2 rounded-lg transition-colors mt-1"
+                          className="inline-flex items-center justify-between text-xs font-bold text-earth-700 hover:text-brand-brown bg-earth-50 hover:bg-earth-100/80 px-3 py-2 rounded-lg transition-colors mt-1"
                         >
                           <span className="flex items-center gap-1.5">
                             <GithubIcon size={15} />
