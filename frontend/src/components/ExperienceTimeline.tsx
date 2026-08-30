@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { experiences } from '../data/resume';
 import { Briefcase, Calendar, ChevronDown, ChevronUp, CheckCircle, Target } from 'lucide-react';
+import { ui } from '../i18n/ui';
 
-export const ExperienceTimeline: React.FC = () => {
+interface TimelineProps {
+  lang: 'id' | 'en';
+}
+
+export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
+  const t = ui[lang];
   const [expandedDesks, setExpandedDesks] = useState<Record<string, boolean>>({});
 
   const toggleDesk = (id: string) => {
@@ -12,9 +18,9 @@ export const ExperienceTimeline: React.FC = () => {
   return (
     <section id="pengalaman" className="py-20 bg-tuku-cream">
       <div className="max-w-5xl mx-auto px-6 mb-12">
-        <h2 className="text-3xl font-bold text-tuku-dark mb-4">Jejak Profesional</h2>
+        <h2 className="text-3xl font-bold text-tuku-dark mb-4">{t['experience.title']}</h2>
         <p className="text-earth-800">
-          Perjalanan karier dan rekam jejak pekerjaan yang membentuk keahlian saya hari ini.
+          {t['experience.desc']}
         </p>
       </div>
 
@@ -41,14 +47,14 @@ export const ExperienceTimeline: React.FC = () => {
                       )}
                       {exp.companyHighlight && (
                         <span className="text-sm font-normal text-earth-500 mt-1 max-w-lg leading-snug">
-                          {exp.companyHighlight}
+                          {exp.companyHighlight[lang]}
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar size={18} className="text-tuku-brown" />
-                    <span>{exp.period}</span>
+                    <span>{exp.period[lang]}</span>
                   </div>
                 </div>
               </div>
@@ -66,7 +72,7 @@ export const ExperienceTimeline: React.FC = () => {
                         onClick={() => toggleDesk(deskId)}
                         className="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-earth-50 focus:outline-none focus:bg-earth-50 transition-colors"
                       >
-                        <h4 className="font-bold text-lg text-tuku-dark">{desk.title}</h4>
+                        <h4 className="font-bold text-lg text-tuku-dark">{desk.title[lang]}</h4>
                         <div className="text-tuku-brown ml-4 flex-shrink-0">
                           {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
                         </div>
@@ -80,10 +86,10 @@ export const ExperienceTimeline: React.FC = () => {
                           <div className="mt-4 mb-6">
                             <h5 className="flex items-center gap-2 font-bold text-tuku-dark mb-3">
                               <Target size={18} className="text-tuku-brown" />
-                              Key Responsibilities & Tasks
+                              {t['experience.responsibilities']}
                             </h5>
                             <ul className="space-y-2">
-                              {desk.details.tasks.map((task, tIdx) => (
+                              {desk.tasks[lang].map((task, tIdx) => (
                                 <li key={tIdx} className="flex items-start gap-3 text-earth-800">
                                   <span className="text-tuku-brown mt-1">•</span>
                                   <span className="leading-relaxed">{task}</span>
@@ -96,10 +102,10 @@ export const ExperienceTimeline: React.FC = () => {
                           <div>
                             <h5 className="flex items-center gap-2 font-bold text-tuku-dark mb-3">
                               <CheckCircle size={18} className="text-green-600" />
-                              Key Achievements
+                              {t['experience.achievements']}
                             </h5>
                             <ul className="space-y-2">
-                              {desk.details.achievements.map((achievement, aIdx) => (
+                              {desk.achievements[lang].map((achievement, aIdx) => (
                                 <li key={aIdx} className="flex items-start gap-3 text-earth-800">
                                   <span className="text-green-600 mt-1">•</span>
                                   <span className="leading-relaxed">{achievement}</span>

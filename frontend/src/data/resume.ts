@@ -1,11 +1,17 @@
-export interface TaskAchievement {
-  tasks: string[];
-  achievements: string[];
+export interface BilingualList {
+  id: string[];
+  en: string[];
+}
+
+export interface BilingualString {
+  id: string;
+  en: string;
 }
 
 export interface JobDesk {
-  title: string;
-  details: TaskAchievement;
+  title: BilingualString;
+  tasks: BilingualList;
+  achievements: BilingualList;
 }
 
 export interface Experience {
@@ -13,8 +19,8 @@ export interface Experience {
   role: string;
   company: string;
   companyUrl?: string;
-  companyHighlight?: string;
-  period: string;
+  companyHighlight?: BilingualString;
+  period: BilingualString;
   jobDesks: JobDesk[];
 }
 
@@ -24,19 +30,41 @@ export const experiences: Experience[] = [
     role: 'Tech Lead',
     company: 'PT. SIGMA CIPTA CARAKA (TELKOMSIGMA)',
     companyUrl: 'https://www.telkomsigma.co.id/',
-    companyHighlight: 'Perusahaan IT terdepan di Indonesia penyedia solusi infrastruktur, cloud, dan integrasi sistem berskala enterprise.',
-    period: 'August 2025 – December 2026',
+    companyHighlight: {
+      id: 'Perusahaan IT terdepan di Indonesia penyedia solusi infrastruktur, cloud, dan integrasi sistem berskala enterprise.',
+      en: 'Leading IT company in Indonesia providing enterprise-scale infrastructure, cloud, and system integration solutions.'
+    },
+    period: {
+      id: 'Agustus 2025 – Desember 2026',
+      en: 'August 2025 – December 2026'
+    },
     jobDesks: [
       {
-        title: 'Technical Planning & Requirement Management',
-        details: {
-          tasks: [
+        title: {
+          id: 'Perencanaan Teknis & Manajemen Kebutuhan',
+          en: 'Technical Planning & Requirement Management'
+        },
+        tasks: {
+          id: [
+            'Menganalisis kebutuhan bisnis dan teknis untuk menentukan solusi teknologi dan pendekatan implementasi yang tepat.',
+            'Menyiapkan kebutuhan teknis, dokumentasi teknis, dan rencana sumber daya IT untuk mendukung aktivitas proyek dan operasional.',
+            'Menerjemahkan kebutuhan bisnis menjadi kebutuhan teknis, aktivitas implementasi, ketergantungan, dan kebutuhan sumber daya.',
+            'Meninjau kebutuhan teknis dan rencana implementasi untuk memastikan keselarasan dengan tujuan bisnis dan lingkungan IT yang ada.'
+          ],
+          en: [
             'Analyzed business and technical requirements to define appropriate technology solutions and implementation approaches.',
             'Prepared technical requirements, technical documentation, and IT resource plans to support project and operational activities.',
             'Translated business requirements into technical requirements, implementation activities, dependencies, and resource needs.',
             'Reviewed technical requirements and implementation plans to ensure alignment with business objectives and existing IT environments.'
+          ]
+        },
+        achievements: {
+          id: [
+            'Meningkatkan struktur dan kejelasan kebutuhan teknis, membuatnya lebih mudah dieksekusi oleh tim teknis.',
+            'Mendukung keselarasan yang lebih baik antara kebutuhan bisnis dan implementasi teknis.',
+            'Meningkatkan persiapan proyek melalui perencanaan teknis, identifikasi sumber daya, dan dokumentasi yang lebih terstruktur.'
           ],
-          achievements: [
+          en: [
             'Improved the structure and clarity of technical requirements, making them easier for technical teams to execute.',
             'Supported better alignment between business requirements and technical implementation.',
             'Improved project preparation through more structured technical planning, resource identification, and documentation.'
@@ -44,65 +72,34 @@ export const experiences: Experience[] = [
         }
       },
       {
-        title: 'Technical Leadership & Team Coordination',
-        details: {
-          tasks: [
+        title: {
+          id: 'Kepemimpinan Teknis & Koordinasi Tim',
+          en: 'Technical Leadership & Team Coordination'
+        },
+        tasks: {
+          id: [
+            'Mengoordinasikan aktivitas teknis di seluruh tim IT terkait untuk mendukung implementasi proyek dan aktivitas operasional.',
+            'Memberikan arahan dan panduan teknis kepada anggota tim selama aktivitas implementasi dan pemecahan masalah.',
+            'Memfasilitasi komunikasi antara tim teknis, pemangku kepentingan proyek, dan pengguna bisnis.',
+            'Mengidentifikasi ketergantungan teknis, kebutuhan implementasi, dan potensi masalah yang dapat memengaruhi penyampaian proyek.'
+          ],
+          en: [
             'Coordinated technical activities across relevant IT teams to support project implementation and operational activities.',
             'Provided technical direction and guidance to team members during implementation and problem-solving activities.',
             'Facilitated communication between technical teams, project stakeholders, and business users.',
             'Identified technical dependencies, implementation requirements, and potential issues that could affect project delivery.'
+          ]
+        },
+        achievements: {
+          id: [
+            'Meningkatkan koordinasi antara tim teknis dan pemangku kepentingan selama aktivitas proyek dan operasional.',
+            'Mendukung eksekusi aktivitas teknis yang lebih terstruktur dengan memperjelas tanggung jawab, kebutuhan, dan ketergantungan.',
+            'Meningkatkan kolaborasi lintas tim melalui komunikasi dan koordinasi teknis yang efektif.'
           ],
-          achievements: [
+          en: [
             'Improved coordination between technical teams and stakeholders during project and operational activities.',
             'Supported more structured execution of technical activities by clarifying responsibilities, requirements, and dependencies.',
             'Improved collaboration across teams through effective communication and technical coordination.'
-          ]
-        }
-      },
-      {
-        title: 'Solution Design & Technical Review',
-        details: {
-          tasks: [
-            'Reviewed proposed technical solutions against business requirements, existing infrastructure, application environments, and operational needs.',
-            'Participated in technical discussions related to application, infrastructure, database, and enterprise IT solutions.',
-            'Evaluated technical approaches and identified potential implementation constraints, dependencies, and operational considerations.',
-            'Provided technical recommendations to support solution selection and implementation planning.'
-          ],
-          achievements: [
-            'Supported the selection of technical solutions that were aligned with business and operational requirements.',
-            'Reduced potential implementation issues by identifying technical dependencies and constraints during the planning stage.',
-            'Improved solution readiness through structured technical review and assessment.'
-          ]
-        }
-      },
-      {
-        title: 'IT Resource & Capacity Planning',
-        details: {
-          tasks: [
-            'Prepared IT resource plans covering required technical resources, infrastructure, applications, and supporting components.',
-            'Identified resource requirements based on project scope, technical architecture, implementation activities, and operational needs.',
-            'Coordinated resource requirements with relevant technical teams and stakeholders.',
-            'Supported planning of resource allocation for project and operational activities.'
-          ],
-          achievements: [
-            'Improved visibility of technical resource requirements during project planning.',
-            'Supported more effective resource allocation based on project requirements and technical dependencies.',
-            'Reduced the risk of resource gaps during implementation by identifying requirements earlier in the planning process.'
-          ]
-        }
-      },
-      {
-        title: 'Technical Documentation & Governance',
-        details: {
-          tasks: [
-            'Prepared and maintained technical documentation, implementation plans, technical specifications, and operational guidelines.',
-            'Established structured documentation for technical requirements, implementation activities, and system configurations.',
-            'Reviewed technical documentation prepared by team members to ensure consistency and completeness.'
-          ],
-          achievements: [
-            'Improved consistency and quality of technical documentation.',
-            'Strengthened knowledge transfer between technical teams and operational support teams.',
-            'Improved maintainability of project and operational knowledge through structured documentation.'
           ]
         }
       }
@@ -113,77 +110,72 @@ export const experiences: Experience[] = [
     role: 'Dev-Ops',
     company: 'PT. SIGMA CIPTA CARAKA (TELKOMSIGMA)',
     companyUrl: 'https://www.telkomsigma.co.id/',
-    companyHighlight: 'Perusahaan IT terdepan di Indonesia penyedia solusi infrastruktur, cloud, dan integrasi sistem berskala enterprise.',
-    period: 'August 2017 – August 2025',
+    companyHighlight: {
+      id: 'Perusahaan IT terdepan di Indonesia penyedia solusi infrastruktur, cloud, dan integrasi sistem berskala enterprise.',
+      en: 'Leading IT company in Indonesia providing enterprise-scale infrastructure, cloud, and system integration solutions.'
+    },
+    period: {
+      id: 'Agustus 2017 – Agustus 2025',
+      en: 'August 2017 – August 2025'
+    },
     jobDesks: [
       {
-        title: 'Oracle Database & Siebel CRM Administration',
-        details: {
-          tasks: [
+        title: {
+          id: 'Administrasi Database Oracle & Siebel CRM',
+          en: 'Oracle Database & Siebel CRM Administration'
+        },
+        tasks: {
+          id: [
+            'Mengelola lingkungan Oracle Database dan Oracle Siebel CRM yang mendukung operasi bisnis perusahaan.',
+            'Menginstal, mengonfigurasi, mengkloning, dan memelihara server Oracle Siebel CRM di seluruh lingkungan pengembangan, pengujian, dan produksi.',
+            'Melakukan pemeliharaan database, troubleshooting SQL, validasi data, analisis performa, serta aktivitas backup dan pemulihan.'
+          ],
+          en: [
             'Administered Oracle Database and Oracle Siebel CRM environments supporting enterprise business operations.',
             'Installed, configured, cloned, and maintained Oracle Siebel CRM servers across development, testing, and production environments.',
-            'Supported Siebel CRM environments for Telkom Enterprise, Wholesale, and Retail business operations.',
-            'Performed database maintenance, SQL troubleshooting, data validation, performance analysis, backup, and recovery activities.',
-            'Monitored enterprise applications, Oracle databases, and Linux servers to identify operational issues.'
+            'Performed database maintenance, SQL troubleshooting, data validation, performance analysis, backup, and recovery activities.'
+          ]
+        },
+        achievements: {
+          id: [
+            'Mempertahankan stabilitas lingkungan aplikasi dan database perusahaan dengan gangguan layanan yang minimal.',
+            'Mempercepat penerapan lingkungan (deployment) melalui prosedur instalasi dan kloning server yang berulang (repeatable).',
+            'Meningkatkan efisiensi pemecahan masalah (troubleshooting) dengan menggabungkan analisis database dan pemantauan aplikasi.'
           ],
-          achievements: [
+          en: [
             'Maintained stable enterprise application and database environments with minimal service interruptions.',
-            'Improved consistency between development, testing, and production environments through standardized installation and configuration activities.',
             'Accelerated environment deployment through repeatable server installation and cloning procedures.',
             'Improved troubleshooting efficiency by combining database analysis, application monitoring, and system log analysis.'
           ]
         }
       },
       {
-        title: 'Process Automation & Scripting',
-        details: {
-          tasks: [
+        title: {
+          id: 'Otomatisasi Proses & Scripting',
+          en: 'Process Automation & Scripting'
+        },
+        tasks: {
+          id: [
+            'Mengembangkan skrip Python dan Shell/Bash untuk mengotomatisasi administrasi sistem, pemrosesan data, pelaporan, dan aktivitas operasional.',
+            'Mengidentifikasi proses manual yang berulang dan mengembangkan solusi otomatisasi untuk meningkatkan efisiensi operasional.',
+            'Mengotomatisasi aktivitas pemrosesan data untuk mengurangi intervensi manual dan meningkatkan konsistensi proses.'
+          ],
+          en: [
             'Developed Python and Shell/Bash scripts to automate system administration, data processing, monitoring, reporting, and operational activities.',
             'Identified repetitive manual processes and developed automation solutions to improve operational efficiency.',
-            'Created reusable scripts for system checks, data validation, reporting, and operational support.',
             'Automated data-processing activities to reduce manual intervention and improve process consistency.'
+          ]
+        },
+        achievements: {
+          id: [
+            'Mengurangi aktivitas manual yang berulang melalui otomatisasi proses.',
+            'Meminimalkan *human error* dengan mengganti tugas operasional manual dengan skrip standar dan proses terotomatisasi.',
+            'Meningkatkan standardisasi proses melalui skrip otomatisasi dan alat operasional yang dapat digunakan kembali.'
           ],
-          achievements: [
+          en: [
             'Reduced repetitive manual activities through process automation.',
             'Minimized human error by replacing manual operational tasks with standardized scripts and automated processes.',
-            'Improved operational efficiency by enabling technical teams to perform recurring activities more consistently.',
             'Increased process standardization through reusable automation scripts and operational tools.'
-          ]
-        }
-      },
-      {
-        title: 'Data Management & Data Migration',
-        details: {
-          tasks: [
-            'Developed and executed SQL queries for data validation, reporting, troubleshooting, reconciliation, and database maintenance.',
-            'Performed data migration and validation between Telkom Tcares customer data and Siebel Wholesale platforms.',
-            'Performed data migration and validation between Telkom IndiHome customer data and Telkomsel platforms.',
-            'Performed data migration and validation between Telkom Wholesale customer data and Telkom Infrastructure platforms.',
-            'Performed data validation and reconciliation to verify data accuracy, integrity, completeness, and consistency.'
-          ],
-          achievements: [
-            'Supported successful large-scale data migration activities with accurate and reliable data transfer.',
-            'Improved data quality by identifying inconsistencies during validation and reconciliation activities.',
-            'Reduced migration-related risks through systematic data validation before and after migration.',
-            'Improved reliability of migrated customer data across enterprise platforms.'
-          ]
-        }
-      },
-      {
-        title: 'System Monitoring & Troubleshooting',
-        details: {
-          tasks: [
-            'Monitored Linux servers, Oracle databases, and enterprise applications using system monitoring and log-analysis tools.',
-            'Utilized Splunk and AppDynamics to monitor application and infrastructure performance.',
-            'Investigated application, database, server, and network incidents using structured troubleshooting and root cause analysis.',
-            'Analyzed system logs to identify abnormal behavior, errors, performance issues, and potential service disruptions.',
-            'Provided Level 2/Level 3 technical support for enterprise applications and infrastructure.'
-          ],
-          achievements: [
-            'Enabled earlier identification of potential system issues before they significantly affected business operations.',
-            'Reduced troubleshooting time through structured log analysis and root cause investigation.',
-            'Improved system availability by resolving application, database, infrastructure, and network-related incidents.',
-            'Supported operational continuity by resolving complex technical issues within required service levels.'
           ]
         }
       }
@@ -194,42 +186,42 @@ export const experiences: Experience[] = [
     role: 'Engineer',
     company: 'PT. PUTRA SEJATI INDOMAKMUR',
     companyUrl: 'https://psi-oilservices.com/',
-    companyHighlight: 'Perusahaan penyedia jasa layanan eksplorasi dan produksi minyak bumi terkemuka.',
-    period: 'Juli 2016 – Juli 2017',
+    companyHighlight: {
+      id: 'Perusahaan penyedia jasa layanan eksplorasi dan produksi minyak bumi terkemuka.',
+      en: 'A leading provider of oil exploration and production services.'
+    },
+    period: {
+      id: 'Juli 2016 – Juli 2017',
+      en: 'July 2016 – July 2017'
+    },
     jobDesks: [
       {
-        title: 'Python Data Automation & Analysis',
-        details: {
-          tasks: [
+        title: {
+          id: 'Otomatisasi & Analisis Data Python',
+          en: 'Python Data Automation & Analysis'
+        },
+        tasks: {
+          id: [
+            'Mengembangkan skrip Python untuk mengotomatisasi ekstraksi, pembersihan, transformasi, analisis, dan pelaporan data Data Acquisition Unit (DAU).',
+            'Memvalidasi dan menganalisis dataset DAU untuk memastikan keakuratan, integritas, dan konsistensi data.',
+            'Mengembangkan alat pelaporan dan visualisasi berbasis Python yang dapat digunakan kembali untuk tim teknik dan operasional.'
+          ],
+          en: [
             'Developed Python scripts to automate data extraction, cleansing, transformation, analysis, and reporting of Data Acquisition Unit (DAU) data.',
             'Validated and analyzed DAU datasets to ensure data accuracy, integrity, and consistency.',
-            'Monitored system-generated data and investigated abnormal readings and data anomalies.',
             'Developed reusable Python-based reporting and visualization tools for engineering and operational teams.'
+          ]
+        },
+        achievements: {
+          id: [
+            'Mengotomatisasi aktivitas pemrosesan data yang berulang, mengurangi upaya manual dan meningkatkan efisiensi pelaporan.',
+            'Meningkatkan kualitas data dengan mengidentifikasi dan menyelesaikan inkonsistensi data sebelum dilaporkan.',
+            'Menstandardisasi aktivitas pelaporan melalui alat pelaporan dan visualisasi berbasis Python.'
           ],
-          achievements: [
+          en: [
             'Automated repetitive data-processing activities, reducing manual effort and improving reporting efficiency.',
             'Improved data quality by identifying and resolving data inconsistencies before reporting.',
-            'Enabled faster identification and investigation of abnormal data through systematic analysis.',
-            'Standardized reporting activities through reusable Python-based reporting and visualization tools.',
-            'Improved availability of timely and consistent analytical information for engineering and operational decision-making.'
-          ]
-        }
-      },
-      {
-        title: 'Industrial Sensor Installation & Automation',
-        details: {
-          tasks: [
-            'Installed and configured Autonics industrial sensors for production and automation systems according to technical specifications.',
-            'Performed sensor calibration, testing, and commissioning before production deployment.',
-            'Diagnosed and resolved sensor installation, wiring, and communication issues.',
-            'Read and interpreted electrical wiring diagrams to ensure accurate installation.',
-            'Collaborated with engineering and maintenance teams during sensor deployment and system integration.'
-          ],
-          achievements: [
-            'Successfully completed sensor installation and commissioning with minimal disruption to operational activities.',
-            'Improved measurement accuracy through proper sensor calibration and testing.',
-            'Reduced troubleshooting time through systematic identification and correction of installation and communication issues.',
-            'Supported successful automation project delivery by ensuring sensors were properly installed, tested, and operational.'
+            'Standardized reporting activities through reusable Python-based reporting and visualization tools.'
           ]
         }
       }

@@ -7,16 +7,19 @@ import { Hero } from '../components/Hero';
 import { ExperienceTimeline } from '../components/ExperienceTimeline';
 import { ProjectSlider } from '../components/ProjectSlider';
 import { ContactForm } from '../components/ContactForm';
+import { getLangFromUrl } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
 ---
 
 <Layout title="Tetangga Baru - Web Portofolio">
   <Navbar />
   <main class="flex-grow">
-    <Hero />
-    <ExperienceTimeline client:visible />
-    <ProjectSlider client:visible />
+    <Hero lang={lang} />
+    <ExperienceTimeline lang={lang} client:visible />
+    <ProjectSlider lang={lang} client:visible />
     <TechGrid />
-    <ContactForm client:visible />
+    <ContactForm lang={lang} client:visible />
   </main>
   <Footer />
 </Layout>
