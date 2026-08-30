@@ -1,0 +1,28 @@
+---
+// Komponen TechGrid Statis
+const mockTechs = [
+  { name: 'Astro', icon: '🚀' },
+  { name: 'React', icon: '⚛️' },
+  { name: 'Bun', icon: '🥟' },
+  { name: 'Elysia', icon: '🦊' },
+  { name: 'Drizzle', icon: '💧' },
+  { name: 'Turso', icon: '🛢️' },
+];
+---
+
+<section id="stack" class="max-w-5xl mx-auto px-6 py-20">
+  <div class="mb-12 text-center">
+    <h2 class="text-3xl font-bold text-tuku-dark mb-4">Tech Stack & Peralatan</h2>
+    <p class="text-earth-800 max-w-xl mx-auto">
+      Bahan-bahan berkualitas yang saya gunakan untuk meracik aplikasi.
+    </p>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+    {mockTechs.map((tech) => (
+      <div class="flex flex-col items-center justify-center p-8 bg-tuku-cream rounded-xl shadow-sm border border-earth-200 hover:shadow-md transition-shadow">
+        <span class="text-4xl mb-4">{tech.icon}</span>
+        <span class="font-bold text-earth-800">{tech.name}</span>
+      </div>
+    ))}
+  </div>
+</section>

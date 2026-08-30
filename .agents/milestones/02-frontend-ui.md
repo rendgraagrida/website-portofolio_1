@@ -1,4 +1,6 @@
-- [ ] Navbar & Footer.
-- [ ] Hero Sapaan.
-- [ ] Project Slider.
-- [ ] Tech Grid.
+- [ ] Import Font & Warna Tuku di Tailwind.
+- [ ] Buat Navbar & Footer statis.
+- [ ] Buat HeroSection.tsx.
+- [ ] Install Swiper.js & buat ProjectSlider.tsx.
+- [ ] Buat TechGrid.astro.
+- [ ] Buat ContactForm.tsx.

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --font-sans: "Outfit", "Inter", sans-serif;
+  
   --color-earth-100: #f4f1ea;
   --color-earth-200: #e3dcc8;
   --color-earth-500: #8c7b65;
@@ -14,6 +16,6 @@
 
 @layer base {
   body {
-    @apply bg-earth-100 text-earth-900 antialiased;
+    @apply bg-earth-100 text-earth-900 antialiased font-sans;
   }
 }

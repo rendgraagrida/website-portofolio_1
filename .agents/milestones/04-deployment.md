@@ -1,2 +1,4 @@
-- [ ] Setup Unit Test akhir.
-- [ ] Deploy Vercel (FE) & Koyeb (BE).
+- [ ] Jalankan Type Check & Unit Test.
+- [ ] Buat Dockerfile Backend.
+- [ ] Deploy Frontend ke Vercel.
+- [ ] Deploy Backend ke Koyeb/Render.

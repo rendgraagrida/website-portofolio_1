@@ -1,1 +1,1 @@
-Tempat menulis Implementation Plan (detail teknis arsitektur) sebelum koding dimulai.
+Tempat merancang arsitektur (Implementation Plan) sebelum koding

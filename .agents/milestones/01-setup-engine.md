@@ -1,2 +1,5 @@
-- [ ] Inisiasi Astro & Elysia.
-- [ ] Konek Drizzle ke Turso.
+- [ ] Inisiasi folder frontend/ & backend/.
+- [ ] Frontend: Install Astro, React, Tailwind, Strict TS.
+- [ ] Backend: Install Bun, Elysia, Drizzle, LibSQL.
+- [ ] Buat .env.
+- [ ] Tes jalankan kedua server.
