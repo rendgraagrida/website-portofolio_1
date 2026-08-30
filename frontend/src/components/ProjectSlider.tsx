@@ -6,54 +6,85 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { api, type ProjectData } from '../lib/eden';
 import { ui } from '../i18n/ui';
-import { Code, Database, Server, Cpu } from 'lucide-react';
+import { Code, ExternalLink, FolderGit2, GitBranch } from 'lucide-react';
 
 interface ProjectSliderProps {
   lang: 'id' | 'en';
 }
 
-const DEFAULT_PROJECTS: ProjectData[] = [
+const GithubIcon: React.FC<{ size?: number; className?: string }> = ({ size = 16, className = "" }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
+
+const GITHUB_PROJECTS_FALLBACK: ProjectData[] = [
   {
     id: 1,
-    title: 'Python Data Acquisition & Automation',
-    titleEn: 'Python Data Acquisition & Automation',
-    description: 'Mengembangkan sistem automasi ekstraksi, cleansing, dan visualisasi data operasional sumur minyak DAU secara presisi.',
-    descriptionEn: 'Developed an automated pipeline for extracting, cleansing, and visualizing DAU oil exploration data with high precision.',
-    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
-    techStack: 'Python, Pandas, Automation, Data Analysis'
+    title: 'Trade Apps Backend (Crypto & Wallet Tracker)',
+    titleEn: 'Trade Apps Backend (Crypto & Wallet Tracker)',
+    description: 'Aplikasi backend untuk melacak wallet cryptocurrency, analisis koin potensial, dan agregasi data historis transaksi finansial.',
+    descriptionEn: 'Backend system designed to track crypto wallets, analyze coin metrics, and aggregate historical financial transaction data.',
+    imageUrl: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80',
+    githubUrl: 'https://github.com/rendgraagrida/trade-apps-backend',
+    techStack: 'JavaScript, Node.js, Web3, Crypto API'
   },
   {
     id: 2,
-    title: 'Enterprise Oracle & Siebel CRM Optimization',
-    titleEn: 'Enterprise Oracle & Siebel CRM Optimization',
-    description: 'Arsitektur pemeliharaan database skala enterprise, tuning query SQL performa tinggi, dan otomatisasi server deployment.',
-    descriptionEn: 'Enterprise-scale database maintenance architecture, high-performance SQL query tuning, and automated server deployments.',
-    imageUrl: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80',
-    techStack: 'Oracle DB, Siebel CRM, PL/SQL, Linux'
+    title: 'AutoTesseract (Automated Quiz & OCR Engine)',
+    titleEn: 'AutoTesseract (Automated Quiz & OCR Engine)',
+    description: 'Otomatisasi pengisian kuis dan ekstraksi data teks gambar secara presisi menggunakan teknologi OCR Python.',
+    descriptionEn: 'Intelligent automation tool for quiz solving and image text extraction using Python OCR technology.',
+    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+    githubUrl: 'https://github.com/rendgraagrida/AutoTesseract',
+    techStack: 'Python, OCR, Tesseract, Automation'
   },
   {
     id: 3,
-    title: 'Cross-System Data Reconciliation Engine',
-    titleEn: 'Cross-System Data Reconciliation Engine',
-    description: 'Skrip validasi & rekonsiliasi data skala jutaan baris lintas sistem Telkomsel, IndiHome, dan TCares tanpa downtime.',
-    descriptionEn: 'Data validation & reconciliation scripts handling millions of records across Telkomsel, IndiHome, and TCares systems with zero downtime.',
-    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-    techStack: 'SQL, Bash, Python, ETL'
+    title: 'Frontend Pelacak App (Asset Tracking UI)',
+    titleEn: 'Frontend Pelacak App (Asset Tracking UI)',
+    description: 'Dashboard antarmuka modern untuk pelacakan transaksi, monitoring metrik portofolio, dan visualisasi data aset.',
+    descriptionEn: 'Modern UI dashboard for transaction tracking, portfolio metrics monitoring, and asset data visualization.',
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    githubUrl: 'https://github.com/rendgraagrida/frontend-pelacak-app',
+    techStack: 'TypeScript, React, TailwindCSS'
   },
   {
     id: 4,
-    title: 'DevOps Automated Monitoring & Scripting',
-    titleEn: 'DevOps Automated Monitoring & Scripting',
-    description: 'Otomatisasi pemantauan kesehatan server berkala, failover detection, dan auto-healing scripts untuk sistem kritikal.',
-    descriptionEn: 'Automated routine server health monitoring, failover detection, and auto-healing scripts for mission-critical systems.',
-    imageUrl: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80',
-    techStack: 'Shell Scripting, Linux Admin, CI/CD'
+    title: 'Caro Projects (Robinhood Chain DApp)',
+    titleEn: 'Caro Projects (Robinhood Chain DApp)',
+    description: 'Eksplorasi aplikasi terdesentralisasi (DApp) dan smart contract pada ekosistem blockchain Robinhood Chain.',
+    descriptionEn: 'Decentralized application (DApp) and smart contract implementation built on the Robinhood Chain blockchain ecosystem.',
+    imageUrl: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=800&q=80',
+    githubUrl: 'https://github.com/rendgraagrida/caro-projects',
+    techStack: 'Solidity, Web3.js, Blockchain'
+  },
+  {
+    id: 5,
+    title: 'Website Portofolio Enterprise & Master Template',
+    titleEn: 'Enterprise Portfolio & Master Template',
+    description: 'Website portofolio fullstack performa tinggi dengan Astro, React, Elysia, LibSQL, dan arsitektur Master Template AI.',
+    descriptionEn: 'High-performance fullstack portfolio website built with Astro, React, Elysia, LibSQL, and AI Master Template architecture.',
+    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+    githubUrl: 'https://github.com/rendgraagrida/website-portofolio_1',
+    techStack: 'Astro, React, Elysia, Bun, SQLite'
   }
 ];
 
 export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
   const t = ui[lang];
-  const [projects, setProjects] = useState<ProjectData[]>(DEFAULT_PROJECTS);
+  const [projects, setProjects] = useState<ProjectData[]>(GITHUB_PROJECTS_FALLBACK);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -64,7 +95,7 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
           setProjects(data);
         }
       } catch (err) {
-        console.warn("Menggunakan fallback data proyek:", err);
+        console.warn("Menggunakan fallback data GitHub projects:", err);
       } finally {
         setLoading(false);
       }
@@ -75,11 +106,13 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
   return (
     <section id="proyek" className="py-24 bg-earth-100/60">
       <div className="max-w-6xl mx-auto px-6 mb-12">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-2 mb-3">
           <div className="p-2 bg-tuku-brown/10 text-tuku-brown rounded-lg">
-            <Cpu size={22} />
+            <FolderGit2 size={22} />
           </div>
-          <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown">Portfolio Showcase</span>
+          <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown">
+            GitHub Projects & Repositories
+          </span>
         </div>
         <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark mb-3 tracking-tight">
           {t['projects.title']}
@@ -92,7 +125,7 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
       <div className="max-w-6xl mx-auto px-6">
         {loading ? (
           <div className="text-center py-20 text-earth-800 font-bold">
-            {lang === 'id' ? 'Sedang menyeduh data proyek...' : 'Loading projects...'}
+            {lang === 'id' ? 'Sedang memuat data repositori...' : 'Loading repositories...'}
           </div>
         ) : (
           <Swiper
@@ -128,7 +161,20 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                           <Code size={36} className="text-tuku-brown/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-tuku-dark/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-tuku-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-tuku-brown/90 hover:bg-tuku-brown px-3 py-1.5 rounded-lg shadow transition-colors"
+                          >
+                            <GithubIcon size={14} />
+                            <span>{lang === 'id' ? 'Buka di GitHub' : 'View on GitHub'}</span>
+                            <ExternalLink size={12} />
+                          </a>
+                        )}
+                      </div>
                     </div>
 
                     <h3 className="text-xl font-bold text-tuku-dark mb-2 group-hover:text-tuku-brown transition-colors">
@@ -139,15 +185,32 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                       {displayDesc}
                     </p>
                     
-                    <div className="mt-auto pt-4 border-t border-earth-100 flex flex-wrap gap-1.5">
-                      {project.techStack?.split(',').map((tech, i) => (
-                        <span 
-                          key={i} 
-                          className="inline-block text-xs font-semibold text-tuku-brown bg-tuku-brown/10 px-2.5 py-1 rounded-md"
+                    <div className="mt-auto pt-4 border-t border-earth-100 flex flex-col gap-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.techStack?.split(',').map((tech, i) => (
+                          <span 
+                            key={i} 
+                            className="inline-block text-xs font-semibold text-tuku-brown bg-tuku-brown/10 px-2.5 py-1 rounded-md"
+                          >
+                            {tech.trim()}
+                          </span>
+                        ))}
+                      </div>
+
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-between text-xs font-bold text-earth-700 hover:text-tuku-brown bg-earth-50 hover:bg-earth-100/80 px-3 py-2 rounded-lg transition-colors mt-1"
                         >
-                          {tech.trim()}
-                        </span>
-                      ))}
+                          <span className="flex items-center gap-1.5">
+                            <GithubIcon size={15} />
+                            <span>{project.githubUrl.replace('https://github.com/', '')}</span>
+                          </span>
+                          <ExternalLink size={13} />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </SwiperSlide>

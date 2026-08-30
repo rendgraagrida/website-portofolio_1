@@ -14,6 +14,7 @@ export interface ProjectData {
   description: string | null;
   descriptionEn: string | null;
   imageUrl: string | null;
+  githubUrl: string | null;
   techStack: string | null;
 }
 

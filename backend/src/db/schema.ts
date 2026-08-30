@@ -8,7 +8,8 @@ export const projects = sqliteTable('projects', {
   description: text('description'),
   descriptionEn: text('description_en'),
   imageUrl: text('image_url'),
-  techStack: text('tech_stack'), // Disimpan sebagai comma-separated string atau JSON
+  githubUrl: text('github_url'),
+  techStack: text('tech_stack'), // Disimpan sebagai comma-separated string
 });
 
 // Skema untuk pesan kontak (Contact Form)
