@@ -1,5 +1,5 @@
-- [ ] Inisiasi folder frontend/ & backend/.
-- [ ] Frontend: Install Astro, React, Tailwind, Strict TS.
-- [ ] Backend: Install Bun, Elysia, Drizzle, LibSQL.
-- [ ] Buat .env.
-- [ ] Tes jalankan kedua server.
+- [x] Inisiasi folder frontend/ & backend/.
+- [x] Frontend: Install Astro, React, Tailwind, Strict TS.
+- [x] Backend: Install Bun, Elysia, Drizzle, LibSQL.
+- [x] Buat .env.
+- [x] Tes jalankan kedua server.

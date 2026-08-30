@@ -1,6 +1,6 @@
-- [ ] Import Font & Warna Tuku di Tailwind.
-- [ ] Buat Navbar & Footer statis.
-- [ ] Buat HeroSection.tsx.
-- [ ] Install Swiper.js & buat ProjectSlider.tsx.
-- [ ] Buat TechGrid.astro.
-- [ ] Buat ContactForm.tsx.
+- [x] Import Font & Warna Tuku di Tailwind.
+- [x] Buat Navbar & Footer statis.
+- [x] Buat HeroSection.tsx.
+- [x] Install Swiper.js & buat ProjectSlider.tsx.
+- [x] Buat TechGrid.astro.
+- [x] Buat ContactForm.tsx.
