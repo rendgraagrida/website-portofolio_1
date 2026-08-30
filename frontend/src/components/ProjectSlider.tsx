@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { api, type ProjectData } from '../lib/eden';
 import { ui } from '../i18n/ui';
-import { Code, ExternalLink, FolderGit2, GitBranch } from 'lucide-react';
+import { Code, ExternalLink, FolderGit2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProjectSliderProps {
   lang: 'id' | 'en';
@@ -104,50 +104,83 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
   }, []);
 
   return (
-    <section id="proyek" className="py-24 bg-earth-100/60">
-      <div className="max-w-6xl mx-auto px-6 mb-12">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="p-2 bg-tuku-brown/10 text-tuku-brown rounded-lg">
-            <FolderGit2 size={22} />
+    <section id="proyek" className="py-24 bg-earth-100/60 overflow-hidden relative">
+      <div className="max-w-6xl mx-auto px-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-tuku-brown/10 text-tuku-brown rounded-lg">
+              <FolderGit2 size={22} />
+            </div>
+            <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown">
+              GitHub Projects Showcase
+            </span>
           </div>
-          <span className="text-sm font-bold uppercase tracking-wider text-tuku-brown">
-            GitHub Projects & Repositories
-          </span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark tracking-tight">
+            {t['projects.title']}
+          </h2>
+          <p className="text-earth-800 text-base md:text-lg max-w-2xl mt-2 leading-relaxed">
+            {t['projects.desc']}
+          </p>
         </div>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-tuku-dark mb-3 tracking-tight">
-          {t['projects.title']}
-        </h2>
-        <p className="text-earth-800 text-lg max-w-2xl leading-relaxed">
-          {t['projects.desc']}
-        </p>
+
+        {/* Custom Navigation Buttons */}
+        <div className="flex items-center gap-3">
+          <button 
+            id="swiper-prev-btn" 
+            aria-label="Previous Slide"
+            className="p-3 bg-white hover:bg-tuku-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button 
+            id="swiper-next-btn" 
+            aria-label="Next Slide"
+            className="p-3 bg-white hover:bg-tuku-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
       </div>
       
       <div className="max-w-6xl mx-auto px-6">
         {loading ? (
           <div className="text-center py-20 text-earth-800 font-bold">
-            {lang === 'id' ? 'Sedang memuat data repositori...' : 'Loading repositories...'}
+            {lang === 'id' ? 'Sedang memuat slider repositori...' : 'Loading repository slider...'}
           </div>
         ) : (
           <Swiper
-            modules={[Navigation, Pagination]}
+            modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={24}
             slidesPerView={1}
-            navigation
-            pagination={{ clickable: true }}
+            grabCursor={true}
+            loop={true}
+            autoplay={{
+              delay: 4500,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
+            navigation={{
+              prevEl: '#swiper-prev-btn',
+              nextEl: '#swiper-next-btn',
+            }}
+            pagination={{ 
+              clickable: true,
+              dynamicBullets: true,
+            }}
             breakpoints={{
-              640: { slidesPerView: 1 },
+              640: { slidesPerView: 1.2 },
               768: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
             }}
-            className="pb-14 !px-1"
+            className="pb-16 !px-1"
           >
             {projects.map((project) => {
               const displayTitle = lang === 'en' && project.titleEn ? project.titleEn : project.title;
               const displayDesc = lang === 'en' && project.descriptionEn ? project.descriptionEn : project.description;
               
               return (
-                <SwiperSlide key={project.id} className="h-auto">
-                  <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-earth-200/80 h-full flex flex-col group">
+                <SwiperSlide key={project.id} className="h-auto pb-2">
+                  <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-earth-200/80 h-full flex flex-col group select-none">
                     <div className="h-48 rounded-xl mb-5 overflow-hidden bg-earth-200 relative">
                       {project.imageUrl ? (
                         <img 

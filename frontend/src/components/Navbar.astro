@@ -1,11 +1,10 @@
 ---
-import { Coffee, FileText } from 'lucide-react';
+import { Coffee } from 'lucide-react';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const toggleUrl = lang === 'id' ? '/en/' : '/';
-const cvUrl = lang === 'id' ? '/cv' : '/en/cv';
 ---
 
 <header class="sticky top-0 z-50 bg-tuku-cream/90 backdrop-blur-md border-b border-earth-200">
@@ -20,13 +19,6 @@ const cvUrl = lang === 'id' ? '/cv' : '/en/cv';
         <a href="#pengalaman" class="hover:text-tuku-brown transition-colors">{t('nav.experience')}</a>
         <a href="#proyek" class="hover:text-tuku-brown transition-colors">{t('nav.projects')}</a>
         <a href="#stack" class="hover:text-tuku-brown transition-colors">{t('nav.stack')}</a>
-        <a href="#cover-letter" class="text-tuku-brown hover:underline transition-colors flex items-center gap-1">
-          <span>✨</span> {t('nav.coverLetter')}
-        </a>
-        <a href={cvUrl} class="hover:text-tuku-brown transition-colors flex items-center gap-1">
-          <FileText size={15} />
-          <span>{t('nav.cv')}</span>
-        </a>
         <a href="#kontak" class="bg-tuku-brown hover:bg-tuku-dark text-earth-100 px-4 py-2 rounded-xl transition-colors shadow-sm">
           {t('nav.contact')}
         </a>
