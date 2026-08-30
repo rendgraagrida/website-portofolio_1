@@ -1,0 +1,4 @@
+- [x] Siapkan konfigurasi `vercel.json` untuk auto-deploy frontend Astro di Vercel.
+- [x] Verifikasi build produksi `astro build` berhasil (4 halaman static: `/`, `/en/`, `/cv`, `/en/cv`).
+- [x] Siapkan `Dockerfile` backend Bun + Elysia untuk deployment cloud di Koyeb/Render.
+- [x] Dokumentasikan panduan langkah demi langkah Live Hosting untuk pengguna.

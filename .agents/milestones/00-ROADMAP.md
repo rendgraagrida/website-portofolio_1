@@ -9,5 +9,6 @@ Bird's-Eye View:
 - [x] Tahap 8: Ekspor CV & Generator Cover Letter Otomatis
 - [x] Tahap 9: Master Tab Switcher (Segmented Control UI)
 - [x] Tahap 10: Optimasi SEO & Social Share Preview (OpenGraph)
+- [x] Tahap 11: Production Deployment Guide & Setup (Vercel & Koyeb)
 
 *SOP: Centang di sini jika satu file milestone utuh telah selesai dikerjakan.*
