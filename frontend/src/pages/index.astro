@@ -2,11 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
-import TechGrid from '../components/TechGrid.astro';
 import { Hero } from '../components/Hero';
-import { ExperienceTimeline } from '../components/ExperienceTimeline';
-import { ProjectSlider } from '../components/ProjectSlider';
-import { CoverLetterGenerator } from '../components/CoverLetterGenerator';
+import { MainTabViewer } from '../components/MainTabViewer';
 import { ContactForm } from '../components/ContactForm';
 import { getLangFromUrl } from '../i18n/utils';
 
@@ -17,10 +14,7 @@ const lang = getLangFromUrl(Astro.url);
   <Navbar />
   <main class="flex-grow">
     <Hero lang={lang} />
-    <ExperienceTimeline lang={lang} client:visible />
-    <ProjectSlider lang={lang} client:visible />
-    <TechGrid />
-    <CoverLetterGenerator lang={lang} client:visible />
+    <MainTabViewer lang={lang} client:load />
     <ContactForm lang={lang} client:visible />
   </main>
   <Footer />

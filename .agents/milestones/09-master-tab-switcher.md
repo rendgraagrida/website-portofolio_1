@@ -1,0 +1,5 @@
+- [x] Buat komponen React `TechGrid.tsx` untuk visualisasi keahlian interaktif.
+- [x] Bangun komponen `MainTabViewer.tsx` (Segmented Tabs: Jejak Profesional, Showcase Proyek, Tech Stack, Cover Letter AI).
+- [x] Tambahkan sinkronisasi navigasi URL hash (`#pengalaman`, `#proyek`, `#stack`, `#cover-letter`).
+- [x] Integrasikan `MainTabViewer` ke dalam `index.astro` dan `en/index.astro`.
+- [x] Verifikasi transisi animasi dan tampilan responsif mobile-friendly.
