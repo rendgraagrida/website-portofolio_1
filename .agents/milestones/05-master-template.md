@@ -1,0 +1,6 @@
+- [x] Eksekusi pembuatan `.agents/rules/` (Accessibility, Performance, DB Migration, Testing).
+- [x] Eksekusi pembuatan `.agents/skills/` (DB Architect, Security Auditor).
+- [x] Eksekusi pembuatan direktori template `.agents/templates/` beserta boilerplate prompt dan kode awal.
+- [x] Eksekusi pembuatan `.agents/workflows/` untuk mendokumentasikan SOP dan arahan CI/CD Automations.
+- [x] Sinkronisasi `.agents/GLOSSARY.md`.
+- [x] Validasi status semua folder di `.agents` bebas dari sisa redundant (misal `qa/` yang dihapus).

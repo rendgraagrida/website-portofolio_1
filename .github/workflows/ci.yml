@@ -1,0 +1,54 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    name: Type Check & Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: bun install
+
+      - name: Frontend Type Check
+        working-directory: ./frontend
+        run: bun run tsc --noEmit
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: bun install
+
+      - name: Backend Type Check
+        working-directory: ./backend
+        run: bun run tsc --noEmit
+
+      - name: Backend Unit Tests
+        working-directory: ./backend
+        run: bun test
+
+  deploy:
+    name: Trigger Deployments
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Note on Deployment
+        run: |
+          echo "✅ Tests passed!"
+          echo "🚀 Vercel and Koyeb will automatically detect this push and start building."
+          echo "Jika Anda menggunakan Vercel CLI atau Koyeb CLI, Anda dapat menambahkan step tambahan di sini."

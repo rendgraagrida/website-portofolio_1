@@ -1,1 +1,1 @@
-Wajib gunakan 'bun:test'. Test API Elysia gunakan 'app.handle()' tanpa buka port.
+ATURAN TESTING & QA: Wajib gunakan `bun:test` untuk Unit/Integration test. Dilarang keras membuat folder QA terpisah! Semua skenario pengujian (Test Plans) dan *edge-cases* WAJIB ditulis menyatu ke dalam dokumen Implementation Plan di folder `work/plans/` sebelum koding dimulai.
