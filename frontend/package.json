@@ -14,11 +14,13 @@
   "dependencies": {
     "@astrojs/react": "^6.0.4",
     "@elysiajs/eden": "^1.4.9",
+    "@nanostores/react": "^1.1.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "astro": "^7.2.9",
     "lucide-react": "^1.37.0",
+    "nanostores": "^1.5.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "swiper": "^14.2.0",

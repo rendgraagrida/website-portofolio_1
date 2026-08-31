@@ -1,7 +1,6 @@
 import React from 'react';
 import { ui } from '../i18n/ui';
 import { personalProfile } from '../data/resume';
-import { FileText, Sparkles, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
   lang: 'id' | 'en';
@@ -29,10 +28,9 @@ const GithubIcon: React.FC<{ size?: number; className?: string }> = ({ size = 18
 
 export const Hero: React.FC<HeroProps> = ({ lang }) => {
   const t = ui[lang];
-  const cvPath = lang === 'en' ? '/en/cv' : '/cv';
 
   return (
-    <section className="max-w-5xl mx-auto px-6 py-20 md:py-32 flex flex-col items-start">
+    <section className="max-w-5xl mx-auto px-6 pt-16 pb-12 md:pt-24 md:pb-16 flex flex-col items-start">
       
       {/* Top Greeting Badge & Social Links */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -76,36 +74,9 @@ export const Hero: React.FC<HeroProps> = ({ lang }) => {
         <span className="text-brand-brown">{t['hero.titleHighlight']}</span>
       </h1>
 
-      <p className="text-lg md:text-xl text-earth-800 max-w-2xl leading-relaxed mb-10">
+      <p className="text-lg md:text-xl text-earth-800 max-w-2xl leading-relaxed">
         {t['hero.desc']}
       </p>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap items-center gap-4">
-        <a 
-          href="#proyek" 
-          className="inline-flex items-center gap-2 bg-brand-brown hover:bg-brand-dark text-earth-100 font-bold py-4 px-8 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
-        >
-          <span>{t['hero.cta']}</span>
-          <ArrowRight size={18} />
-        </a>
-
-        <a 
-          href={cvPath}
-          className="inline-flex items-center gap-2 bg-white hover:bg-earth-50 text-brand-dark border-2 border-earth-300 font-bold py-3.5 px-6 rounded-xl shadow-sm hover:shadow transition-all"
-        >
-          <FileText size={18} className="text-brand-brown" />
-          <span>{t['hero.downloadCv']}</span>
-        </a>
-
-        <a 
-          href="#cover-letter"
-          className="inline-flex items-center gap-2 bg-brand-cream hover:bg-earth-200 text-brand-brown border border-brand-brown/20 font-bold py-3.5 px-6 rounded-xl shadow-sm transition-all"
-        >
-          <Sparkles size={18} />
-          <span>{t['hero.generateLetter']}</span>
-        </a>
-      </div>
 
     </section>
   );

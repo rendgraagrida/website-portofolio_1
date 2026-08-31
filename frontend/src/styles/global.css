@@ -13,7 +13,6 @@
   --color-brand-brown: #8B4513;
   --color-brand-dark: #3E2723;
   
-  /* Alias untuk backward-compatibility */
   --color-brand-primary: #8B4513;
 }
 
@@ -21,4 +20,19 @@
   body {
     @apply bg-earth-100 text-earth-900 antialiased font-sans;
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
