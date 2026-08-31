@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.4",
@@ -32,6 +33,12 @@
   },
   "devDependencies": {
     "@elysiajs/cors": "^1.4.2",
-    "elysia": "^1.4.30"
+    "@playwright/test": "^1.62.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.6",
+    "elysia": "^1.4.30",
+    "jsdom": "^30.0.1",
+    "vitest": "^4.1.11"
   }
 }
