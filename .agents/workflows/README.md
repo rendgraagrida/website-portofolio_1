@@ -1,1 +1,0 @@
-FOLDER WORKFLOWS: Tempat menyimpan dokumentasi 3 jenis alur kerja: 1) SOP Dev Loop (Cara kerja AI & Manusia). 2) Otomatisasi Infrastruktur (GitHub Actions CI/CD). 3) Otomatisasi Sistem Internal (misal: pengiriman email otomatis / autoresponder, Cron Jobs, atau Webhooks).

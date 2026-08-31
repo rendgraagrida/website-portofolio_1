@@ -1,1 +1,0 @@
-ARAHAN CI/CD AUTOMATION: Saat masuk ke Milestone Deployment, rancang GitHub Actions yang melakukan 3 langkah otomatis setiap ada `git push` ke branch main: 1) Jalankan `bun install` & `bun test`. 2) Trigger deployment Frontend (Vercel). 3) Trigger deployment Backend (Koyeb).
