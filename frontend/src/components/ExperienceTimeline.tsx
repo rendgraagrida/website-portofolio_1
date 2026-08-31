@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { $isGlobalEditMode } from '../stores/editMode';
+import { $navMode } from '../stores/navigation';
 import { 
   $experiences, 
   addExperience, 
@@ -14,15 +15,13 @@ import {
   Calendar, 
   ChevronDown, 
   ChevronUp, 
-  CheckCircle2, 
   Target,
   Edit3,
   Trash2,
   Plus,
   RotateCcw,
   X,
-  MapPin,
-  Tag
+  MapPin
 } from 'lucide-react';
 import { ui } from '../i18n/ui';
 
@@ -34,6 +33,8 @@ export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
   const t = ui[lang];
   const experiences = useStore($experiences);
   const isEditMode = useStore($isGlobalEditMode);
+  const navMode = useStore($navMode);
+  const isPersonal = navMode === 'personal';
 
   const [expandedDesks, setExpandedDesks] = useState<Record<string, boolean>>({
     'exp-1': true,
@@ -139,14 +140,21 @@ export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
     <section id="pengalaman" className="py-12 select-none">
       <div className="max-w-5xl mx-auto px-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full paper-btn text-earth-800 text-xs font-extrabold mb-3">
-            <Briefcase size={14} className="text-brand-brown" />
+          <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-black mb-3 ${
+            isPersonal 
+              ? 'bg-[#00F0FF] text-black border-2 border-black shadow-[3px_3px_0px_0px_#000] rounded-none uppercase' 
+              : 'paper-btn text-earth-800 rounded-full'
+          }`}>
+            <Briefcase size={14} className={isPersonal ? 'text-black' : 'text-brand-brown'} />
             <span>Professional Career Track</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-earth-900 mb-2 tracking-tight">
+
+          <h2 className={`text-3xl md:text-4xl font-extrabold text-earth-900 mb-2 tracking-tight ${
+            isPersonal ? 'font-comic text-4xl md:text-5xl text-black tracking-wide' : ''
+          }`}>
             {t['experience.title']}
           </h2>
-          <p className="text-earth-800 text-base md:text-lg">
+          <p className={`text-base md:text-lg ${isPersonal ? 'text-black font-medium' : 'text-earth-800'}`}>
             {t['experience.desc']}
           </p>
         </div>
@@ -282,7 +290,7 @@ export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
 
       {/* Timeline List */}
       <div className="max-w-5xl mx-auto px-6">
-        <div className="relative border-l-2 border-[#DCD5C9] ml-4 md:ml-6 space-y-12 pb-8">
+        <div className={`relative border-l-3 ${isPersonal ? 'border-black' : 'border-[#DCD5C9]'} ml-4 md:ml-6 space-y-12 pb-8`}>
           {experiences.map((exp) => {
             const isEditingThis = editingExpId === exp.id;
             const isExpanded = expandedDesks[exp.id] ?? true;
@@ -290,9 +298,13 @@ export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
             return (
               <div key={exp.id} className="relative pl-8 md:pl-12">
                 
-                {/* Timeline Dot */}
-                <div className="absolute w-7 h-7 paper-btn rounded-full -left-[15px] top-1 flex items-center justify-center text-brand-brown">
-                  <div className="w-2.5 h-2.5 rounded-full bg-brand-brown shadow-inner"></div>
+                {/* Timeline Dot (Solid Black & Neo-Brutalist in Personal Mode) */}
+                <div className={`absolute w-7 h-7 -left-[15px] top-1 flex items-center justify-center ${
+                  isPersonal 
+                    ? 'bg-[#FF007F] border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-none' 
+                    : 'paper-btn rounded-full text-brand-brown'
+                }`}>
+                  <div className={`w-2.5 h-2.5 ${isPersonal ? 'bg-white' : 'bg-brand-brown rounded-full shadow-inner'}`}></div>
                 </div>
 
                 {/* Edit & Delete Controls in Edit Mode */}
@@ -386,48 +398,72 @@ export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
                   <>
                     {/* Header */}
                     <div className="mb-4 pr-16">
-                      <h3 className="text-2xl font-extrabold text-earth-900 tracking-tight">{exp.role}</h3>
+                      <h3 className={`text-2xl font-extrabold text-earth-900 tracking-tight ${
+                        isPersonal ? 'font-comic text-3xl text-black tracking-wide' : ''
+                      }`}>
+                        {exp.role}
+                      </h3>
                       <div className="flex flex-wrap items-center text-earth-800 mt-2 gap-3 md:gap-5 font-medium">
-                        <span className="font-extrabold text-brand-brown text-base">{exp.company}</span>
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-earth-600 bg-[#ECE7DF] px-3 py-1 rounded-full shadow-inner">
-                          <Calendar size={13} className="text-brand-brown" />
+                        <span className={`font-extrabold text-base ${isPersonal ? 'text-black bg-[#FFE600] px-2 border-2 border-black shadow-[2px_2px_0px_0px_#000]' : 'text-brand-brown'}`}>
+                          {exp.company}
+                        </span>
+                        <div className={`flex items-center gap-1.5 text-xs font-bold ${
+                          isPersonal 
+                            ? 'bg-[#FF007F] text-white px-3 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000]' 
+                            : 'bg-[#ECE7DF] text-earth-600 px-3 py-1 rounded-full shadow-inner'
+                        }`}>
+                          <Calendar size={13} className={isPersonal ? 'text-white' : 'text-brand-brown'} />
                           <span>{exp.period}</span>
                         </div>
                         {exp.location && (
-                          <div className="flex items-center gap-1 text-xs text-earth-600 font-medium">
-                            <MapPin size={12} className="text-brand-brown" />
+                          <div className={`flex items-center gap-1 text-xs font-bold ${isPersonal ? 'text-black' : 'text-earth-600'}`}>
+                            <MapPin size={12} className={isPersonal ? 'text-black' : 'text-brand-brown'} />
                             <span>{exp.location}</span>
                           </div>
                         )}
                       </div>
                       {exp.summary && (
-                        <p className="text-xs md:text-sm text-earth-700 mt-2 leading-relaxed max-w-3xl">
+                        <p className={`text-xs md:text-sm mt-2 leading-relaxed max-w-3xl ${isPersonal ? 'text-black font-semibold' : 'text-earth-700'}`}>
                           {exp.summary}
                         </p>
                       )}
                     </div>
 
-                    {/* Expandable Details Card */}
-                    <div className="paper-card rounded-2xl overflow-hidden transition-all duration-300">
+                    {/* Expandable Details Card (Dual Styled) */}
+                    <div className={`transition-all duration-300 overflow-hidden ${
+                      isPersonal 
+                        ? 'bg-white border-3 border-black shadow-[6px_6px_0px_0px_#000] rounded-none' 
+                        : 'paper-card rounded-2xl'
+                    }`}>
                       <button 
                         onClick={() => toggleDesk(exp.id)}
-                        className="w-full text-left px-6 py-3.5 flex items-center justify-between hover:bg-[#F3EFE7] focus:outline-none transition-colors"
+                        className={`w-full text-left px-6 py-3.5 flex items-center justify-between focus:outline-none transition-colors ${
+                          isPersonal ? 'hover:bg-[#00F0FF]/30' : 'hover:bg-[#F3EFE7]'
+                        }`}
                       >
-                        <span className="font-extrabold text-sm md:text-base text-earth-900 flex items-center gap-2">
-                          <Target size={16} className="text-brand-brown" />
+                        <span className={`font-extrabold text-sm md:text-base flex items-center gap-2 ${
+                          isPersonal ? 'font-comic text-lg text-black tracking-wide' : 'text-earth-900'
+                        }`}>
+                          <Target size={16} className={isPersonal ? 'text-black' : 'text-brand-brown'} />
                           <span>{t['experience.responsibilities']} &amp; Pencapaian</span>
                         </span>
-                        <div className="w-7 h-7 rounded-xl paper-btn flex items-center justify-center text-brand-brown flex-shrink-0">
+                        <div className={`w-7 h-7 flex items-center justify-center ${
+                          isPersonal 
+                            ? 'bg-[#FF007F] text-white border-2 border-black shadow-[2px_2px_0px_0px_#000]' 
+                            : 'paper-btn rounded-xl text-brand-brown'
+                        }`}>
                           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
                       </button>
 
                       <div className={`overflow-hidden transition-all duration-400 ease-in-out ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <div className="p-6 pt-2 border-t border-[#ECE7DF] space-y-4">
+                        <div className={`p-6 pt-2 space-y-4 ${isPersonal ? 'border-t-3 border-black bg-white' : 'border-t border-[#ECE7DF]'}`}>
                           <ul className="space-y-2.5">
                             {(exp.bullets || []).map((b, bIdx) => (
-                              <li key={bIdx} className="flex items-start gap-3 text-earth-800 text-xs md:text-sm">
-                                <span className="w-1.5 h-1.5 rounded-full bg-brand-brown mt-2 flex-shrink-0"></span>
+                              <li key={bIdx} className={`flex items-start gap-3 text-xs md:text-sm ${
+                                isPersonal ? 'text-black font-semibold' : 'text-earth-800'
+                              }`}>
+                                <span className={`w-2 h-2 mt-1.5 flex-shrink-0 ${isPersonal ? 'bg-[#FF007F] border border-black' : 'bg-brand-brown rounded-full'}`}></span>
                                 <span className="leading-relaxed">{b}</span>
                               </li>
                             ))}
@@ -435,9 +471,13 @@ export const ExperienceTimeline: React.FC<TimelineProps> = ({ lang }) => {
 
                           {/* Tech Stack Pills */}
                           {(exp.skills || []).length > 0 && (
-                            <div className="pt-3 border-t border-[#ECE7DF] flex flex-wrap items-center gap-1.5">
+                            <div className={`pt-3 flex flex-wrap items-center gap-1.5 ${isPersonal ? 'border-t-2 border-black' : 'border-t border-[#ECE7DF]'}`}>
                               {exp.skills.map((skill, sIdx) => (
-                                <span key={sIdx} className="text-[10px] font-bold text-brand-brown bg-[#ECE7DF] px-2.5 py-0.5 rounded-md shadow-inner">
+                                <span key={sIdx} className={`text-[10px] font-black px-2.5 py-0.5 ${
+                                  isPersonal 
+                                    ? 'bg-[#00F0FF] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000]' 
+                                    : 'bg-[#ECE7DF] text-brand-brown rounded-md shadow-inner'
+                                }`}>
                                   {skill}
                                 </span>
                               ))}

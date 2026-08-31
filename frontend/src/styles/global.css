@@ -1,7 +1,11 @@
 @import "tailwindcss";
 
+@custom-variant personal (&:where([data-theme="personal"], [data-theme="personal"] *));
+
 @theme {
   --font-sans: "Outfit", "Inter", sans-serif;
+  --font-comic: "Bangers", "Bebas Neue", cursive, sans-serif;
+  --font-heading: "Bebas Neue", "Outfit", sans-serif;
   
   --color-earth-100: #F4F1EA;
   --color-earth-200: #E5E0D5;
@@ -13,27 +17,38 @@
   --color-brand-brown: #795548;
   --color-brand-dark: #322621;
   --color-brand-primary: #795548;
+
+  /* Pop Art / Neo-Brutalism Palette */
+  --color-pop-yellow: #FFE600;
+  --color-pop-cyan: #00F0FF;
+  --color-pop-pink: #FF007F;
+  --color-pop-orange: #FF5E00;
+  --color-pop-green: #00FF66;
 }
 
 @layer base {
   body {
     background-color: #F4F1EA;
     color: #2C251F;
-    transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
     @apply antialiased font-sans selection:bg-brand-brown/20;
   }
 
-  /* Personal Mode: Warm Vintage Pop-Art Comic Scrapbook Background Color */
-  body.paper-lined-popart-mode {
-    background-color: #F8EDD3 !important;
+  /* When data-theme is personal: bright pop art canvas */
+  html[data-theme="personal"] body {
+    background-color: #FFE800 !important;
+    color: #000000 !important;
+    background-image: radial-gradient(#000000 1.5px, transparent 1.5px) !important;
+    background-size: 24px 24px !important;
   }
 }
 
-/* Paper Design System Shadows */
+/* Professional Paper System */
 .paper-card {
   background-color: #FAF8F5;
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: 8px 8px 22px rgba(195, 185, 172, 0.35), -8px -8px 22px rgba(255, 255, 255, 0.95);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .paper-card-subtle {
@@ -46,6 +61,7 @@
   background-color: #ECE7DF;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: inset 3px 3px 7px rgba(175, 165, 150, 0.28), inset -3px -3px 7px rgba(255, 255, 255, 0.9);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .paper-btn {
@@ -63,6 +79,42 @@
 .paper-btn:active {
   box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.12), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
   transform: translateY(1px);
+}
+
+/* Neo-Brutalism Overrides in Personal Mode */
+html[data-theme="personal"] .paper-card {
+  background-color: #FFFFFF !important;
+  border: 3.5px solid #000000 !important;
+  border-radius: 0px !important;
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+}
+
+html[data-theme="personal"] .paper-well {
+  background-color: #00F0FF !important;
+  border: 3px solid #000000 !important;
+  border-radius: 0px !important;
+  box-shadow: inset 3px 3px 0px 0px #000000 !important;
+  color: #000000 !important;
+}
+
+html[data-theme="personal"] .paper-btn {
+  background-color: #FFFFFF !important;
+  border: 3px solid #000000 !important;
+  border-radius: 0px !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+}
+
+html[data-theme="personal"] .paper-btn:hover {
+  background-color: #00F0FF !important;
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+  transform: translate(-2px, -2px) !important;
+}
+
+html[data-theme="personal"] .paper-btn:active {
+  box-shadow: 1px 1px 0px 0px #000000 !important;
+  transform: translate(2px, 2px) !important;
 }
 
 /* Smooth Natural Fade Animations */

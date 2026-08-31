@@ -23,7 +23,7 @@ const ogImage = Astro.props.image || '/og-image.svg';
 ---
 
 <!doctype html>
-<html lang={lang} class="scroll-smooth">
+<html lang={lang} class="scroll-smooth" data-theme="professional">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,10 +56,10 @@ const ogImage = Astro.props.image || '/og-image.svg';
     <meta name="twitter:description" content={siteDesc} />
     <meta name="twitter:image" content={ogImage} />
 
-    <!-- Fonts -->
+    <!-- Fonts: Outfit for Body & Bangers/Bebas Neue for Pop Art Headings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   </head>
   <body class="flex flex-col min-h-screen bg-brand-cream text-earth-900 font-sans antialiased">
     <slot />

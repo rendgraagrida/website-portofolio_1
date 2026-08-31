@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { $isGlobalEditMode } from '../stores/editMode';
+import { $navMode } from '../stores/navigation';
 import { 
   $profileData, 
   updateQuote, 
@@ -31,6 +32,8 @@ interface PersonalityViewProps {
 export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
   const profile = useStore($profileData);
   const isEditMode = useStore($isGlobalEditMode);
+  const navMode = useStore($navMode);
+  const isPersonal = navMode === 'personal';
 
   const [isEditingQuote, setIsEditingQuote] = useState(false);
   const [quoteInput, setQuoteInput] = useState(profile.quote);
@@ -76,12 +79,20 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
   return (
     <div className="space-y-8 animate-fade-in select-none">
       
-      {/* Hero Quote Card */}
-      <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
+      {/* Hero Quote Card (Neo-Brutalist in Personal Mode) */}
+      <div className={`p-6 md:p-8 relative overflow-hidden transition-all duration-300 ${
+        isPersonal
+          ? 'bg-[#00F0FF] border-4 border-black shadow-[8px_8px_0px_0px_#000] rounded-none'
+          : 'paper-card rounded-3xl bg-[#FAF8F5] border border-white/80 shadow-md'
+      }`}>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4 flex-1">
-            <div className="w-10 h-10 rounded-2xl bg-brand-brown/10 text-brand-brown flex items-center justify-center flex-shrink-0 shadow-inner">
-              <Quote size={20} />
+            <div className={`w-12 h-12 flex items-center justify-center flex-shrink-0 ${
+              isPersonal 
+                ? 'bg-[#FF007F] text-white border-2 border-black shadow-[3px_3px_0px_0px_#000] rounded-none' 
+                : 'rounded-2xl bg-brand-brown/10 text-brand-brown shadow-inner'
+            }`}>
+              <Quote size={24} />
             </div>
             
             <div className="flex-1">
@@ -91,19 +102,19 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
                     rows={2}
                     value={quoteInput}
                     onChange={(e) => setQuoteInput(e.target.value)}
-                    className="paper-well w-full p-3 rounded-xl text-sm font-bold text-earth-900 focus:outline-none focus:ring-1 focus:ring-brand-brown resize-none"
+                    className="w-full p-3 rounded-none border-2 border-black bg-white text-sm font-bold text-black focus:outline-none resize-none shadow-[3px_3px_0px_0px_#000]"
                   />
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleSaveQuote}
-                      className="bg-brand-brown hover:bg-earth-900 text-white px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 shadow-sm"
+                      className="bg-black text-white px-3.5 py-1.5 rounded-none text-xs font-black flex items-center gap-1 shadow-[2px_2px_0px_0px_#FFF]"
                     >
                       <Check size={12} />
                       <span>{lang === 'id' ? 'Simpan' : 'Save'}</span>
                     </button>
                     <button
                       onClick={() => setIsEditingQuote(false)}
-                      className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-700"
+                      className="bg-white text-black border border-black px-3 py-1.5 rounded-none text-xs font-bold"
                     >
                       {lang === 'id' ? 'Batal' : 'Cancel'}
                     </button>
@@ -111,10 +122,14 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
                 </div>
               ) : (
                 <>
-                  <p className="text-base md:text-lg font-bold text-earth-900 leading-relaxed italic mb-3">
+                  <p className={`text-base md:text-xl font-extrabold leading-relaxed italic mb-3 ${
+                    isPersonal ? 'text-black font-sans tracking-tight drop-shadow-xs' : 'text-earth-900'
+                  }`}>
                     "{profile.quote}"
                   </p>
-                  <div className="flex items-center gap-2 text-xs font-black text-brand-brown uppercase tracking-wider">
+                  <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-wider ${
+                    isPersonal ? 'text-black bg-white px-2.5 py-1 border-2 border-black inline-flex shadow-[3px_3px_0px_0px_#000]' : 'text-brand-brown'
+                  }`}>
                     <Sparkles size={13} />
                     <span>{profile.fullName} • Personal Philosophy</span>
                   </div>
@@ -129,7 +144,11 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
                 setQuoteInput(profile.quote);
                 setIsEditingQuote(true);
               }}
-              className="paper-btn p-2 rounded-xl text-brand-brown hover:text-earth-900 flex-shrink-0"
+              className={`p-2 flex-shrink-0 ${
+                isPersonal 
+                  ? 'bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black hover:bg-[#FF007F] hover:text-white' 
+                  : 'paper-btn rounded-xl text-brand-brown hover:text-earth-900'
+              }`}
               title="Edit Kutipan"
             >
               <Edit3 size={14} />
@@ -141,13 +160,17 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
       {/* Personality Pillars Header & Add Button */}
       {isEditMode && (
         <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-brand-brown uppercase tracking-wider">
+          <span className={`text-xs font-black uppercase tracking-wider ${isPersonal ? 'text-black bg-[#FFE600] px-2 py-0.5 border-2 border-black' : 'text-brand-brown'}`}>
             {lang === 'id' ? 'Pilar Kepribadian' : 'Personality Pillars'} ({profile.personalityPillars.length})
           </span>
 
           <button
             onClick={() => setIsAddingPillar(true)}
-            className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5"
+            className={`px-3.5 py-1.5 text-xs font-black flex items-center gap-1.5 ${
+              isPersonal 
+                ? 'bg-[#FF007F] text-white border-2 border-black shadow-[3px_3px_0px_0px_#000] rounded-none' 
+                : 'paper-btn rounded-xl text-brand-brown'
+            }`}
           >
             <Plus size={13} />
             <span>{lang === 'id' ? 'Tambah Pilar' : 'Add Pillar'}</span>
@@ -157,47 +180,49 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
 
       {/* Add New Pillar Modal / Form */}
       {isAddingPillar && (
-        <form onSubmit={handleAddPillar} className="paper-card p-6 rounded-3xl bg-[#FAF8F5] border border-brand-brown/30 shadow-md space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#ECE7DF]">
-            <h4 className="font-extrabold text-sm text-earth-900">{lang === 'id' ? 'Tambah Pilar Baru' : 'Add New Pillar'}</h4>
-            <button type="button" onClick={() => setIsAddingPillar(false)} className="text-earth-500 hover:text-earth-900">
-              <X size={16} />
+        <form onSubmit={handleAddPillar} className={`p-6 space-y-4 ${
+          isPersonal ? 'bg-white border-4 border-black shadow-[8px_8px_0px_0px_#000] rounded-none' : 'paper-card rounded-3xl bg-[#FAF8F5] border border-brand-brown/30'
+        }`}>
+          <div className="flex items-center justify-between pb-2 border-b border-black">
+            <h4 className="font-extrabold text-sm text-black uppercase tracking-wider">{lang === 'id' ? 'Tambah Pilar Baru' : 'Add New Pillar'}</h4>
+            <button type="button" onClick={() => setIsAddingPillar(false)} className="text-black hover:text-red-600">
+              <X size={18} />
             </button>
           </div>
           <div>
-            <label className="block text-xs font-bold text-earth-800 mb-1">{lang === 'id' ? 'Judul Karakter' : 'Trait Title'}</label>
+            <label className="block text-xs font-black text-black mb-1">{lang === 'id' ? 'Judul Karakter' : 'Trait Title'}</label>
             <input
               type="text"
               required
               placeholder="Contoh: Solution-Oriented Thinker"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="paper-well w-full py-2 px-3 rounded-xl text-xs text-earth-900 focus:outline-none"
+              className="w-full py-2 px-3 border-2 border-black bg-[#F4F1EA] text-xs font-bold text-black focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-earth-800 mb-1">{lang === 'id' ? 'Deskripsi' : 'Description'}</label>
+            <label className="block text-xs font-black text-black mb-1">{lang === 'id' ? 'Deskripsi' : 'Description'}</label>
             <textarea
               rows={3}
               required
               placeholder="Jelaskan pola pikir atau cara kerja Anda..."
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
-              className="paper-well w-full py-2 px-3 rounded-xl text-xs text-earth-900 focus:outline-none resize-none"
+              className="w-full py-2 px-3 border-2 border-black bg-[#F4F1EA] text-xs text-black focus:outline-none resize-none font-medium"
             />
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setIsAddingPillar(false)} className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-700">
+            <button type="button" onClick={() => setIsAddingPillar(false)} className="px-3 py-1.5 border-2 border-black text-xs font-bold bg-white">
               {lang === 'id' ? 'Batal' : 'Cancel'}
             </button>
-            <button type="submit" className="bg-brand-brown text-white px-4 py-1.5 rounded-xl text-xs font-extrabold shadow-sm">
+            <button type="submit" className="bg-black text-white px-4 py-1.5 border-2 border-black text-xs font-black shadow-[2px_2px_0px_0px_#FFE600]">
               {lang === 'id' ? 'Simpan Pilar' : 'Save Pillar'}
             </button>
           </div>
         </form>
       )}
 
-      {/* Personality Pillars Grid */}
+      {/* Personality Pillars Grid (Dual Styled) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profile.personalityPillars.map((t, idx) => {
           const Icon = icons[idx % icons.length];
@@ -206,20 +231,24 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
           return (
             <div
               key={t.id || idx}
-              className="paper-card p-6 rounded-3xl bg-[#FAF8F5] border border-white/90 hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 flex flex-col relative group"
+              className={`p-6 flex flex-col relative transition-all duration-300 ${
+                isPersonal 
+                  ? 'bg-white border-3 border-black shadow-[6px_6px_0px_0px_#000] rounded-none hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_#000]' 
+                  : 'paper-card rounded-3xl bg-[#FAF8F5] border border-white/90 hover:paper-btn hover:-translate-y-1'
+              }`}
             >
               {isEditMode && !isEditingThis && (
                 <div className="absolute top-3 right-3 flex items-center gap-1 z-10">
                   <button
                     onClick={() => handleStartEditPillar(t)}
-                    className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all"
+                    className="w-7 h-7 bg-white border border-black hover:bg-[#FFE600] text-black flex items-center justify-center transition-all shadow-[1px_1px_0px_0px_#000]"
                     title="Edit Pilar"
                   >
                     <Edit3 size={12} />
                   </button>
                   <button
                     onClick={() => deletePersonalityPillar(t.id)}
-                    className="w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all"
+                    className="w-7 h-7 bg-white border border-black hover:bg-rose-600 hover:text-white text-black flex items-center justify-center transition-all shadow-[1px_1px_0px_0px_#000]"
                     title="Hapus Pilar"
                   >
                     <Trash2 size={12} />
@@ -233,19 +262,19 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
                     type="text"
                     value={pillarTitle}
                     onChange={(e) => setPillarTitle(e.target.value)}
-                    className="paper-well w-full py-1.5 px-2.5 rounded-xl text-xs font-bold text-earth-900"
+                    className="w-full py-1.5 px-2.5 border-2 border-black text-xs font-bold text-black"
                   />
                   <textarea
                     rows={3}
                     value={pillarDesc}
                     onChange={(e) => setPillarDesc(e.target.value)}
-                    className="paper-well w-full p-2.5 rounded-xl text-xs text-earth-800 resize-none"
+                    className="w-full p-2.5 border-2 border-black text-xs text-black resize-none"
                   />
                   <div className="flex justify-end gap-2 pt-1">
-                    <button onClick={() => setEditingPillarId(null)} className="paper-btn px-2.5 py-1 rounded-lg text-xs font-bold text-earth-700">
+                    <button onClick={() => setEditingPillarId(null)} className="px-2.5 py-1 border border-black text-xs font-bold">
                       {lang === 'id' ? 'Batal' : 'Cancel'}
                     </button>
-                    <button onClick={() => handleSavePillar(t.id)} className="bg-brand-brown text-white px-3 py-1 rounded-lg text-xs font-extrabold">
+                    <button onClick={() => handleSavePillar(t.id)} className="bg-black text-white px-3 py-1 text-xs font-black">
                       {lang === 'id' ? 'Simpan' : 'Save'}
                     </button>
                   </div>
@@ -253,14 +282,20 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
               ) : (
                 <>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-9 h-9 rounded-xl paper-well flex items-center justify-center text-brand-brown flex-shrink-0">
-                      <Icon size={18} />
+                    <div className={`w-10 h-10 flex items-center justify-center flex-shrink-0 ${
+                      isPersonal ? 'bg-[#FFE600] text-black border-2 border-black shadow-[2px_2px_0px_0px_#000] rounded-none' : 'w-9 h-9 rounded-xl paper-well text-brand-brown'
+                    }`}>
+                      <Icon size={20} />
                     </div>
-                    <h3 className="font-extrabold text-sm md:text-base text-earth-900 leading-snug pr-12">
+                    <h3 className={`font-extrabold text-sm md:text-base leading-snug pr-12 ${
+                      isPersonal ? 'font-comic text-xl text-black tracking-wide' : 'text-earth-900'
+                    }`}>
                       {t.title}
                     </h3>
                   </div>
-                  <p className="text-xs md:text-sm text-earth-800 leading-relaxed mt-auto">
+                  <p className={`text-xs md:text-sm leading-relaxed mt-auto ${
+                    isPersonal ? 'text-black font-semibold' : 'text-earth-800'
+                  }`}>
                     {t.desc}
                   </p>
                 </>
@@ -270,24 +305,28 @@ export const PersonalityView: React.FC<PersonalityViewProps> = ({ lang }) => {
         })}
       </div>
 
-      {/* Core Principles Well */}
-      <div className="paper-well p-6 md:p-8 rounded-3xl border border-[#E6E0D5]">
-        <div className="flex items-center gap-2.5 mb-4 text-earth-900 font-extrabold text-sm md:text-base">
-          <HeartHandshake size={18} className="text-brand-brown" />
-          <span>{lang === 'id' ? 'Nilai Kerja & Kolaborasi' : 'Core Working Principles'}</span>
+      {/* Core Principles (Dual Styled) */}
+      <div className={`p-6 md:p-8 transition-all duration-300 ${
+        isPersonal ? 'bg-[#FF007F] border-4 border-black shadow-[8px_8px_0px_0px_#000] rounded-none text-white' : 'paper-well rounded-3xl border border-[#E6E0D5]'
+      }`}>
+        <div className={`flex items-center gap-2.5 mb-4 font-extrabold text-sm md:text-base ${
+          isPersonal ? 'font-comic text-2xl text-white tracking-wider' : 'text-earth-900'
+        }`}>
+          <HeartHandshake size={22} className={isPersonal ? 'text-white' : 'text-brand-brown'} />
+          <span>{lang === 'id' ? 'NILAI KERJA & KOLABORASI' : 'CORE WORKING PRINCIPLES'}</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="bg-white/80 p-4 rounded-2xl shadow-sm border border-[#ECE7DF]">
-            <div className="text-xl font-black text-brand-brown mb-1">Integritas</div>
-            <div className="text-xs text-earth-700 font-medium">Jujur, transparan, dan dapat diandalkan dalam setiap komitmen.</div>
+          <div className={`p-4 ${isPersonal ? 'bg-white text-black border-3 border-black shadow-[4px_4px_0px_0px_#000] rounded-none' : 'bg-white/80 rounded-2xl shadow-sm border border-[#ECE7DF]'}`}>
+            <div className={`text-xl font-black mb-1 ${isPersonal ? 'font-comic text-2xl text-[#FF007F]' : 'text-brand-brown'}`}>Integritas</div>
+            <div className="text-xs text-black font-bold">Jujur, transparan, dan dapat diandalkan dalam setiap komitmen.</div>
           </div>
-          <div className="bg-white/80 p-4 rounded-2xl shadow-sm border border-[#ECE7DF]">
-            <div className="text-xl font-black text-brand-brown mb-1">Presisi</div>
-            <div className="text-xs text-earth-700 font-medium">Memperhatikan detail arsitektur hingga optimasi baris kode terkecil.</div>
+          <div className={`p-4 ${isPersonal ? 'bg-white text-black border-3 border-black shadow-[4px_4px_0px_0px_#000] rounded-none' : 'bg-white/80 rounded-2xl shadow-sm border border-[#ECE7DF]'}`}>
+            <div className={`text-xl font-black mb-1 ${isPersonal ? 'font-comic text-2xl text-[#00F0FF]' : 'text-brand-brown'}`}>Presisi</div>
+            <div className="text-xs text-black font-bold">Memperhatikan detail arsitektur hingga optimasi baris kode terkecil.</div>
           </div>
-          <div className="bg-white/80 p-4 rounded-2xl shadow-sm border border-[#ECE7DF]">
-            <div className="text-xl font-black text-brand-brown mb-1">Empati</div>
-            <div className="text-xs text-earth-700 font-medium">Mendengarkan pengguna dan mengutamakan kenyamanan rekan tim.</div>
+          <div className={`p-4 ${isPersonal ? 'bg-white text-black border-3 border-black shadow-[4px_4px_0px_0px_#000] rounded-none' : 'bg-white/80 rounded-2xl shadow-sm border border-[#ECE7DF]'}`}>
+            <div className={`text-xl font-black mb-1 ${isPersonal ? 'font-comic text-2xl text-[#FFE600]' : 'text-brand-brown'}`}>Empati</div>
+            <div className="text-xs text-black font-bold">Mendengarkan pengguna dan mengutamakan kenyamanan rekan tim.</div>
           </div>
         </div>
       </div>
