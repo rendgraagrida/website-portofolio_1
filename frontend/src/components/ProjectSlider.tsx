@@ -104,18 +104,14 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
   }, []);
 
   return (
-    <section id="proyek" className="py-24 bg-earth-100/60 overflow-hidden relative">
+    <section id="proyek" className="py-12 overflow-hidden relative">
       <div className="max-w-6xl mx-auto px-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 bg-brand-brown/10 text-brand-brown rounded-lg">
-              <FolderGit2 size={22} />
-            </div>
-            <span className="text-sm font-bold uppercase tracking-wider text-brand-brown">
-              GitHub Projects Showcase
-            </span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full paper-btn text-earth-800 text-xs font-extrabold mb-3">
+            <FolderGit2 size={14} className="text-brand-brown" />
+            <span>Verified GitHub Code Repositories</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-earth-900 tracking-tight">
             {t['projects.title']}
           </h2>
           <p className="text-earth-800 text-base md:text-lg max-w-2xl mt-2 leading-relaxed">
@@ -123,19 +119,19 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
           </p>
         </div>
 
-        {/* Custom Navigation Buttons */}
-        <div className="flex items-center gap-3">
+        {/* Paper-Embossed Navigation Arrows */}
+        <div className="flex items-center gap-3 select-none">
           <button 
             id="swiper-prev-btn" 
             aria-label="Previous Slide"
-            className="p-3 bg-white hover:bg-brand-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
+            className="w-11 h-11 paper-btn rounded-2xl flex items-center justify-center text-earth-800 hover:text-brand-brown focus:outline-none"
           >
             <ChevronLeft size={20} />
           </button>
           <button 
             id="swiper-next-btn" 
             aria-label="Next Slide"
-            className="p-3 bg-white hover:bg-brand-brown hover:text-white text-earth-800 rounded-full border border-earth-300 shadow-sm transition-all focus:outline-none"
+            className="w-11 h-11 paper-btn rounded-2xl flex items-center justify-center text-earth-800 hover:text-brand-brown focus:outline-none"
           >
             <ChevronRight size={20} />
           </button>
@@ -172,16 +168,18 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
               768: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
             }}
-            className="pb-16 !px-1"
+            className="pb-16 !px-2"
           >
             {projects.map((project) => {
               const displayTitle = lang === 'en' && project.titleEn ? project.titleEn : project.title;
               const displayDesc = lang === 'en' && project.descriptionEn ? project.descriptionEn : project.description;
               
               return (
-                <SwiperSlide key={project.id} className="h-auto pb-2">
-                  <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-earth-200/80 h-full flex flex-col group select-none">
-                    <div className="h-48 rounded-xl mb-5 overflow-hidden bg-earth-200 relative">
+                <SwiperSlide key={project.id} className="h-auto pb-4">
+                  <div className="paper-card rounded-3xl p-6 h-full flex flex-col group select-none transition-all duration-300">
+                    
+                    {/* Image Container with Inset Frame */}
+                    <div className="h-48 rounded-2xl mb-5 overflow-hidden bg-[#ECE7DF] relative shadow-inner">
                       {project.imageUrl ? (
                         <img 
                           src={project.imageUrl} 
@@ -190,27 +188,28 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-brand-cream">
+                        <div className="w-full h-full flex items-center justify-center bg-[#ECE7DF]">
                           <Code size={36} className="text-brand-brown/40" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                        {project.githubUrl && (
+                      
+                      {project.githubUrl && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                           <a
                             href={project.githubUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-brown/90 hover:bg-brand-brown px-3 py-1.5 rounded-lg shadow transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-brown/95 px-3 py-1.5 rounded-xl shadow transition-colors"
                           >
                             <GithubIcon size={14} />
                             <span>{lang === 'id' ? 'Buka di GitHub' : 'View on GitHub'}</span>
                             <ExternalLink size={12} />
                           </a>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
 
-                    <h3 className="text-xl font-bold text-brand-dark mb-2 group-hover:text-brand-brown transition-colors">
+                    <h3 className="text-lg font-extrabold text-earth-900 mb-2 group-hover:text-brand-brown transition-colors">
                       {displayTitle}
                     </h3>
                     
@@ -218,12 +217,12 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                       {displayDesc}
                     </p>
                     
-                    <div className="mt-auto pt-4 border-t border-earth-100 flex flex-col gap-3">
+                    <div className="mt-auto pt-4 border-t border-[#ECE7DF] flex flex-col gap-3">
                       <div className="flex flex-wrap gap-1.5">
                         {project.techStack?.split(',').map((tech, i) => (
                           <span 
                             key={i} 
-                            className="inline-block text-xs font-semibold text-brand-brown bg-brand-brown/10 px-2.5 py-1 rounded-md"
+                            className="inline-block text-[11px] font-bold text-earth-800 bg-[#ECE7DF] px-2.5 py-0.5 rounded-full shadow-inner"
                           >
                             {tech.trim()}
                           </span>
@@ -235,16 +234,17 @@ export const ProjectSlider: React.FC<ProjectSliderProps> = ({ lang }) => {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-between text-xs font-bold text-earth-700 hover:text-brand-brown bg-earth-50 hover:bg-earth-100/80 px-3 py-2 rounded-lg transition-colors mt-1"
+                          className="paper-btn inline-flex items-center justify-between text-xs font-bold text-earth-800 hover:text-brand-brown px-3 py-2 rounded-xl transition-colors mt-1"
                         >
                           <span className="flex items-center gap-1.5">
-                            <GithubIcon size={15} />
+                            <GithubIcon size={14} />
                             <span>{project.githubUrl.replace('https://github.com/', '')}</span>
                           </span>
-                          <ExternalLink size={13} />
+                          <ExternalLink size={12} />
                         </a>
                       )}
                     </div>
+
                   </div>
                 </SwiperSlide>
               );

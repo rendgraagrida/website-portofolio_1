@@ -149,34 +149,20 @@ Bandung, West Java, Indonesia
   };
 
   return (
-    <section id="cover-letter" className="py-24 bg-brand-cream border-t border-earth-200">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className="p-6 md:p-10">
+      <div className="max-w-6xl mx-auto">
         
-        {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-brown/10 text-brand-brown text-sm font-bold mb-3">
-            <Sparkles size={16} />
-            <span>{t['coverLetter.badge']}</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark mb-3 tracking-tight">
-            {t['coverLetter.title']}
-          </h2>
-          <p className="text-earth-800 text-lg leading-relaxed">
-            {t['coverLetter.desc']}
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Controls / Inputs Form (5 cols) */}
-          <div className="lg:col-span-5 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-earth-200 flex flex-col gap-5">
-            <div className="flex items-center gap-2 text-brand-dark font-extrabold pb-3 border-b border-earth-100">
-              <Building size={20} className="text-brand-brown" />
-              <span>{lang === 'id' ? 'Kustomisasi Sasaran Lamaran' : 'Customize Target Job'}</span>
+          {/* Controls Form (5 cols) */}
+          <div className="lg:col-span-5 paper-card p-6 md:p-8 rounded-3xl flex flex-col gap-5">
+            <div className="flex items-center gap-2.5 text-earth-900 font-extrabold pb-3 border-b border-[#ECE7DF]">
+              <Building size={18} className="text-brand-brown" />
+              <span className="text-sm md:text-base">{lang === 'id' ? 'Kustomisasi Sasaran Lamaran' : 'Customize Target Job'}</span>
             </div>
 
             <div>
-              <label htmlFor="target-company" className="block text-sm font-bold text-earth-800 mb-1.5">
+              <label htmlFor="target-company" className="block text-xs uppercase font-extrabold tracking-wider text-earth-800 mb-1.5">
                 {t['coverLetter.companyLabel']}
               </label>
               <input 
@@ -185,12 +171,12 @@ Bandung, West Java, Indonesia
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder={t['coverLetter.companyPlaceholder']}
-                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 font-medium transition-all"
+                className="w-full px-4 py-3 rounded-2xl paper-well focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown/40 text-earth-900 font-medium transition-all text-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="target-role" className="block text-sm font-bold text-earth-800 mb-1.5">
+              <label htmlFor="target-role" className="block text-xs uppercase font-extrabold tracking-wider text-earth-800 mb-1.5">
                 {t['coverLetter.roleLabel']}
               </label>
               <input 
@@ -199,19 +185,19 @@ Bandung, West Java, Indonesia
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder={t['coverLetter.rolePlaceholder']}
-                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 font-medium transition-all"
+                className="w-full px-4 py-3 rounded-2xl paper-well focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown/40 text-earth-900 font-medium transition-all text-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="target-focus" className="block text-sm font-bold text-earth-800 mb-1.5">
+              <label htmlFor="target-focus" className="block text-xs uppercase font-extrabold tracking-wider text-earth-800 mb-1.5">
                 {t['coverLetter.focusLabel']}
               </label>
               <select 
                 id="target-focus"
                 value={focus}
                 onChange={(e) => setFocus(e.target.value as FocusArea)}
-                className="w-full px-4 py-3 rounded-xl border border-earth-200 bg-earth-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 font-medium transition-all"
+                className="w-full px-4 py-3 rounded-2xl paper-well focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown/40 text-earth-900 font-medium transition-all text-sm cursor-pointer"
               >
                 <option value="devops">DevOps, Cloud & Linux Server Admin</option>
                 <option value="database">Enterprise Oracle Database & Siebel CRM</option>
@@ -221,7 +207,7 @@ Bandung, West Java, Indonesia
               </select>
             </div>
 
-            <div className="pt-2 text-xs text-earth-600 bg-earth-100/60 p-3.5 rounded-xl flex items-start gap-2">
+            <div className="pt-2 text-xs text-earth-700 bg-[#ECE7DF] p-3.5 rounded-2xl flex items-start gap-2 shadow-inner">
               <UserCheck size={16} className="text-brand-brown flex-shrink-0 mt-0.5" />
               <span>
                 {lang === 'id' 
@@ -232,26 +218,26 @@ Bandung, West Java, Indonesia
           </div>
 
           {/* Result Preview Box (7 cols) */}
-          <div className="lg:col-span-7 bg-white rounded-2xl shadow-md border border-earth-200 overflow-hidden flex flex-col">
+          <div className="lg:col-span-7 paper-card rounded-3xl overflow-hidden flex flex-col">
             {/* Top Toolbar */}
-            <div className="bg-earth-100 px-6 py-4 border-b border-earth-200 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 font-bold text-brand-dark text-sm">
-                <FileText size={18} className="text-brand-brown" />
+            <div className="bg-[#ECE7DF] px-6 py-3.5 border-b border-[#E6E0D5] flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 font-extrabold text-earth-900 text-xs uppercase tracking-wider">
+                <FileText size={16} className="text-brand-brown" />
                 <span>{t['coverLetter.previewTitle']}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-brown hover:text-white border border-earth-200 rounded-lg text-xs font-bold text-earth-800 transition-all shadow-sm"
+                  className="paper-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-earth-800 hover:text-brand-brown"
                 >
-                  {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                  {copied ? <Check size={14} className="text-emerald-700" /> : <Copy size={14} />}
                   <span>{copied ? t['coverLetter.copied'] : t['coverLetter.copyBtn']}</span>
                 </button>
 
                 <button
                   onClick={handleDownloadTxt}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-brown hover:text-white border border-earth-200 rounded-lg text-xs font-bold text-earth-800 transition-all shadow-sm"
+                  className="paper-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-earth-800 hover:text-brand-brown"
                   title="Download .TXT"
                 >
                   <Download size={14} />
@@ -260,7 +246,7 @@ Bandung, West Java, Indonesia
 
                 <button
                   onClick={handlePrint}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-brown hover:bg-brand-dark text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                  className="paper-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-earth-800 hover:text-brand-brown"
                   title="Print PDF"
                 >
                   <Printer size={14} />
@@ -269,21 +255,21 @@ Bandung, West Java, Indonesia
               </div>
             </div>
 
-            {/* Letter Content Preview */}
-            <div className="p-6 md:p-8 overflow-y-auto max-h-[500px] bg-slate-50/50 font-serif text-earth-900 leading-relaxed text-sm md:text-base selection:bg-brand-brown/20 whitespace-pre-line border-b border-earth-100">
+            {/* Letter Content Preview (Crisp Paper Sheet) */}
+            <div className="p-6 md:p-8 overflow-y-auto max-h-[480px] bg-white font-serif text-earth-900 leading-relaxed text-sm md:text-base selection:bg-brand-brown/20 whitespace-pre-line border-b border-[#ECE7DF]">
               {generatedLetter}
             </div>
 
             {/* Footer status */}
-            <div className="px-6 py-3 bg-white text-xs text-earth-500 flex justify-between items-center">
+            <div className="px-6 py-3 bg-[#FAF8F5] text-xs text-earth-600 flex justify-between items-center">
               <span>{lang === 'id' ? 'Format Standar Profesional HR & ATS' : 'HR & ATS Compliant Format'}</span>
-              <span className="font-semibold text-brand-brown">{company}</span>
+              <span className="font-bold text-brand-brown">{company}</span>
             </div>
           </div>
 
         </div>
 
       </div>
-    </section>
+    </div>
   );
 };

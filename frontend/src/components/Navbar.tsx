@@ -15,21 +15,25 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
   const toggleUrl = lang === 'id' ? '/en/' : '/';
 
   return (
-    <header className="sticky top-0 z-50 bg-brand-cream/90 backdrop-blur-md border-b border-earth-200">
+    <header className="sticky top-0 z-50 bg-[#F4F1EA]/90 backdrop-blur-md border-b border-[#E6E0D5]">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         
-        {/* Left: Clickable Logo/Brand to Toggle Portfolio Generator */}
+        {/* Left: Paper-Embossed Clickable Logo/Brand to Toggle Portfolio Generator */}
         <button
           onClick={togglePortfolioGen}
-          className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-xl font-extrabold text-xl transition-all duration-300 select-none focus:outline-none ${
+          className={`group flex items-center gap-2.5 px-3.5 py-2 rounded-2xl font-extrabold text-lg transition-all duration-300 select-none focus:outline-none ${
             isPortfolioGenOpen 
-              ? 'bg-brand-brown/15 text-brand-brown shadow-sm ring-1 ring-brand-brown/30' 
-              : 'text-brand-dark hover:text-brand-brown hover:bg-white/60'
+              ? 'paper-well text-brand-brown scale-[0.98]' 
+              : 'paper-btn text-earth-900 hover:text-brand-brown'
           }`}
           title={lang === 'id' ? 'Klik untuk Buka / Tutup Portofolio Generator' : 'Click to Toggle Portfolio Generator'}
         >
-          <div className={`p-1 rounded-lg transition-transform duration-300 ${isPortfolioGenOpen ? 'rotate-12 scale-110 text-brand-brown' : 'group-hover:scale-110 text-brand-brown'}`}>
-            <Terminal size={22} />
+          <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform duration-300 ${
+            isPortfolioGenOpen 
+              ? 'bg-brand-brown text-white shadow-inner' 
+              : 'bg-[#ECE7DF] shadow-[inset_1px_1px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.9)] text-brand-brown group-hover:scale-105'
+          }`}>
+            <Terminal size={17} />
           </div>
           <span>
             Rendgra.<span className="text-brand-brown">Dev</span>
@@ -37,34 +41,34 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
           <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full transition-all duration-300 hidden sm:inline-flex items-center gap-1 ${
             isPortfolioGenOpen
               ? 'bg-brand-brown text-white'
-              : 'bg-brand-brown/10 text-brand-brown group-hover:bg-brand-brown/20'
+              : 'bg-[#ECE7DF] text-earth-700 shadow-inner'
           }`}>
             <Sparkles size={10} />
             <span>{isPortfolioGenOpen ? (lang === 'id' ? 'Tutup' : 'Close') : 'Gen'}</span>
           </span>
         </button>
 
-        {/* Right Actions: Hubungi Saya (Toggle) + Language Switcher */}
+        {/* Right Actions: Hubungi Saya (Paper Button) + Language Switcher */}
         <div className="flex items-center gap-3 md:gap-4">
           
           {/* Hubungi Saya Toggle Button */}
           <button
             onClick={toggleContact}
-            className={`px-4 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 shadow-sm flex items-center gap-1.5 focus:outline-none select-none ${
+            className={`px-4 md:px-5 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 focus:outline-none select-none ${
               isContactOpen
-                ? 'bg-brand-dark text-white ring-2 ring-brand-brown shadow-md scale-105'
-                : 'bg-brand-brown hover:bg-brand-dark text-white hover:shadow'
+                ? 'paper-well text-brand-brown font-extrabold scale-[0.98]'
+                : 'paper-btn text-earth-900 hover:text-brand-brown'
             }`}
             title={lang === 'id' ? 'Klik untuk Buka / Tutup Form Kontak' : 'Click to Toggle Contact Form'}
           >
-            {isContactOpen ? <X size={15} /> : <Send size={15} />}
+            {isContactOpen ? <X size={15} /> : <Send size={15} className="text-brand-brown" />}
             <span>{isContactOpen ? (lang === 'id' ? 'Tutup Kontak' : 'Close Contact') : t['nav.contact']}</span>
           </button>
 
-          {/* Language Toggle */}
+          {/* Paper Language Toggle */}
           <a
             href={toggleUrl}
-            className="flex items-center px-3 py-1.5 bg-white border border-earth-200 rounded-xl hover:border-brand-brown transition-colors text-xs font-extrabold shadow-sm select-none"
+            className="flex items-center px-3 py-1.5 paper-btn rounded-xl text-xs font-extrabold select-none text-earth-700 hover:text-brand-brown"
           >
             <span className={lang === 'id' ? 'text-brand-brown font-black' : 'text-earth-400'}>ID</span>
             <span className="mx-1 text-earth-300">|</span>

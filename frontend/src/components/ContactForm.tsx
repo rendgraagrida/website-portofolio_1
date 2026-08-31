@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ui } from '../i18n/ui';
 import { api } from '../lib/eden';
-import { Send, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, RefreshCw, MessageSquareQuote } from 'lucide-react';
 
 interface ContactProps {
   lang: 'id' | 'en';
@@ -47,25 +47,26 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   };
 
   return (
-    <section id="kontak" className="max-w-2xl mx-auto px-6 py-24">
+    <section id="kontak" className="max-w-2xl mx-auto px-6 py-12">
       <div className="text-center mb-10">
-        <span className="text-sm font-bold uppercase tracking-wider text-brand-brown block mb-2">
-          {lang === 'id' ? 'Mari Berbincang' : "Let's Connect"}
-        </span>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-dark mb-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full paper-btn text-earth-800 text-xs font-extrabold mb-3">
+          <MessageSquareQuote size={14} className="text-brand-brown" />
+          <span>Professional Collaboration</span>
+        </div>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-earth-900 mb-3 tracking-tight">
           {t['contact.title']}
         </h2>
-        <p className="text-earth-800 text-lg max-w-lg mx-auto">
+        <p className="text-earth-800 text-base md:text-lg max-w-lg mx-auto leading-relaxed">
           {t['contact.desc']}
         </p>
       </div>
 
       {success ? (
-        <div className="bg-white border-2 border-green-500/30 text-earth-900 p-8 rounded-2xl text-center shadow-lg animate-fade-in">
-          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="paper-card p-8 rounded-3xl text-center animate-fade-in">
+          <div className="w-16 h-16 bg-[#ECE7DF] shadow-inner text-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 size={36} />
           </div>
-          <h3 className="font-extrabold text-2xl text-brand-dark mb-2">
+          <h3 className="font-extrabold text-2xl text-earth-900 mb-2">
             {lang === 'id' ? 'Pesan Berhasil Terkirim! 🎉' : 'Message Sent Successfully! 🎉'}
           </h3>
           <p className="text-earth-700 leading-relaxed max-w-md mx-auto mb-6">
@@ -75,23 +76,23 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
           </p>
           <button 
             onClick={() => setSuccess(false)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-cream text-brand-brown border border-brand-brown/20 hover:bg-brand-brown hover:text-white rounded-xl font-bold transition-all shadow-sm"
+            className="paper-btn inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-earth-900 hover:text-brand-brown"
           >
             <RefreshCw size={16} />
-            {lang === 'id' ? 'Kirim Pesan Lainnya' : 'Send Another Message'}
+            <span>{lang === 'id' ? 'Kirim Pesan Lainnya' : 'Send Another Message'}</span>
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="bg-white p-8 md:p-10 rounded-2xl shadow-md border border-earth-200/80 flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="paper-card p-8 md:p-10 rounded-3xl flex flex-col gap-5">
           {errorMessage && (
-            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3 text-sm">
+            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center gap-3 text-sm">
               <AlertCircle size={18} className="flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-bold text-brand-dark mb-2">
+            <label htmlFor="name" className="block text-xs uppercase font-extrabold tracking-wider text-earth-800 mb-2">
               {t['contact.name']} <span className="text-red-500">*</span>
             </label>
             <input 
@@ -100,13 +101,13 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 transition-all" 
+              className="w-full px-4 py-3.5 rounded-2xl paper-well focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown/40 text-earth-900 transition-all font-medium" 
               placeholder={lang === 'id' ? 'Nama lengkap atau panggilan Anda' : 'Your full or preferred name'} 
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-bold text-brand-dark mb-2">
+            <label htmlFor="email" className="block text-xs uppercase font-extrabold tracking-wider text-earth-800 mb-2">
               {t['contact.email']} <span className="text-red-500">*</span>
             </label>
             <input 
@@ -115,13 +116,13 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 transition-all" 
+              className="w-full px-4 py-3.5 rounded-2xl paper-well focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown/40 text-earth-900 transition-all font-medium" 
               placeholder="nama@perusahaan.com" 
             />
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-bold text-brand-dark mb-2">
+            <label htmlFor="message" className="block text-xs uppercase font-extrabold tracking-wider text-earth-800 mb-2">
               {t['contact.message']} <span className="text-red-500">*</span>
             </label>
             <textarea 
@@ -130,7 +131,7 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
               required
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl border border-earth-200 bg-earth-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown text-earth-900 transition-all resize-none" 
+              className="w-full px-4 py-3.5 rounded-2xl paper-well focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-brown/40 text-earth-900 transition-all resize-none font-medium" 
               placeholder={lang === 'id' ? 'Ceritakan proyek, ide kolaborasi, atau sekadar menyapa...' : 'Tell me about your project, idea, or just say hi...'} 
             ></textarea>
           </div>
@@ -138,16 +139,16 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="w-full py-4 mt-2 bg-brand-brown hover:bg-brand-dark text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
+            className="w-full py-4 mt-2 paper-btn bg-[#FAF8F5] text-earth-900 hover:text-brand-brown font-extrabold rounded-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base select-none"
           >
             {isSubmitting ? (
               <>
-                <RefreshCw size={20} className="animate-spin" />
+                <RefreshCw size={18} className="animate-spin" />
                 <span>{lang === 'id' ? 'Mengirim Pesan...' : 'Sending Message...'}</span>
               </>
             ) : (
               <>
-                <Send size={18} />
+                <Send size={17} className="text-brand-brown" />
                 <span>{t['contact.send']}</span>
               </>
             )}

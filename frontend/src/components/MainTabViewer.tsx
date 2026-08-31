@@ -30,19 +30,19 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
     {
       key: 'experience',
       label: lang === 'id' ? 'Jejak Profesional' : 'Professional Journey',
-      icon: <Briefcase size={18} />,
+      icon: <Briefcase size={17} />,
       badge: '8+ Thn'
     },
     {
       key: 'projects',
       label: lang === 'id' ? 'Showcase Repositori' : 'GitHub Projects',
-      icon: <FolderGit2 size={18} />,
+      icon: <FolderGit2 size={17} />,
       badge: '5 Repo'
     },
     {
       key: 'stack',
       label: lang === 'id' ? 'Core Tech Stack' : 'Core Tech Stack',
-      icon: <Cpu size={18} />,
+      icon: <Cpu size={17} />,
       badge: '16 Tools'
     }
   ];
@@ -50,19 +50,21 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
   return (
     <div id="main-tab-navigator" className="w-full pt-4 pb-20 scroll-mt-20">
       
-      {/* CASE 1: PORTFOLIO GENERATOR OVERLAY (Triggered by clicking Rendgra.Dev logo) */}
+      {/* CASE 1: PORTFOLIO GENERATOR OVERLAY (Paper Card) */}
       {showPortfolioGen && (
-        <div className="max-w-6xl mx-auto px-4 md:px-6 mb-12 animate-fade-in transition-all duration-400">
-          <div className="bg-white rounded-3xl border-2 border-brand-brown/30 shadow-xl overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 mb-12 animate-fade-in">
+          <div className="paper-card rounded-3xl overflow-hidden">
             {/* Overlay Header with Close Button */}
-            <div className="bg-brand-cream/80 px-6 py-4 border-b border-earth-200 flex items-center justify-between">
-              <div className="flex items-center gap-2 font-extrabold text-brand-dark text-sm md:text-base">
-                <Sparkles size={18} className="text-brand-brown animate-pulse" />
+            <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between">
+              <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
+                <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
+                  <Sparkles size={16} />
+                </div>
                 <span>{lang === 'id' ? 'Portofolio & Cover Letter Generator' : 'Portfolio & Cover Letter Generator'}</span>
               </div>
               <button
                 onClick={closeOverlays}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-brand-brown hover:text-white text-earth-800 rounded-xl text-xs font-bold transition-all shadow-sm border border-earth-200"
+                className="paper-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-800"
               >
                 <X size={14} />
                 <span>{lang === 'id' ? 'Tutup (Esc)' : 'Close'}</span>
@@ -74,19 +76,21 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
         </div>
       )}
 
-      {/* CASE 2: CONTACT FORM OVERLAY (Triggered by clicking Hubungi Saya button) */}
+      {/* CASE 2: CONTACT FORM OVERLAY (Paper Card) */}
       {showContact && (
-        <div className="max-w-4xl mx-auto px-4 md:px-6 mb-12 animate-fade-in transition-all duration-400">
-          <div className="bg-white rounded-3xl border-2 border-brand-brown/30 shadow-xl overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 mb-12 animate-fade-in">
+          <div className="paper-card rounded-3xl overflow-hidden">
             {/* Overlay Header with Close Button */}
-            <div className="bg-brand-cream/80 px-6 py-4 border-b border-earth-200 flex items-center justify-between">
-              <div className="flex items-center gap-2 font-extrabold text-brand-dark text-sm md:text-base">
-                <MessageSquareQuote size={18} className="text-brand-brown" />
+            <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between">
+              <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
+                <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
+                  <MessageSquareQuote size={16} />
+                </div>
                 <span>{lang === 'id' ? 'Mari Berbincang & Berkolaborasi' : "Let's Connect & Collaborate"}</span>
               </div>
               <button
                 onClick={closeOverlays}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-brand-brown hover:text-white text-earth-800 rounded-xl text-xs font-bold transition-all shadow-sm border border-earth-200"
+                className="paper-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-800"
               >
                 <X size={14} />
                 <span>{lang === 'id' ? 'Tutup (Esc)' : 'Close'}</span>
@@ -98,22 +102,22 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
         </div>
       )}
 
-      {/* MAIN 3-SEGMENTED TAB BAR */}
+      {/* PAPER-BASED SEGMENTED TAB BAR */}
       <div className="max-w-5xl mx-auto px-4 md:px-6 mb-8">
-        <div className="bg-earth-100 p-2 rounded-2xl md:rounded-full border border-earth-200 shadow-inner flex flex-wrap md:flex-nowrap items-center justify-between gap-2 overflow-x-auto">
+        <div className="paper-well p-2 rounded-2xl md:rounded-full flex flex-wrap md:flex-nowrap items-center justify-between gap-2 overflow-x-auto">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key && !showPortfolioGen && !showContact;
             return (
               <button
                 key={tab.key}
                 onClick={() => selectMainTab(tab.key)}
-                className={`flex-1 min-w-[150px] md:min-w-0 py-3.5 px-4 md:px-6 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center justify-center gap-2 focus:outline-none select-none ${
+                className={`flex-1 min-w-[150px] md:min-w-0 py-3.5 px-4 md:px-6 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center justify-center gap-2.5 focus:outline-none select-none ${
                   isActive
-                    ? 'bg-brand-brown text-white shadow-md transform scale-[1.02]'
-                    : 'text-earth-700 hover:text-brand-brown hover:bg-white/60'
+                    ? 'paper-btn text-brand-brown font-extrabold scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900 hover:bg-white/40'
                 }`}
               >
-                <span className={isActive ? 'text-white' : 'text-brand-brown'}>
+                <span className={isActive ? 'text-brand-brown' : 'text-earth-500'}>
                   {tab.icon}
                 </span>
                 <span className="truncate">{tab.label}</span>
@@ -121,8 +125,8 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
                   <span
                     className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${
                       isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-earth-200/80 text-earth-700'
+                        ? 'bg-brand-brown/10 text-brand-brown'
+                        : 'bg-white/60 text-earth-600'
                     }`}
                   >
                     {tab.badge}
@@ -134,9 +138,9 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
         </div>
       </div>
 
-      {/* DYNAMIC CONTENT FOR ACTIVE TAB (WHEN OVERLAYS ARE CLOSED) */}
+      {/* DYNAMIC CONTENT CONTAINER */}
       {!showPortfolioGen && !showContact && (
-        <div className="min-h-[500px] transition-opacity duration-400 ease-in-out">
+        <div className="min-h-[500px]">
           {activeTab === 'experience' && (
             <div className="animate-fade-in">
               <ExperienceTimeline lang={lang} />
@@ -150,7 +154,7 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
           )}
 
           {activeTab === 'stack' && (
-            <div className="animate-fade-in bg-[#FAF9F5] rounded-3xl max-w-6xl mx-auto border border-earth-200/60 my-4 shadow-sm">
+            <div className="animate-fade-in">
               <TechGrid lang={lang} />
             </div>
           )}
