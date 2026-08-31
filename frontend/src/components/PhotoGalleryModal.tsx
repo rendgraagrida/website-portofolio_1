@@ -1,65 +1,67 @@
 import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { $showGallery, toggleGallery } from '../stores/navigation';
-import { X, Camera, Heart, Maximize2, MapPin, Sparkles } from 'lucide-react';
+import { X, Camera, Heart, Sparkles, Maximize2, Layers } from 'lucide-react';
 
 interface PhotoGalleryModalProps {
   lang: 'id' | 'en';
 }
 
-interface GallerySticker {
+interface ContourSticker {
   id: string;
   title: { id: string; en: string };
-  location: { id: string; en: string };
+  subtitle: { id: string; en: string };
   src: string;
-  rotation: string;
-  tag: { id: string; en: string };
+  tag: string;
 }
 
-const galleryStickers: GallerySticker[] = [
+const individualStickers: ContourSticker[] = [
+  {
+    id: 'collage',
+    title: { id: 'Kolase Stiker Bersatu (All-in-One)', en: 'Unified Sticker Collage' },
+    subtitle: { id: 'Seluruh momen digabung berdampingan tanpa background', en: 'All moments merged seamlessly with transparent contours' },
+    src: '/gallery/sticker-collage.png',
+    tag: 'Master Collage'
+  },
   {
     id: 'studio',
-    title: { id: 'Kebersamaan Keluarga', en: 'Family Studio Joy' },
-    location: { id: 'Studio Potret, Bandung', en: 'Portrait Studio, Bandung' },
-    src: '/gallery/photo-studio.jpg',
-    rotation: '-rotate-2',
-    tag: { id: 'Family & Harmony', en: 'Family & Harmony' }
+    title: { id: 'Keluarga Ceria di Studio', en: 'Family Studio Joy' },
+    subtitle: { id: 'Momen penuh tawa dan kehangatan keluarga', en: 'Laughs and family warmth' },
+    src: '/gallery/sticker-studio.png',
+    tag: 'Family'
   },
   {
     id: 'bromo',
-    title: { id: 'Petualangan Gunung Bromo', en: 'Mount Bromo Expedition' },
-    location: { id: 'Bromo Tengger Semeru, Jawa Timur', en: 'Bromo Tengger Semeru, East Java' },
-    src: '/gallery/photo-bromo.jpg',
-    rotation: 'rotate-2',
-    tag: { id: 'Sunrise & Nature', en: 'Sunrise & Nature' }
+    title: { id: 'Eksplorasi Gunung Bromo', en: 'Mount Bromo Expedition' },
+    subtitle: { id: 'Sunrise dan petualangan alam terbuka', en: 'Sunrise and nature expedition' },
+    src: '/gallery/sticker-bromo.png',
+    tag: 'Adventure'
   },
   {
     id: 'supermarket',
-    title: { id: 'Supermarket Creative Experience', en: 'Creative Studio Session' },
-    location: { id: 'Picart Studio Room', en: 'Picart Studio Room' },
-    src: '/gallery/photo-supermarket.jpg',
-    rotation: '-rotate-3',
-    tag: { id: 'Playful Moments', en: 'Playful Moments' }
+    title: { id: 'Supermarket Creative Session', en: 'Creative Studio Room' },
+    subtitle: { id: 'Eksplorasi konsep ruangan pop-art biru', en: 'Pop-art blue studio experience' },
+    src: '/gallery/sticker-supermarket.png',
+    tag: 'Creative'
   },
   {
     id: 'profile',
     title: { id: 'Rendgra Agrida', en: 'Rendgra Agrida' },
-    location: { id: 'Bandung, Jawa Barat', en: 'Bandung, West Java' },
-    src: '/gallery/photo-profile.png',
-    rotation: 'rotate-1',
-    tag: { id: 'Tech Lead & Engineer', en: 'Tech Lead & Engineer' }
+    subtitle: { id: 'Senior Software Engineer & Tech Lead', en: 'Senior Software Engineer & Tech Lead' },
+    src: '/gallery/sticker-profile.png',
+    tag: 'Tech Lead'
   }
 ];
 
 export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) => {
   const showGallery = useStore($showGallery);
-  const [activeImage, setActiveImage] = useState<GallerySticker | null>(null);
+  const [activeImage, setActiveImage] = useState<ContourSticker | null>(null);
 
   if (!showGallery) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/50 backdrop-blur-md animate-fade-in">
-      <div className="paper-card rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl animate-fade-in max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/55 backdrop-blur-md animate-fade-in">
+      <div className="paper-card rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl animate-fade-in max-h-[92vh] flex flex-col">
         
         {/* Header with Title and Close Button */}
         <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between flex-shrink-0">
@@ -67,7 +69,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
             <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
               <Camera size={16} />
             </div>
-            <span>{lang === 'id' ? 'Galeri Foto & Stiker Kebersamaan' : 'Photo Gallery & Memory Stickers'}</span>
+            <span>{lang === 'id' ? 'Galeri Stiker Kontur Personil (Tanpa Background)' : 'Personnel Contour Sticker Gallery (Transparent)'}</span>
           </div>
 
           <button
@@ -79,70 +81,89 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
           </button>
         </div>
 
-        {/* Scrollable Gallery Area (Sticker Board Layout) */}
-        <div className="p-6 md:p-8 overflow-y-auto bg-[#F4F1EA]">
+        {/* Scrollable Gallery Area */}
+        <div className="p-6 md:p-8 overflow-y-auto bg-[#F4F1EA] space-y-8">
           
-          <div className="text-center max-w-xl mx-auto mb-8">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black mb-2">
-              <Sparkles size={12} />
-              <span>{lang === 'id' ? 'Koleksi Stiker & Momen Nyata' : 'Sticker Collection & Moments'}</span>
-            </span>
-            <p className="text-earth-800 text-xs md:text-sm leading-relaxed">
-              {lang === 'id'
-                ? 'Kumpulan momen kebersamaan dan perjalanan hidup yang menjadi sumber energi dalam berkarya di dunia rekayasa perangkat lunak.'
-                : 'A curated collection of cherished moments and journeys that fuel my passion for engineering and building reliable systems.'}
-            </p>
+          {/* SECTION 1: MASTER UNIFIED STICKER BANNER (Ala Tuku Banner) */}
+          <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
+            <div className="flex items-center justify-between mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black">
+                <Layers size={13} />
+                <span>{lang === 'id' ? 'Kolase Stiker Bersatu' : 'Unified Sticker Banner'}</span>
+              </div>
+              <span className="text-[11px] font-bold text-earth-600 bg-[#ECE7DF] px-2.5 py-1 rounded-full shadow-inner">
+                {lang === 'id' ? 'Garis Luar Putih Tebal' : 'Die-Cut White Outer Outline'}
+              </span>
+            </div>
+
+            {/* Wide Master Collage Image */}
+            <div 
+              onClick={() => setActiveImage(individualStickers[0])}
+              className="w-full h-48 sm:h-64 md:h-72 flex items-end justify-center cursor-pointer group bg-gradient-to-b from-[#EFEBE4]/60 to-[#ECE7DF] rounded-2xl p-4 transition-all duration-300 hover:shadow-inner"
+            >
+              <img
+                src="/gallery/sticker-collage.png"
+                alt="Rendgra Agrida & Family Sticker Collage"
+                className="max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 transition-transform duration-400"
+              />
+            </div>
+
+            {/* Sticker Pill Label Underneath Banner */}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#ECE7DF]">
+              <span className="text-xs font-bold text-earth-800">
+                {lang === 'id' 
+                  ? 'Potongan kontur orang dipotong presisi dan disatukan berdampingan tanpa latar belakang.'
+                  : 'Individual human contours precisely cut and unified side-by-side with zero background.'}
+              </span>
+              <button
+                onClick={() => setActiveImage(individualStickers[0])}
+                className="paper-btn px-3 py-1 rounded-xl text-xs font-extrabold text-brand-brown flex items-center gap-1.5"
+              >
+                <Maximize2 size={12} />
+                <span>{lang === 'id' ? 'Lihat Resolusi Penuh' : 'View Full Res'}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Die-Cut Sticker Grid with Thick White Outer Line */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 p-2">
-            {galleryStickers.map((sticker) => (
-              <div
-                key={sticker.id}
-                onClick={() => setActiveImage(sticker)}
-                className={`group cursor-pointer transform ${sticker.rotation} hover:rotate-0 hover:scale-[1.03] transition-all duration-300 ease-out`}
-              >
-                {/* Sticker Frame: Thick White Border + Deep Soft Shadow */}
-                <div className="bg-white p-2.5 md:p-3 rounded-3xl border-[5px] md:border-[7px] border-white shadow-[0_12px_28px_rgba(0,0,0,0.14),0_4px_10px_rgba(0,0,0,0.08)] relative overflow-hidden group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.22)]">
-                  
-                  {/* Photo Container */}
-                  <div className="h-56 sm:h-64 rounded-2xl overflow-hidden bg-[#ECE7DF] relative">
+          {/* SECTION 2: INDIVIDUAL DIE-CUT CONTOUR STICKERS */}
+          <div>
+            <div className="text-center max-w-lg mx-auto mb-6">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black mb-1.5">
+                <Sparkles size={12} />
+                <span>{lang === 'id' ? 'Potongan Stiker Personil' : 'Individual Cutout Stickers'}</span>
+              </span>
+              <p className="text-earth-700 text-xs leading-relaxed">
+                {lang === 'id' ? 'Klik stiker di bawah untuk memperbesar dan melihat detail kontur stiker.' : 'Click any sticker below to enlarge.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+              {individualStickers.slice(1).map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setActiveImage(item)}
+                  className="paper-card p-4 rounded-3xl flex flex-col items-center text-center cursor-pointer group hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 select-none"
+                >
+                  {/* Contour Sticker Container (Transparent bg with drop shadow) */}
+                  <div className="w-full h-40 sm:h-48 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden">
                     <img
-                      src={sticker.src}
-                      alt={sticker.title[lang]}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={item.src}
+                      alt={item.title[lang]}
+                      className="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] group-hover:scale-110 group-hover:rotate-2 transition-transform duration-300"
                       loading="lazy"
                     />
-
-                    {/* Subtle Hover Zoom Overlay */}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                      <span className="inline-flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-lg">
-                        <Maximize2 size={13} />
-                        <span>{lang === 'id' ? 'Perbesar Foto' : 'Enlarge Photo'}</span>
-                      </span>
-                    </div>
                   </div>
 
-                  {/* Sticker Caption Bottom Label */}
-                  <div className="pt-3 pb-1 px-2 flex items-center justify-between">
-                    <div>
-                      <h4 className="font-extrabold text-sm text-earth-900 leading-tight group-hover:text-brand-brown transition-colors">
-                        {sticker.title[lang]}
-                      </h4>
-                      <p className="text-[11px] text-earth-600 flex items-center gap-1 mt-0.5 font-medium">
-                        <MapPin size={11} className="text-brand-brown" />
-                        <span>{sticker.location[lang]}</span>
-                      </p>
-                    </div>
+                  <h4 className="font-extrabold text-xs md:text-sm text-earth-900 leading-tight mb-1 group-hover:text-brand-brown transition-colors">
+                    {item.title[lang]}
+                  </h4>
 
-                    <span className="text-[10px] font-black uppercase tracking-wider text-brand-brown bg-[#F5F2EB] px-2.5 py-1 rounded-full shadow-inner">
-                      {sticker.tag[lang]}
-                    </span>
-                  </div>
-
+                  <span className="mt-auto text-[10px] font-black uppercase tracking-wider text-brand-brown bg-white px-2.5 py-0.5 rounded-full shadow-sm border border-[#ECE7DF]">
+                    {item.tag}
+                  </span>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
         </div>
@@ -151,7 +172,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
         <div className="px-6 py-3.5 bg-[#FAF8F5] border-t border-[#ECE7DF] flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-earth-600">
             <Heart size={14} className="text-rose-500 fill-rose-500" />
-            <span>Rendgra Agrida • Family &amp; Life Journey</span>
+            <span>Rendgra Agrida • Die-Cut Contour Sticker Collection</span>
           </div>
 
           <button
@@ -171,7 +192,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
           onClick={() => setActiveImage(null)}
         >
           <div 
-            className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center"
+            className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Lightbox */}
@@ -182,24 +203,16 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
               <X size={18} />
             </button>
 
-            {/* High-Resolution Sticker Frame */}
-            <div className="bg-white p-3 md:p-4 rounded-3xl border-[6px] md:border-[10px] border-white shadow-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            {/* High-Resolution Die-Cut Sticker Card */}
+            <div className="paper-card p-6 md:p-8 rounded-3xl max-h-[80vh] flex flex-col items-center justify-center overflow-hidden bg-[#F4F1EA]">
               <img 
                 src={activeImage.src} 
                 alt={activeImage.title[lang]} 
-                className="max-h-[68vh] w-auto object-contain rounded-2xl"
+                className="max-h-[60vh] max-w-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.3)]"
               />
-              <div className="pt-3 px-2 flex justify-between items-center">
-                <div>
-                  <h4 className="font-extrabold text-base text-earth-900">{activeImage.title[lang]}</h4>
-                  <p className="text-xs text-earth-600 flex items-center gap-1 mt-0.5 font-medium">
-                    <MapPin size={12} className="text-brand-brown" />
-                    <span>{activeImage.location[lang]}</span>
-                  </p>
-                </div>
-                <span className="text-xs font-bold text-brand-brown bg-[#F5F2EB] px-3 py-1 rounded-full shadow-inner">
-                  {activeImage.tag[lang]}
-                </span>
+              <div className="pt-4 text-center">
+                <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title[lang]}</h4>
+                <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle[lang]}</p>
               </div>
             </div>
 
