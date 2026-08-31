@@ -1,6 +1,7 @@
 /**
  * Utility untuk memproses foto menjadi stiker kontur transparan
- * dengan garis luar putih tebal (die-cut contour stroke) langsung di browser.
+ * dengan garis luar putih tebal (die-cut contour stroke) langsung di browser,
+ * serta merekonstruksi kolase stiker bersatu secara dinamis.
  */
 
 export async function processImageToContourSticker(
@@ -24,7 +25,6 @@ export async function processImageToContourSticker(
     });
   } catch (err) {
     console.warn('AI background removal fallback to canvas:', err);
-    // Fallback if WASM or CDN is offline: use original file directly
     cutoutBlob = file;
   }
 
@@ -94,4 +94,69 @@ export async function processImageToContourSticker(
 
     img.src = url;
   });
+}
+
+/**
+ * Merekonstruksi ulang seluruh stiker yang tersimpan menjadi satu
+ * kolase banner bersatu (side-by-side overlapping collage) secara dinamis di browser.
+ */
+export async function reconstructStickerCollage(
+  stickerSrcs: string[]
+): Promise<string> {
+  if (!stickerSrcs || stickerSrcs.length === 0) return '';
+
+  const loadedImages = await Promise.all(
+    stickerSrcs.map(
+      (src) =>
+        new Promise<HTMLImageElement>((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(img);
+          img.src = src;
+        })
+    )
+  );
+
+  const validImages = loadedImages.filter(
+    (img) => img.naturalWidth > 0 && img.naturalHeight > 0
+  );
+
+  if (validImages.length === 0) return '';
+
+  const targetHeight = 450;
+  const scaled = validImages.map((img) => {
+    const ratio = targetHeight / img.naturalHeight;
+    const w = img.naturalWidth * ratio;
+    return { img, w, h: targetHeight };
+  });
+
+  const overlapFactor = 0.75;
+  let totalWidth = 0;
+  scaled.forEach((s, idx) => {
+    if (idx === 0) {
+      totalWidth += s.w;
+    } else {
+      totalWidth += s.w * overlapFactor;
+    }
+  });
+  totalWidth += 80;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(900, Math.round(totalWidth));
+  canvas.height = targetHeight + 60;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas not supported');
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  let currentX = 40;
+  scaled.forEach((item, idx) => {
+    const y = canvas.height - item.h - 15 + (idx % 2 === 0 ? 0 : 10);
+    ctx.drawImage(item.img, currentX, y, item.w, item.h);
+    currentX += item.w * overlapFactor;
+  });
+
+  return canvas.toDataURL('image/png', 0.95);
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $showGallery, toggleGallery } from '../stores/navigation';
-import { processImageToContourSticker } from '../utils/stickerProcessor';
+import { processImageToContourSticker, reconstructStickerCollage } from '../utils/stickerProcessor';
 import { 
   X, 
   Camera, 
@@ -13,7 +13,8 @@ import {
   Loader2, 
   Maximize2,
   Layers,
-  UploadCloud
+  RefreshCw,
+  Check
 } from 'lucide-react';
 
 interface PhotoGalleryModalProps {
@@ -60,25 +61,34 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
   }
 ];
 
-const STORAGE_KEY = 'rendgra_gallery_stickers_v1';
+const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v2';
+const STORAGE_COLLAGE_KEY = 'rendgra_gallery_collage_v2';
 
 export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) => {
   const showGallery = useStore($showGallery);
   const [stickers, setStickers] = useState<ContourStickerItem[]>(DEFAULT_STICKERS);
+  const [collageUrl, setCollageUrl] = useState<string>('/gallery/sticker-collage.png');
   const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressText, setProgressText] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load persisted custom stickers on mount
+  // Load persisted stickers & custom collage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      const savedStickers = localStorage.getItem(STORAGE_STICKERS_KEY);
+      if (savedStickers) {
+        const parsed = JSON.parse(savedStickers);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setStickers(parsed);
         }
+      }
+      const savedCollage = localStorage.getItem(STORAGE_COLLAGE_KEY);
+      if (savedCollage) {
+        setCollageUrl(savedCollage);
       }
     } catch (e) {
       console.warn('Gagal membaca localStorage stickers:', e);
@@ -88,9 +98,33 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
   const saveStickers = (items: ContourStickerItem[]) => {
     setStickers(items);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(STORAGE_STICKERS_KEY, JSON.stringify(items));
     } catch (e) {
       console.warn('Gagal menyimpan localStorage stickers:', e);
+    }
+  };
+
+  // Reconstruct unified collage from all current stored stickers
+  const handleSyncCollage = async (currentItems = stickers) => {
+    if (currentItems.length === 0) return;
+    setIsSyncing(true);
+    try {
+      const srcs = currentItems.map((s) => s.src);
+      const newCollage = await reconstructStickerCollage(srcs);
+      if (newCollage) {
+        setCollageUrl(newCollage);
+        try {
+          localStorage.setItem(STORAGE_COLLAGE_KEY, newCollage);
+        } catch (e) {
+          console.warn('LocalStorage limit reached for collage, keeping in memory:', e);
+        }
+        setSyncSuccess(true);
+        setTimeout(() => setSyncSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('Gagal merekonstruksi kolase:', err);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -117,7 +151,10 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
 
       const updated = [newSticker, ...stickers];
       saveStickers(updated);
-      setActiveImage(newSticker); // Automatically open preview of newly uploaded sticker
+      setActiveImage(newSticker);
+
+      // Auto trigger sync collage with the newly added sticker
+      handleSyncCollage(updated);
     } catch (err) {
       console.error('Gagal memproses stiker:', err);
       alert(lang === 'id' ? 'Gagal memproses gambar menjadi stiker. Silakan coba gambar lain.' : 'Failed to process image into sticker.');
@@ -130,20 +167,26 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     }
   };
 
-  const handleDeleteSticker = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteSticker = (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (confirm(lang === 'id' ? 'Apakah Anda yakin ingin menghapus stiker ini dari galeri?' : 'Are you sure you want to delete this sticker?')) {
-      const updated = stickers.filter(s => s.id !== id);
+      const updated = stickers.filter((s) => s.id !== id);
       saveStickers(updated);
       if (activeImage?.id === id) {
         setActiveImage(null);
       }
+      // Reconstruct collage after deleting
+      handleSyncCollage(updated);
     }
   };
 
   const handleResetDefaults = () => {
     if (confirm(lang === 'id' ? 'Kembalikan stiker ke koleksi default?' : 'Reset to default sticker presets?')) {
       saveStickers(DEFAULT_STICKERS);
+      setCollageUrl('/gallery/sticker-collage.png');
+      try {
+        localStorage.removeItem(STORAGE_COLLAGE_KEY);
+      } catch {}
     }
   };
 
@@ -153,7 +196,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/55 backdrop-blur-md animate-fade-in">
       <div className="paper-card rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl animate-fade-in max-h-[92vh] flex flex-col">
         
-        {/* Header with Title, Upload Trigger and Close Button */}
+        {/* Header with Title, Sync, Upload & Close */}
         <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
             <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
@@ -163,15 +206,38 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Sync / Reconstruct Button */}
+            <button
+              onClick={() => handleSyncCollage()}
+              disabled={isSyncing}
+              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
+              title={lang === 'id' ? 'Sinkronisasi & Rekonstruksi Kolase dari Semua Foto' : 'Sync & Reconstruct Collage'}
+            >
+              {isSyncing ? (
+                <Loader2 size={13} className="animate-spin text-brand-brown" />
+              ) : syncSuccess ? (
+                <Check size={13} className="text-emerald-700" />
+              ) : (
+                <RefreshCw size={13} className="text-brand-brown" />
+              )}
+              <span>
+                {isSyncing
+                  ? (lang === 'id' ? 'Menyinkronkan...' : 'Syncing...')
+                  : syncSuccess
+                  ? (lang === 'id' ? 'Tersinkronisasi! ✅' : 'Synced! ✅')
+                  : (lang === 'id' ? 'Sync Kolase' : 'Sync Collage')}
+              </span>
+            </button>
+
             {/* Upload Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
+              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
               title={lang === 'id' ? 'Unggah Foto Baru & Potong Kontur Otomatis' : 'Upload & Auto Cutout'}
             >
-              {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
-              <span>{lang === 'id' ? 'Upload Foto Stiker' : 'Upload Sticker'}</span>
+              {isProcessing ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
+              <span>{lang === 'id' ? 'Upload Foto' : 'Upload Photo'}</span>
             </button>
 
             {/* Hidden File Input */}
@@ -199,7 +265,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
           <div className="bg-brand-brown/10 px-6 py-3 border-b border-brand-brown/20 flex items-center justify-between animate-pulse">
             <div className="flex items-center gap-2.5 text-brand-brown text-xs md:text-sm font-bold">
               <Loader2 size={16} className="animate-spin" />
-              <span>{progressText || (lang === 'id' ? 'Sedang memproses pemotongan kontur & garis putih...' : 'Processing contour & white outline...')}</span>
+              <span>{progressText || (lang === 'id' ? 'Sedang memproses pemotongan kontur & garis stiker...' : 'Processing contour & white outline...')}</span>
             </div>
             <span className="text-[11px] font-semibold text-earth-600">AI Background Removal &amp; Dilation</span>
           </div>
@@ -208,40 +274,66 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
         {/* Scrollable Gallery Area */}
         <div className="p-6 md:p-8 overflow-y-auto bg-[#F4F1EA] space-y-8">
           
-          {/* SECTION 1: MASTER UNIFIED STICKER BANNER */}
+          {/* SECTION 1: DYNAMIC RECONSTRUCTED MASTER COLLAGE BANNER */}
           <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
             <div className="flex items-center justify-between mb-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black">
                 <Layers size={13} />
-                <span>{lang === 'id' ? 'Kolase Stiker Bersatu' : 'Unified Sticker Banner'}</span>
+                <span>{lang === 'id' ? 'Kolase Bersatu (Dynamic Collage)' : 'Unified Reconstructed Banner'}</span>
               </div>
-              <span className="text-[11px] font-bold text-earth-600 bg-[#ECE7DF] px-2.5 py-1 rounded-full shadow-inner">
-                {lang === 'id' ? 'Garis Luar Putih Tebal' : 'Die-Cut White Outer Outline'}
-              </span>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSyncCollage()}
+                  disabled={isSyncing}
+                  className="paper-btn px-3 py-1 rounded-xl text-[11px] font-extrabold text-brand-brown flex items-center gap-1.5"
+                >
+                  <RefreshCw size={11} className={isSyncing ? 'animate-spin' : ''} />
+                  <span>{lang === 'id' ? 'Rekonstruksi Kolase' : 'Reconstruct Collage'}</span>
+                </button>
+                <span className="text-[11px] font-bold text-earth-600 bg-[#ECE7DF] px-2.5 py-1 rounded-full shadow-inner hidden sm:inline-block">
+                  {lang === 'id' ? 'Die-Cut White Outline' : 'Die-Cut White Outline'}
+                </span>
+              </div>
             </div>
 
             {/* Wide Master Collage Image */}
-            <div className="w-full h-48 sm:h-64 md:h-72 flex items-end justify-center bg-gradient-to-b from-[#EFEBE4]/60 to-[#ECE7DF] rounded-2xl p-4 transition-all duration-300">
+            <div 
+              onClick={() => setActiveImage({
+                id: 'active-collage',
+                title: lang === 'id' ? 'Kolase Stiker Bersatu' : 'Unified Sticker Collage',
+                subtitle: lang === 'id' ? 'Gabungan seluruh stiker yang tersimpan tanpa latar belakang' : 'All stored stickers merged seamlessly without background',
+                src: collageUrl,
+                tag: 'Master Banner'
+              })}
+              className="w-full h-48 sm:h-64 md:h-72 flex items-end justify-center bg-gradient-to-b from-[#EFEBE4]/60 to-[#ECE7DF] rounded-2xl p-4 transition-all duration-300 cursor-pointer group hover:shadow-inner"
+            >
               <img
-                src="/gallery/sticker-collage.png"
+                src={collageUrl}
                 alt="Rendgra Agrida & Family Sticker Collage"
-                className="max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] hover:scale-105 transition-transform duration-400"
+                className="max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 transition-transform duration-400"
               />
             </div>
 
-            {/* Banner Description */}
+            {/* Banner Footer Info */}
             <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#ECE7DF]">
               <span className="text-xs font-bold text-earth-800">
                 {lang === 'id' 
-                  ? 'Potongan kontur orang dipotong presisi dan disatukan berdampingan tanpa latar belakang.'
-                  : 'Individual human contours precisely cut and unified side-by-side with zero background.'}
+                  ? `Kolase otomatis disinkronkan dari ${stickers.length} foto stiker yang tersimpan.`
+                  : `Collage dynamically synced from all ${stickers.length} stored contour stickers.`}
               </span>
               <button
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => setActiveImage({
+                  id: 'active-collage',
+                  title: lang === 'id' ? 'Kolase Stiker Bersatu' : 'Unified Sticker Collage',
+                  subtitle: lang === 'id' ? 'Gabungan seluruh stiker yang tersimpan tanpa latar belakang' : 'All stored stickers merged seamlessly without background',
+                  src: collageUrl,
+                  tag: 'Master Banner'
+                })}
                 className="paper-btn px-3 py-1 rounded-xl text-xs font-extrabold text-brand-brown flex items-center gap-1.5"
               >
-                <UploadCloud size={13} />
-                <span>{lang === 'id' ? 'Tambah Foto Anda' : 'Add Your Photo'}</span>
+                <Maximize2 size={12} />
+                <span>{lang === 'id' ? 'Lihat Ukuran Penuh' : 'View Full Size'}</span>
               </button>
             </div>
           </div>
@@ -252,7 +344,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
               <div className="flex items-center gap-1.5">
                 <Sparkles size={14} className="text-brand-brown" />
                 <h3 className="text-sm md:text-base font-black text-earth-900">
-                  {lang === 'id' ? 'Koleksi Stiker Kontur' : 'Contour Sticker Collection'} ({stickers.length})
+                  {lang === 'id' ? 'Daftar Stiker Tersimpan' : 'Stored Sticker Collection'} ({stickers.length})
                 </h3>
               </div>
 
@@ -354,13 +446,15 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
                   <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title}</h4>
                   <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle}</p>
                 </div>
-                <button
-                  onClick={(e) => handleDeleteSticker(activeImage.id, e)}
-                  className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
-                >
-                  <Trash2 size={13} />
-                  <span>{lang === 'id' ? 'Hapus' : 'Delete'}</span>
-                </button>
+                {activeImage.id !== 'active-collage' && (
+                  <button
+                    onClick={() => handleDeleteSticker(activeImage.id)}
+                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
+                  >
+                    <Trash2 size={13} />
+                    <span>{lang === 'id' ? 'Hapus Stiker' : 'Delete'}</span>
+                  </button>
+                )}
               </div>
             </div>
 
