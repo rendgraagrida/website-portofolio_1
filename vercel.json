@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "cd frontend && (bun install || npm install)",
-  "buildCommand": "cd frontend && (bun run build || npm run build)",
-  "outputDirectory": "frontend/dist",
+  "installCommand": "if [ -d \"frontend\" ]; then cd frontend; fi && (bun install || npm install)",
+  "buildCommand": "if [ -d \"frontend\" ]; then cd frontend; fi && (bun run build || npm run build)",
+  "outputDirectory": "dist",
   "framework": "astro",
   "cleanUrls": true,
   "trailingSlash": false
