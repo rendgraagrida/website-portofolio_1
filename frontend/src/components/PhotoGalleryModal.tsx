@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $showGallery, toggleGallery } from '../stores/navigation';
 import { processImageToContourSticker, reconstructStickerCollage } from '../utils/stickerProcessor';
+import { StickerEditorModal } from './StickerEditorModal';
 import { 
   X, 
   Camera, 
@@ -12,10 +13,10 @@ import {
   RotateCcw, 
   Loader2, 
   Maximize2,
-  Layers,
-  Shuffle,
   Hand,
-  Check
+  RotateCw,
+  Shuffle,
+  Edit3
 } from 'lucide-react';
 
 interface PhotoGalleryModalProps {
@@ -27,6 +28,7 @@ export interface ContourStickerItem {
   title: string;
   subtitle: string;
   src: string;
+  rawSrc?: string; // Original uncropped photo for restore tool
   tag: string;
   isCustom?: boolean;
 }
@@ -37,7 +39,6 @@ interface DraggableStickerState {
   y: number; // px from top
   rotation: number; // deg
   zIndex: number;
-  scale: number;
 }
 
 const DEFAULT_STICKERS: ContourStickerItem[] = [
@@ -46,6 +47,7 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     title: 'Keluarga Ceria di Studio',
     subtitle: 'Momen penuh tawa dan kehangatan keluarga',
     src: '/gallery/sticker-studio.png',
+    rawSrc: '/gallery/photo-studio.jpg',
     tag: 'Family'
   },
   {
@@ -53,6 +55,7 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     title: 'Eksplorasi Gunung Bromo',
     subtitle: 'Sunrise dan petualangan alam terbuka',
     src: '/gallery/sticker-bromo.png',
+    rawSrc: '/gallery/photo-bromo.jpg',
     tag: 'Adventure'
   },
   {
@@ -60,6 +63,7 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     title: 'Supermarket Creative Session',
     subtitle: 'Eksplorasi konsep ruangan pop-art biru',
     src: '/gallery/sticker-supermarket.png',
+    rawSrc: '/gallery/photo-supermarket.jpg',
     tag: 'Creative'
   },
   {
@@ -67,31 +71,31 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     title: 'Rendgra Agrida',
     subtitle: 'Senior Software Engineer & Tech Lead',
     src: '/gallery/sticker-profile.png',
+    rawSrc: '/gallery/photo-profile.png',
     tag: 'Tech Lead'
   }
 ];
 
-const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v3';
-const STORAGE_COLLAGE_KEY = 'rendgra_gallery_collage_v3';
+const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v4';
 
 export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) => {
   const showGallery = useStore($showGallery);
   const [stickers, setStickers] = useState<ContourStickerItem[]>(DEFAULT_STICKERS);
-  const [collageUrl, setCollageUrl] = useState<string>('/gallery/sticker-collage.png');
   const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
   
   // Interactive Draggable Board State
-  const [isInteractiveMode, setIsInteractiveMode] = useState(true);
   const [dragStates, setDragStates] = useState<Record<string, DraggableStickerState>>({});
   const [maxZIndex, setMaxZIndex] = useState(10);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const dragStartRef = useRef<{ startX: number; startY: number; initX: number; initY: number } | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
 
+  // Manual Editor Modal State
+  const [editingSticker, setEditingSticker] = useState<ContourStickerItem | null>(null);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressText, setProgressText] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
-  const [syncSuccess, setSyncSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize interactive positions across the canvas
@@ -99,17 +103,16 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     const states: Record<string, DraggableStickerState> = {};
     const count = items.length;
     items.forEach((item, index) => {
-      const step = count > 1 ? 70 / (count - 1) : 0;
-      const x = 12 + index * step + (Math.random() * 6 - 3); // Overlapping horizontal spread
-      const y = Math.round(15 + Math.random() * 30);
+      const step = count > 1 ? 68 / (count - 1) : 0;
+      const x = 12 + index * step + (Math.random() * 6 - 3);
+      const y = Math.round(15 + Math.random() * 25);
       const rotation = Math.round(Math.random() * 12 - 6);
       states[item.id] = {
         id: item.id,
         x: Math.max(5, Math.min(75, x)),
         y,
         rotation,
-        zIndex: index + 1,
-        scale: 1
+        zIndex: index + 1
       };
     });
     setDragStates(states);
@@ -129,11 +132,6 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
         }
       }
       initDraggablePositions(currentItems);
-
-      const savedCollage = localStorage.getItem(STORAGE_COLLAGE_KEY);
-      if (savedCollage) {
-        setCollageUrl(savedCollage);
-      }
     } catch (e) {
       console.warn('Gagal membaca localStorage stickers:', e);
     }
@@ -149,32 +147,29 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     }
   };
 
-  // Sync / Shuffle Positions & Layering Overlap
-  const handleShuffleAndSync = async (currentItems = stickers) => {
-    if (currentItems.length === 0) return;
+  // SINGLE Sync & Acak Button Handler
+  const handleSingleSync = () => {
+    if (stickers.length === 0) return;
     setIsSyncing(true);
     
-    // 1. Randomize interactive drag board positions & layering
-    const shuffledItems = [...currentItems].sort(() => Math.random() - 0.5);
-    initDraggablePositions(shuffledItems);
+    // Randomize positions, overlapping order, and rotation angles
+    const shuffled = [...stickers].sort(() => Math.random() - 0.5);
+    initDraggablePositions(shuffled);
+    setTimeout(() => setIsSyncing(false), 300);
+  };
 
-    // 2. Generate new composite collage image with deep overlap
-    try {
-      const srcs = shuffledItems.map((s) => s.src);
-      const newCollage = await reconstructStickerCollage(srcs, true);
-      if (newCollage) {
-        setCollageUrl(newCollage);
-        try {
-          localStorage.setItem(STORAGE_COLLAGE_KEY, newCollage);
-        } catch (e) {}
-        setSyncSuccess(true);
-        setTimeout(() => setSyncSuccess(false), 2500);
-      }
-    } catch (err) {
-      console.error('Gagal merekonstruksi kolase:', err);
-    } finally {
-      setIsSyncing(false);
-    }
+  // SINGLE Rotate Button Handler (Rotates all stickers or selected by +15°)
+  const handleSingleRotate = () => {
+    setDragStates((prev) => {
+      const updated: Record<string, DraggableStickerState> = {};
+      Object.keys(prev).forEach((id) => {
+        updated[id] = {
+          ...prev[id],
+          rotation: (prev[id].rotation + 15) % 360
+        };
+      });
+      return updated;
+    });
   };
 
   // Drag & Drop Handlers for Manual Manipulation
@@ -183,13 +178,12 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     const board = boardRef.current;
     if (!board) return;
 
-    const boardRect = board.getBoundingClientRect();
-    const current = dragStates[id] || { x: 20, y: 20, rotation: 0, zIndex: maxZIndex + 1, scale: 1 };
+    const current = dragStates[id] || { x: 20, y: 20, rotation: 0, zIndex: maxZIndex + 1 };
     
     // Bring dragged sticker to top layer (menimpa stiker lain)
     const nextZ = maxZIndex + 1;
     setMaxZIndex(nextZ);
-    setDragStates(prev => ({
+    setDragStates((prev) => ({
       ...prev,
       [id]: { ...prev[id], zIndex: nextZ }
     }));
@@ -216,7 +210,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     const nextX = Math.max(2, Math.min(80, dragStartRef.current.initX + dxPercent));
     const nextY = Math.max(0, Math.min(180, dragStartRef.current.initY + dyPx));
 
-    setDragStates(prev => ({
+    setDragStates((prev) => ({
       ...prev,
       [draggingId]: {
         ...prev[draggingId],
@@ -241,9 +235,12 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     if (!file) return;
 
     setIsProcessing(true);
-    setProgressText(lang === 'id' ? 'Memotong kontur stiker...' : 'Cutting sticker contour...');
+    setProgressText(lang === 'id' ? 'Memotong kontur foto otomatis...' : 'Cutting sticker contour...');
 
     try {
+      // Create raw object URL for manual restore capability
+      const rawUrl = URL.createObjectURL(file);
+
       const stickerDataUrl = await processImageToContourSticker(file, (step) => {
         setProgressText(step);
       });
@@ -251,15 +248,15 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
       const newSticker: ContourStickerItem = {
         id: `custom-${Date.now()}`,
         title: file.name.replace(/\.[^/.]+$/, '').slice(0, 30) || (lang === 'id' ? 'Stiker Baru' : 'New Sticker'),
-        subtitle: lang === 'id' ? 'Stiker die-cut kontur otomatis' : 'Auto contour die-cut sticker',
+        subtitle: lang === 'id' ? 'Stiker die-cut kontur' : 'Auto contour die-cut sticker',
         src: stickerDataUrl,
+        rawSrc: rawUrl,
         tag: 'New Sticker',
         isCustom: true
       };
 
       const updated = [newSticker, ...stickers];
       saveStickers(updated);
-      handleShuffleAndSync(updated);
     } catch (err) {
       console.error('Gagal memproses stiker:', err);
       alert(lang === 'id' ? 'Gagal memproses gambar menjadi stiker.' : 'Failed to process image into sticker.');
@@ -280,16 +277,31 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
       if (activeImage?.id === id) {
         setActiveImage(null);
       }
-      handleShuffleAndSync(updated);
     }
+  };
+
+  const handleSaveEditedSticker = (newStickerSrc: string) => {
+    if (!editingSticker) return;
+
+    const updated = stickers.map((item) => {
+      if (item.id === editingSticker.id) {
+        return {
+          ...item,
+          src: newStickerSrc
+        };
+      }
+      return item;
+    });
+
+    saveStickers(updated);
+    setEditingSticker(null);
   };
 
   const handleResetDefaults = () => {
     if (confirm(lang === 'id' ? 'Kembalikan stiker ke koleksi default?' : 'Reset to default sticker presets?')) {
       saveStickers(DEFAULT_STICKERS);
-      setCollageUrl('/gallery/sticker-collage.png');
       try {
-        localStorage.removeItem(STORAGE_COLLAGE_KEY);
+        localStorage.removeItem(STORAGE_STICKERS_KEY);
       } catch {}
     }
   };
@@ -300,38 +312,38 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/55 backdrop-blur-md animate-fade-in">
       <div className="paper-card rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl animate-fade-in max-h-[92vh] flex flex-col">
         
-        {/* Header with Title, Sync & Acak, Upload & Close */}
+        {/* Header with Title and Unified Non-Duplicated Controls */}
         <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
             <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
               <Camera size={16} />
             </div>
-            <span>{lang === 'id' ? 'Papan Stiker Interaktif & Geser Manual' : 'Interactive Drag & Drop Sticker Board'}</span>
+            <span>{lang === 'id' ? 'Papan Stiker Interaktif & Galeri Foto' : 'Interactive Sticker Playground'}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Sync & Acak Posisi Button */}
+            {/* SINGLE Rotate Button */}
             <button
-              onClick={() => handleShuffleAndSync()}
+              onClick={handleSingleRotate}
+              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-extrabold text-earth-800 hover:text-brand-brown flex items-center gap-1.5"
+              title={lang === 'id' ? 'Putar Kemiringan Stiker (+15°)' : 'Rotate Stickers (+15°)'}
+            >
+              <RotateCw size={13} />
+              <span>{lang === 'id' ? 'Putar' : 'Rotate'}</span>
+            </button>
+
+            {/* SINGLE Sync & Acak Button */}
+            <button
+              onClick={handleSingleSync}
               disabled={isSyncing}
               className="paper-btn px-3 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
               title={lang === 'id' ? 'Acak Posisi & Saling Menimpa Ulang' : 'Shuffle & Overlap Positions'}
             >
-              {isSyncing ? (
-                <Loader2 size={13} className="animate-spin" />
-              ) : syncSuccess ? (
-                <Check size={13} className="text-emerald-700" />
-              ) : (
-                <Shuffle size={13} />
-              )}
-              <span>
-                {isSyncing
-                  ? (lang === 'id' ? 'Mengacak...' : 'Shuffling...')
-                  : (lang === 'id' ? 'Sync & Acak Posisi' : 'Sync & Shuffle')}
-              </span>
+              <Shuffle size={13} className={isSyncing ? 'animate-spin' : ''} />
+              <span>{lang === 'id' ? 'Sync & Acak' : 'Sync & Shuffle'}</span>
             </button>
 
-            {/* Upload Button */}
+            {/* SINGLE Upload Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
@@ -382,12 +394,12 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black">
                 <Hand size={13} />
-                <span>{lang === 'id' ? 'Papan Geser Bebas (Bisa Saling Menimpa)' : 'Interactive Drag & Overlap Canvas'}</span>
+                <span>{lang === 'id' ? 'Papan Geser Bebas & Saling Menimpa' : 'Interactive Drag & Overlap Canvas'}</span>
               </div>
 
               <span className="text-[11px] font-bold text-earth-600 bg-[#ECE7DF] px-3 py-1 rounded-full shadow-inner flex items-center gap-1">
                 <Sparkles size={11} className="text-brand-brown" />
-                <span>{lang === 'id' ? 'Tahan & geser stiker dengan kursor/jari Anda' : 'Click & drag stickers freely'}</span>
+                <span>{lang === 'id' ? 'Geser stiker secara bebas dengan kursor/jari Anda' : 'Drag stickers freely'}</span>
               </span>
             </div>
 
@@ -423,7 +435,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
                       className="h-44 sm:h-52 md:h-60 max-w-none object-contain pointer-events-none"
                     />
 
-                    {/* Subtle Sticker Tag */}
+                    {/* Sticker Label Tag */}
                     <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/95 px-2.5 py-0.5 rounded-full text-[10px] font-black text-brand-brown shadow-md border border-[#ECE7DF] pointer-events-none">
                       {item.title.split(' ')[0]}
                     </div>
@@ -431,25 +443,9 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
                 );
               })}
             </div>
-
-            {/* Canvas Bottom Toolbar */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#ECE7DF]">
-              <span className="text-xs font-bold text-earth-800">
-                {lang === 'id' 
-                  ? '💡 Tips: Klik stiker untuk membawanya ke lapisan paling depan (menimpa stiker lain).'
-                  : '💡 Tip: Click any sticker to bring it to the front layer over others.'}
-              </span>
-              <button
-                onClick={() => handleShuffleAndSync()}
-                className="paper-btn px-3 py-1 rounded-xl text-xs font-extrabold text-brand-brown flex items-center gap-1.5"
-              >
-                <Shuffle size={12} />
-                <span>{lang === 'id' ? 'Acak Tata Letak' : 'Shuffle Layout'}</span>
-              </button>
-            </div>
           </div>
 
-          {/* SECTION 2: INDIVIDUAL DIE-CUT CONTOUR STICKERS GRID */}
+          {/* SECTION 2: INDIVIDUAL STICKERS WITH MANUAL EDIT & RESTORE BUTTONS */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-1.5">
@@ -474,20 +470,37 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
               {stickers.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => setActiveImage(item)}
                   className="paper-card p-4 rounded-3xl flex flex-col items-center text-center cursor-pointer group hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 select-none relative"
                 >
-                  {/* Delete Button */}
-                  <button
-                    onClick={(e) => handleDeleteSticker(item.id, e)}
-                    className="absolute top-2 right-2 w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-80 hover:opacity-100 z-10"
-                    title={lang === 'id' ? 'Hapus stiker ini' : 'Delete this sticker'}
-                  >
-                    <Trash2 size={12} />
-                  </button>
+                  {/* Action Buttons Top Bar: Edit & Delete */}
+                  <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+                    {/* Manual Clean & Restore Edit Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingSticker(item);
+                      }}
+                      className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-80 hover:opacity-100"
+                      title={lang === 'id' ? 'Koreksi & Bersihkan Stiker Manual' : 'Manual Clean & Restore'}
+                    >
+                      <Edit3 size={12} />
+                    </button>
 
-                  {/* Contour Sticker Container */}
-                  <div className="w-full h-40 sm:h-48 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden">
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => handleDeleteSticker(item.id, e)}
+                      className="w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-80 hover:opacity-100"
+                      title={lang === 'id' ? 'Hapus stiker ini' : 'Delete this sticker'}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+
+                  {/* Contour Sticker Container (Click to view full lightbox) */}
+                  <div 
+                    onClick={() => setActiveImage(item)}
+                    className="w-full h-40 sm:h-48 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden"
+                  >
                     <img
                       src={item.src}
                       alt={item.title}
@@ -496,7 +509,10 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
                     />
                   </div>
 
-                  <h4 className="font-extrabold text-xs md:text-sm text-earth-900 leading-tight mb-1 group-hover:text-brand-brown transition-colors">
+                  <h4 
+                    onClick={() => setActiveImage(item)}
+                    className="font-extrabold text-xs md:text-sm text-earth-900 leading-tight mb-1 group-hover:text-brand-brown transition-colors"
+                  >
                     {item.title}
                   </h4>
 
@@ -557,20 +573,43 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
                   <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title}</h4>
                   <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle}</p>
                 </div>
-                {activeImage.id !== 'active-collage' && (
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setEditingSticker(activeImage);
+                      setActiveImage(null);
+                    }}
+                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-brand-brown flex items-center gap-1.5"
+                  >
+                    <Edit3 size={13} />
+                    <span>{lang === 'id' ? 'Koreksi Kuas' : 'Manual Brush'}</span>
+                  </button>
                   <button
                     onClick={() => handleDeleteSticker(activeImage.id)}
                     className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
                   >
                     <Trash2 size={13} />
-                    <span>{lang === 'id' ? 'Hapus Stiker' : 'Delete'}</span>
+                    <span>{lang === 'id' ? 'Hapus' : 'Delete'}</span>
                   </button>
-                )}
+                </div>
               </div>
             </div>
 
           </div>
         </div>
+      )}
+
+      {/* MANUAL CLEANUP & RESTORE STICKER MODAL */}
+      {editingSticker && (
+        <StickerEditorModal
+          isOpen={!!editingSticker}
+          onClose={() => setEditingSticker(null)}
+          onSave={handleSaveEditedSticker}
+          sourceImageUrl={editingSticker.rawSrc || editingSticker.src}
+          initialCutoutUrl={editingSticker.src}
+          lang={lang}
+        />
       )}
 
     </div>
