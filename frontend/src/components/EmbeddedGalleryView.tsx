@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useStore } from '@nanostores/react';
+import { $isOwner, openSignInModal } from '../stores/auth';
 import { processImageToContourSticker } from '../utils/stickerProcessor';
 import { StickerEditorModal } from './StickerEditorModal';
 import { 
@@ -11,9 +13,9 @@ import {
   Hand, 
   RotateCw, 
   Shuffle, 
-  Edit3,
+  Edit3, 
   X,
-  Maximize2
+  Lock
 } from 'lucide-react';
 
 interface EmbeddedGalleryViewProps {
@@ -32,9 +34,9 @@ export interface ContourStickerItem {
 
 interface DraggableStickerState {
   id: string;
-  x: number; // percentage (0 - 100)
-  y: number; // px from top
-  rotation: number; // deg
+  x: number;
+  y: number;
+  rotation: number;
   zIndex: number;
 }
 
@@ -76,6 +78,8 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
 const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v5';
 
 export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }) => {
+  const isOwner = useStore($isOwner);
+
   const [stickers, setStickers] = useState<ContourStickerItem[]>(DEFAULT_STICKERS);
   const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
   
@@ -151,7 +155,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     setTimeout(() => setIsSyncing(false), 250);
   };
 
-  // ROTATE INDIVIDUAL PHOTO (Hanya memutar foto yang dipilih!)
+  // ROTATE INDIVIDUAL PHOTO
   const handleRotateSinglePhoto = (id: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setDragStates((prev) => {
@@ -166,15 +170,13 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     });
   };
 
-  // Drag & Drop Handlers for Manual Canvas Manipulation
+  // Drag & Drop Handlers
   const handlePointerDown = (id: string, e: React.PointerEvent) => {
     e.preventDefault();
     const board = boardRef.current;
     if (!board) return;
 
     const current = dragStates[id] || { id, x: 20, y: 20, rotation: 0, zIndex: maxZIndex + 1 };
-    
-    // Bring dragged sticker to front layer
     const nextZ = maxZIndex + 1;
     setMaxZIndex(nextZ);
     setDragStates((prev) => ({
@@ -225,6 +227,11 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isOwner) {
+      openSignInModal();
+      return;
+    }
+
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -263,6 +270,10 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
 
   const handleDeleteSticker = (id: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
+    if (!isOwner) {
+      openSignInModal();
+      return;
+    }
     if (confirm(lang === 'id' ? 'Hapus stiker ini dari galeri?' : 'Delete this sticker?')) {
       const updated = stickers.filter((s) => s.id !== id);
       saveStickers(updated);
@@ -290,6 +301,10 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   };
 
   const handleResetDefaults = () => {
+    if (!isOwner) {
+      openSignInModal();
+      return;
+    }
     if (confirm(lang === 'id' ? 'Kembalikan stiker ke koleksi default?' : 'Reset to default sticker presets?')) {
       saveStickers(DEFAULT_STICKERS);
       try {
@@ -301,7 +316,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   return (
     <div className="space-y-8 animate-fade-in">
       
-      {/* SECTION 1: MASTER CANVAS & SINGLE CONSOLIDATED TOOLBAR */}
+      {/* SECTION 1: MASTER CANVAS & TOOLBAR */}
       <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
         
         {/* Toolbar with Non-Duplicated Controls */}
@@ -332,25 +347,37 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
               <span>{lang === 'id' ? 'Sync & Acak' : 'Sync & Shuffle'}</span>
             </button>
 
-            {/* SINGLE Upload Button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isProcessing}
-              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
-              title={lang === 'id' ? 'Unggah Foto Baru & Potong Kontur Otomatis' : 'Upload & Auto Cutout'}
-            >
-              {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
-              <span>{lang === 'id' ? 'Upload Foto' : 'Upload'}</span>
-            </button>
+            {/* Upload Button: Active for Owner, Prompts login for guests */}
+            {isOwner ? (
+              <>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isProcessing}
+                  className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
+                  title={lang === 'id' ? 'Unggah Foto Baru & Potong Kontur Otomatis' : 'Upload & Auto Cutout'}
+                >
+                  {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
+                  <span>{lang === 'id' ? 'Upload Foto' : 'Upload'}</span>
+                </button>
 
-            {/* Hidden File Input */}
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              accept="image/*" 
-              className="hidden" 
-            />
+                <input 
+                  type="file" 
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  accept="image/*" 
+                  className="hidden" 
+                />
+              </>
+            ) : (
+              <button
+                onClick={openSignInModal}
+                className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-600 hover:text-brand-brown flex items-center gap-1.5"
+                title="Sign in as owner to upload custom stickers"
+              >
+                <Lock size={12} />
+                <span>{lang === 'id' ? 'Mode Read-Only' : 'Read-Only'}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -397,14 +424,13 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                   className="h-44 sm:h-52 md:h-60 max-w-none object-contain pointer-events-none"
                 />
 
-                {/* Individual Rotate & Action Badge on Sticker */}
+                {/* Individual Rotate on Sticker */}
                 <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/95 px-2 py-0.5 rounded-full text-[10px] font-black text-brand-brown shadow-md border border-[#ECE7DF]">
                   <span>{item.title.split(' ')[0]}</span>
-                  {/* Single photo rotate button on sticker */}
                   <button
                     onClick={(e) => handleRotateSinglePhoto(item.id, e)}
                     className="p-0.5 hover:bg-[#ECE7DF] rounded text-earth-700 hover:text-brand-brown transition-colors pointer-events-auto"
-                    title={lang === 'id' ? 'Putar foto ini (+15°)' : 'Rotate this photo (+15°)'}
+                    title={lang === 'id' ? 'Putar foto ini (+15°)' : 'Rotate photo (+15°)'}
                   >
                     <RotateCw size={11} />
                   </button>
@@ -421,13 +447,13 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
             <span>{lang === 'id' ? 'Klik & geser stiker bebas untuk menimpa foto lain.' : 'Click & drag stickers freely to overlap.'}</span>
           </span>
           <span className="text-[11px] text-earth-500 hidden sm:inline">
-            {lang === 'id' ? 'Gunakan tombol putar pada tiap stiker untuk memutar foto' : 'Use rotate button on each sticker'}
+            {lang === 'id' ? 'Tombol putar tersedia pada tiap stiker' : 'Rotate available on each sticker'}
           </span>
         </div>
 
       </div>
 
-      {/* SECTION 2: INDIVIDUAL STICKER COLLECTION WITH ROTATE & MANUAL CLEAN TOOLS */}
+      {/* SECTION 2: INDIVIDUAL STICKER COLLECTION */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1.5">
@@ -437,7 +463,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
             </h3>
           </div>
 
-          {stickers.length !== DEFAULT_STICKERS.length && (
+          {isOwner && stickers.length !== DEFAULT_STICKERS.length && (
             <button
               onClick={handleResetDefaults}
               className="paper-btn px-3 py-1 rounded-xl text-[11px] font-bold text-earth-700 hover:text-brand-brown flex items-center gap-1"
@@ -454,7 +480,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
               key={item.id}
               className="paper-card p-4 rounded-3xl flex flex-col items-center text-center cursor-pointer group hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 select-none relative"
             >
-              {/* Top Action Buttons: Rotate Single, Edit Brush, Delete */}
+              {/* Top Action Buttons (Rotate for all, Edit/Delete for Owner) */}
               <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
                 {/* Rotate Single Photo Button */}
                 <button
@@ -465,29 +491,31 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                   <RotateCw size={12} />
                 </button>
 
-                {/* Manual Clean & Restore Edit Brush Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingSticker(item);
-                  }}
-                  className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
-                  title={lang === 'id' ? 'Koreksi & Bersihkan Stiker Manual' : 'Manual Clean & Restore'}
-                >
-                  <Edit3 size={12} />
-                </button>
+                {isOwner && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingSticker(item);
+                      }}
+                      className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
+                      title={lang === 'id' ? 'Koreksi & Bersihkan Stiker Manual' : 'Manual Clean & Restore'}
+                    >
+                      <Edit3 size={12} />
+                    </button>
 
-                {/* Delete Button */}
-                <button
-                  onClick={(e) => handleDeleteSticker(item.id, e)}
-                  className="w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
-                  title={lang === 'id' ? 'Hapus stiker ini' : 'Delete this sticker'}
-                >
-                  <Trash2 size={12} />
-                </button>
+                    <button
+                      onClick={(e) => handleDeleteSticker(item.id, e)}
+                      className="w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
+                      title={lang === 'id' ? 'Hapus stiker ini' : 'Delete this sticker'}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </>
+                )}
               </div>
 
-              {/* Contour Sticker Container (Click to view full lightbox) */}
+              {/* Contour Sticker Container */}
               <div 
                 onClick={() => setActiveImage(item)}
                 className="w-full h-40 sm:h-48 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden"
@@ -525,7 +553,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
             className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Lightbox */}
             <button
               onClick={() => setActiveImage(null)}
               className="absolute -top-12 right-0 bg-white/20 hover:bg-white text-white hover:text-black w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-lg"
@@ -533,7 +560,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
               <X size={18} />
             </button>
 
-            {/* High-Resolution Die-Cut Sticker Card */}
             <div className="paper-card p-6 md:p-8 rounded-3xl max-h-[80vh] flex flex-col items-center justify-center overflow-hidden bg-[#F4F1EA]">
               <img 
                 src={activeImage.src} 
@@ -554,23 +580,27 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                     <RotateCw size={13} />
                     <span>{lang === 'id' ? 'Putar Foto' : 'Rotate'}</span>
                   </button>
-                  <button
-                    onClick={() => {
-                      setEditingSticker(activeImage);
-                      setActiveImage(null);
-                    }}
-                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-brand-brown flex items-center gap-1.5"
-                  >
-                    <Edit3 size={13} />
-                    <span>{lang === 'id' ? 'Koreksi Kuas' : 'Manual Brush'}</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSticker(activeImage.id)}
-                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
-                  >
-                    <Trash2 size={13} />
-                    <span>{lang === 'id' ? 'Hapus' : 'Delete'}</span>
-                  </button>
+                  {isOwner && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setEditingSticker(activeImage);
+                          setActiveImage(null);
+                        }}
+                        className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-brand-brown flex items-center gap-1.5"
+                      >
+                        <Edit3 size={13} />
+                        <span>{lang === 'id' ? 'Koreksi Kuas' : 'Manual Brush'}</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSticker(activeImage.id)}
+                        className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
+                      >
+                        <Trash2 size={13} />
+                        <span>{lang === 'id' ? 'Hapus' : 'Delete'}</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

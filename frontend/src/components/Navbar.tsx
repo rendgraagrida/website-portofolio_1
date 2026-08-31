@@ -1,7 +1,17 @@
 import React from 'react';
 import { useStore } from '@nanostores/react';
 import { $showPortfolioGen, $showContact, togglePortfolioGen, toggleContact } from '../stores/navigation';
-import { Terminal, Sparkles, Send, X } from 'lucide-react';
+import { 
+  $currentUser, 
+  $isAuthenticated, 
+  $isOwner, 
+  openSignInModal, 
+  openProfileEditModal, 
+  signOut 
+} from '../stores/auth';
+import { SignInModal } from './SignInModal';
+import { ProfileEditModal } from './ProfileEditModal';
+import { Terminal, Sparkles, Send, X, LogIn, LogOut, Edit3, ShieldCheck, User } from 'lucide-react';
 import { ui } from '../i18n/ui';
 
 interface NavbarProps {
@@ -12,6 +22,9 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
   const t = ui[lang];
   const isPortfolioGenOpen = useStore($showPortfolioGen);
   const isContactOpen = useStore($showContact);
+  const currentUser = useStore($currentUser);
+  const isAuthenticated = useStore($isAuthenticated);
+  const isOwner = useStore($isOwner);
   const toggleUrl = lang === 'id' ? '/en/' : '/';
 
   return (
@@ -48,27 +61,68 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
           </span>
         </button>
 
-        {/* Right Actions: Hubungi Saya (Paper Button) + Language Switcher */}
-        <div className="flex items-center gap-3 md:gap-4">
+        {/* Right Actions: Auth, Hubungi Saya, Language Switcher */}
+        <div className="flex items-center gap-2.5 md:gap-3.5">
           
+          {/* Auth Controls */}
+          {isAuthenticated ? (
+            <div className="flex items-center gap-1.5">
+              {/* Owner Edit Profile Trigger */}
+              {isOwner && (
+                <button
+                  onClick={openProfileEditModal}
+                  className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-brand-brown hover:text-earth-900 flex items-center gap-1.5"
+                  title="Edit Profile"
+                >
+                  <Edit3 size={13} />
+                  <span className="hidden sm:inline">{lang === 'id' ? 'Edit Profil' : 'Edit Profile'}</span>
+                </button>
+              )}
+
+              {/* User Avatar Badge & Sign Out */}
+              <button
+                onClick={signOut}
+                className="paper-well px-2.5 py-1.5 rounded-xl text-xs font-extrabold text-earth-800 hover:text-rose-600 flex items-center gap-1.5"
+                title={lang === 'id' ? `Keluar (${currentUser?.email})` : `Sign Out (${currentUser?.email})`}
+              >
+                {isOwner ? (
+                  <ShieldCheck size={14} className="text-brand-brown" />
+                ) : (
+                  <User size={14} className="text-earth-600" />
+                )}
+                <span className="max-w-[90px] truncate hidden md:inline">{currentUser?.name}</span>
+                <LogOut size={12} className="text-earth-500 hover:text-rose-600 ml-0.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={openSignInModal}
+              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-800 hover:text-brand-brown flex items-center gap-1.5"
+              title="Sign In"
+            >
+              <LogIn size={13} />
+              <span>{lang === 'id' ? 'Sign In' : 'Sign In'}</span>
+            </button>
+          )}
+
           {/* Hubungi Saya Toggle Button */}
           <button
             onClick={toggleContact}
-            className={`px-4 md:px-5 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 focus:outline-none select-none ${
+            className={`px-3.5 md:px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-1.5 focus:outline-none select-none ${
               isContactOpen
                 ? 'paper-well text-brand-brown font-extrabold scale-[0.98]'
                 : 'paper-btn text-earth-900 hover:text-brand-brown'
             }`}
             title={lang === 'id' ? 'Klik untuk Buka / Tutup Form Kontak' : 'Click to Toggle Contact Form'}
           >
-            {isContactOpen ? <X size={15} /> : <Send size={15} className="text-brand-brown" />}
-            <span>{isContactOpen ? (lang === 'id' ? 'Tutup Kontak' : 'Close Contact') : t['nav.contact']}</span>
+            {isContactOpen ? <X size={14} /> : <Send size={14} className="text-brand-brown" />}
+            <span className="hidden sm:inline">{isContactOpen ? (lang === 'id' ? 'Tutup Kontak' : 'Close') : t['nav.contact']}</span>
           </button>
 
           {/* Paper Language Toggle */}
           <a
             href={toggleUrl}
-            className="flex items-center px-3 py-1.5 paper-btn rounded-xl text-xs font-extrabold select-none text-earth-700 hover:text-brand-brown"
+            className="flex items-center px-2.5 py-1.5 paper-btn rounded-xl text-xs font-extrabold select-none text-earth-700 hover:text-brand-brown"
           >
             <span className={lang === 'id' ? 'text-brand-brown font-black' : 'text-earth-400'}>ID</span>
             <span className="mx-1 text-earth-300">|</span>
@@ -78,6 +132,11 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
         </div>
 
       </div>
+
+      {/* Global Modals */}
+      <SignInModal lang={lang} />
+      <ProfileEditModal lang={lang} />
+
     </header>
   );
 };
