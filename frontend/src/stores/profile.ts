@@ -84,7 +84,7 @@ export const DEFAULT_PROFILE: ProfileData = {
   ]
 };
 
-const STORAGE_PROFILE_KEY = 'rendgra_profile_data_v1';
+const STORAGE_PROFILE_KEY = 'rendgra_profile_data_v2';
 
 const getInitialProfile = (): ProfileData => {
   if (typeof window === 'undefined') return DEFAULT_PROFILE;
@@ -99,18 +99,70 @@ const getInitialProfile = (): ProfileData => {
 
 export const $profileData = atom<ProfileData>(getInitialProfile());
 
-export const updateProfileData = (newData: Partial<ProfileData>) => {
-  const current = $profileData.get();
-  const updated = { ...current, ...newData };
-  $profileData.set(updated);
+export const saveProfileToStorage = (data: ProfileData) => {
+  $profileData.set(data);
   try {
-    localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify(updated));
+    localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify(data));
   } catch (e) {}
 };
 
+export const updateQuote = (newQuote: string) => {
+  const current = $profileData.get();
+  saveProfileToStorage({ ...current, quote: newQuote });
+};
+
+// Personality Pillar CRUD
+export const addPersonalityPillar = (item: Omit<PersonalityItem, 'id'>) => {
+  const current = $profileData.get();
+  const newItem: PersonalityItem = { ...item, id: `p-${Date.now()}` };
+  saveProfileToStorage({
+    ...current,
+    personalityPillars: [...current.personalityPillars, newItem]
+  });
+};
+
+export const updatePersonalityPillar = (id: string, updatedFields: Partial<PersonalityItem>) => {
+  const current = $profileData.get();
+  const updatedPillars = current.personalityPillars.map((p) =>
+    p.id === id ? { ...p, ...updatedFields } : p
+  );
+  saveProfileToStorage({ ...current, personalityPillars: updatedPillars });
+};
+
+export const deletePersonalityPillar = (id: string) => {
+  const current = $profileData.get();
+  saveProfileToStorage({
+    ...current,
+    personalityPillars: current.personalityPillars.filter((p) => p.id !== id)
+  });
+};
+
+// Hobbies CRUD
+export const addHobby = (item: Omit<HobbyItem, 'id'>) => {
+  const current = $profileData.get();
+  const newItem: HobbyItem = { ...item, id: `h-${Date.now()}` };
+  saveProfileToStorage({
+    ...current,
+    hobbies: [...current.hobbies, newItem]
+  });
+};
+
+export const updateHobby = (id: string, updatedFields: Partial<HobbyItem>) => {
+  const current = $profileData.get();
+  const updatedHobbies = current.hobbies.map((h) =>
+    h.id === id ? { ...h, ...updatedFields } : h
+  );
+  saveProfileToStorage({ ...current, hobbies: updatedHobbies });
+};
+
+export const deleteHobby = (id: string) => {
+  const current = $profileData.get();
+  saveProfileToStorage({
+    ...current,
+    hobbies: current.hobbies.filter((h) => h.id !== id)
+  });
+};
+
 export const resetProfileData = () => {
-  $profileData.set(DEFAULT_PROFILE);
-  try {
-    localStorage.removeItem(STORAGE_PROFILE_KEY);
-  } catch (e) {}
+  saveProfileToStorage(DEFAULT_PROFILE);
 };

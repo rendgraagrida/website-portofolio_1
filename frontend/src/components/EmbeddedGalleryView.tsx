@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useStore } from '@nanostores/react';
+import { $isGlobalEditMode, toggleGlobalEditMode } from '../stores/editMode';
 import { processImageToContourSticker } from '../utils/stickerProcessor';
 import { StickerEditorModal } from './StickerEditorModal';
 import { 
@@ -88,11 +90,10 @@ const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v7';
 const STORAGE_DRAG_KEY = 'rendgra_gallery_drag_positions_v7';
 
 export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }) => {
+  const isEditMode = useStore($isGlobalEditMode);
+
   const [stickers, setStickers] = useState<ContourStickerItem[]>(DEFAULT_STICKERS);
   const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
-  
-  // EDIT MODE TOGGLE (Default is clean / normal view)
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Interactive Draggable & Transform Board State
   const [dragStates, setDragStates] = useState<Record<string, DraggableStickerState>>({});
@@ -126,7 +127,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
 
   // Initialize interactive positions & scale across the canvas
   const initDraggablePositions = (items: ContourStickerItem[], forceNew: boolean = false) => {
-    // Check if saved drag layout exists
     if (!forceNew) {
       try {
         const savedLayout = localStorage.getItem(STORAGE_DRAG_KEY);
@@ -194,14 +194,11 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   // Toggle Edit Mode & Save
   const handleToggleEditMode = () => {
     if (isEditMode) {
-      // Save current layout to localStorage and exit edit mode
       saveDragLayout(dragStates);
       saveStickers(stickers);
       setSelectedStickerId(null);
-      setIsEditMode(false);
-    } else {
-      setIsEditMode(true);
     }
+    toggleGlobalEditMode();
   };
 
   // SINGLE Sync & Acak Button Handler
@@ -273,7 +270,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   
   const handleTouchStart = (id: string, e: React.TouchEvent) => {
     if (!isEditMode) {
-      // In clean mode, touch just brings it forward or click opens lightbox
       const nextZ = maxZIndex + 1;
       setMaxZIndex(nextZ);
       setDragStates((prev) => ({

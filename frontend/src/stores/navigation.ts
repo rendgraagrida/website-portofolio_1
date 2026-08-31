@@ -6,13 +6,13 @@ export type PersonalTab = 'personality' | 'hobbies' | 'gallery';
 
 export const $navMode = atom<NavigationMode>('professional');
 export const $activeProfTab = atom<ProfessionalTab>('experience');
-export const $activePersonalTab = atom<PersonalTab>('gallery');
+export const $activePersonalTab = atom<PersonalTab>('personality');
 
 export const $showPortfolioGen = atom<boolean>(false);
 export const $showContact = atom<boolean>(false);
 export const $showGallery = atom<boolean>(false);
 
-// Toggle between Professional Mode and Personal Mode when clicking "Halo saya Rendgra"
+// Toggle between Professional Mode and Personal Mode (Directs to Personality tab first)
 export const togglePersonalMode = () => {
   const currentMode = $navMode.get();
   $showPortfolioGen.set(false);
@@ -20,7 +20,7 @@ export const togglePersonalMode = () => {
 
   if (currentMode === 'professional') {
     $navMode.set('personal');
-    $activePersonalTab.set('gallery');
+    $activePersonalTab.set('personality'); // Direct to Personality first
   } else {
     $navMode.set('professional');
   }
