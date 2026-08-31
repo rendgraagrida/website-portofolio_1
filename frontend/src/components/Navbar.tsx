@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/react';
 import { $showPortfolioGen, $showContact, togglePortfolioGen, toggleContact, $navMode } from '../stores/navigation';
 import { Terminal, Sparkles, Send, X, Globe } from 'lucide-react';
 import { ui } from '../i18n/ui';
+import { QuoteCarousel } from './QuoteCarousel';
 
 interface NavbarProps {
   lang: 'id' | 'en';
@@ -17,45 +18,56 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
   const toggleUrl = lang === 'id' ? '/en/' : '/';
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${
-      isPersonal ? 'bg-transparent' : 'bg-[#F4F1EA]/90 backdrop-blur-md border-b border-[#E6E0D5]'
-    }`}>
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <>
+      {/* Absolute Center Quote Carousel (Stays at the very top, scrolls away, not sticky) */}
+      {isPersonal && (
+        <div className="absolute top-0 left-0 right-0 h-16 flex items-center justify-center z-40 pointer-events-none">
+          <div className="pointer-events-auto w-full px-2 sm:px-6 flex justify-center">
+            <QuoteCarousel lang={lang} />
+          </div>
+        </div>
+      )}
+
+      <header className={`sticky top-0 z-50 transition-all duration-300 ${
+        isPersonal ? 'bg-transparent' : 'bg-[#F4F1EA]/90 backdrop-blur-md border-b border-[#E6E0D5]'
+      }`}>
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between relative">
         
         {/* Left: Paper-Embossed Clickable Logo/Brand to Toggle Portfolio Generator */}
-        <div className={isPersonal ? 'invisible' : ''}>
+        <div className={`flex items-center flex-1 overflow-hidden ${isPersonal ? 'invisible' : ''}`}>
           <button
-            onClick={togglePortfolioGen}
-            className={`group flex items-center gap-2.5 px-3.5 py-2 rounded-2xl font-extrabold text-lg transition-all duration-300 select-none focus:outline-none ${
-              isPortfolioGenOpen 
-                ? 'paper-well text-brand-brown scale-[0.98]' 
-                : 'paper-btn text-earth-900 hover:text-brand-brown'
-            }`}
-            title={lang === 'id' ? 'Klik untuk Buka / Tutup Portofolio Generator' : 'Click to Toggle Portfolio Generator'}
-          >
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform duration-300 ${
-              isPortfolioGenOpen 
-                ? 'bg-brand-brown text-white shadow-inner' 
-                : 'bg-[#ECE7DF] shadow-[inset_1px_1px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.9)] text-brand-brown group-hover:scale-105'
-            }`}>
-              <Terminal size={17} />
-            </div>
-            <span>
-              Rendgra.<span className="text-brand-brown">Dev</span>
-            </span>
-            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full transition-all duration-300 hidden sm:inline-flex items-center gap-1 ${
-              isPortfolioGenOpen
-                ? 'bg-brand-brown text-white'
-                : 'bg-[#ECE7DF] text-earth-700 shadow-inner'
-            }`}>
-              <Sparkles size={10} />
-              <span>{isPortfolioGenOpen ? (lang === 'id' ? 'Tutup' : 'Close') : 'Gen'}</span>
-            </span>
+              onClick={togglePortfolioGen}
+              className={`group flex items-center gap-2.5 px-3.5 py-2 rounded-2xl font-extrabold text-lg transition-all duration-300 select-none focus:outline-none ${
+                isPortfolioGenOpen 
+                  ? 'paper-well text-brand-brown scale-[0.98]' 
+                  : 'paper-btn text-earth-900 hover:text-brand-brown'
+              }`}
+              title={lang === 'id' ? 'Klik untuk Buka / Tutup Portofolio Generator' : 'Click to Toggle Portfolio Generator'}
+            >
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-transform duration-300 ${
+                isPortfolioGenOpen 
+                  ? 'bg-brand-brown text-white shadow-inner' 
+                  : 'bg-[#ECE7DF] shadow-[inset_1px_1px_3px_rgba(0,0,0,0.06),inset_-1px_-1px_3px_rgba(255,255,255,0.9)] text-brand-brown group-hover:scale-105'
+              }`}>
+                <Terminal size={17} />
+              </div>
+              <span>
+                Rendgra.<span className="text-brand-brown">Dev</span>
+              </span>
+              <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full transition-all duration-300 hidden sm:inline-flex items-center gap-1 ${
+                isPortfolioGenOpen
+                  ? 'bg-brand-brown text-white'
+                  : 'bg-[#ECE7DF] text-earth-700 shadow-inner'
+              }`}>
+                <Sparkles size={10} />
+                <span>{isPortfolioGenOpen ? (lang === 'id' ? 'Tutup' : 'Close') : 'Gen'}</span>
+              </span>
           </button>
         </div>
 
+
         {/* Right Actions: Hubungi Saya + Language Switcher */}
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center justify-end flex-1 gap-2 md:gap-3">
           
           {/* Hubungi Saya Toggle Button */}
           <div className={isPersonal ? 'invisible' : ''}>
@@ -101,5 +113,6 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
 
       </div>
     </header>
+    </>
   );
 };
