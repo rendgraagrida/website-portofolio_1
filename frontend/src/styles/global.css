@@ -19,7 +19,13 @@
   body {
     background-color: #F4F1EA;
     color: #2C251F;
+    transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     @apply antialiased font-sans selection:bg-brand-brown/20;
+  }
+
+  /* Personal Mode: Warm Vintage Pop-Art Comic Scrapbook Background Color */
+  body.paper-lined-popart-mode {
+    background-color: #F8EDD3 !important;
   }
 }
 
