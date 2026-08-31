@@ -59,10 +59,13 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
         </div>
       )}
 
-      {/* MASTER SEGMENTED TABS NAVIGATOR (Dual Styled: Paper vs Neo-Brutalism) */}
-      <div className="flex flex-col items-center mb-10">
-        
-        <div className={`p-1.5 flex items-center gap-1.5 w-full max-w-2xl transition-all duration-300 ${
+      {/* Hide Tabs and Content if an overlay is active */}
+      {!(showContact || showPortfolioGen) && (
+        <>
+          {/* MASTER SEGMENTED TABS NAVIGATOR (Dual Styled: Paper vs Neo-Brutalism) */}
+          <div className="flex flex-col items-center mb-10">
+            
+            <div className={`p-1.5 flex items-center gap-1.5 w-full max-w-2xl transition-all duration-300 ${
           isPersonal 
             ? 'bg-[#00F0FF] border-3 border-black shadow-[6px_6px_0px_0px_#000] rounded-none' 
             : 'paper-well rounded-2xl border border-[#E6E0D5]'
@@ -172,6 +175,8 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
           </>
         )}
       </div>
+        </>
+      )}
 
     </section>
   );
