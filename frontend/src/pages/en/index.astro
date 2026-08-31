@@ -12,7 +12,7 @@ const lang = getLangFromUrl(Astro.url);
 <Layout title="Rendgra Agrida - Software Engineer & Tech Lead Portfolio">
   <Navbar />
   <main class="flex-grow">
-    <Hero lang={lang} />
+    <Hero lang={lang} client:load />
     <MainTabViewer lang={lang} client:load />
   </main>
   <Footer />
