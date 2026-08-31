@@ -1,61 +1,151 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $showGallery, toggleGallery } from '../stores/navigation';
-import { X, Camera, Heart, Sparkles, Maximize2, Layers } from 'lucide-react';
+import { processImageToContourSticker } from '../utils/stickerProcessor';
+import { 
+  X, 
+  Camera, 
+  Heart, 
+  Sparkles, 
+  Plus, 
+  Trash2, 
+  RotateCcw, 
+  Loader2, 
+  Maximize2,
+  Layers,
+  UploadCloud
+} from 'lucide-react';
 
 interface PhotoGalleryModalProps {
   lang: 'id' | 'en';
 }
 
-interface ContourSticker {
+export interface ContourStickerItem {
   id: string;
-  title: { id: string; en: string };
-  subtitle: { id: string; en: string };
+  title: string;
+  subtitle: string;
   src: string;
   tag: string;
+  isCustom?: boolean;
 }
 
-const individualStickers: ContourSticker[] = [
-  {
-    id: 'collage',
-    title: { id: 'Kolase Stiker Bersatu (All-in-One)', en: 'Unified Sticker Collage' },
-    subtitle: { id: 'Seluruh momen digabung berdampingan tanpa background', en: 'All moments merged seamlessly with transparent contours' },
-    src: '/gallery/sticker-collage.png',
-    tag: 'Master Collage'
-  },
+const DEFAULT_STICKERS: ContourStickerItem[] = [
   {
     id: 'studio',
-    title: { id: 'Keluarga Ceria di Studio', en: 'Family Studio Joy' },
-    subtitle: { id: 'Momen penuh tawa dan kehangatan keluarga', en: 'Laughs and family warmth' },
+    title: 'Keluarga Ceria di Studio',
+    subtitle: 'Momen penuh tawa dan kehangatan keluarga',
     src: '/gallery/sticker-studio.png',
     tag: 'Family'
   },
   {
     id: 'bromo',
-    title: { id: 'Eksplorasi Gunung Bromo', en: 'Mount Bromo Expedition' },
-    subtitle: { id: 'Sunrise dan petualangan alam terbuka', en: 'Sunrise and nature expedition' },
+    title: 'Eksplorasi Gunung Bromo',
+    subtitle: 'Sunrise dan petualangan alam terbuka',
     src: '/gallery/sticker-bromo.png',
     tag: 'Adventure'
   },
   {
     id: 'supermarket',
-    title: { id: 'Supermarket Creative Session', en: 'Creative Studio Room' },
-    subtitle: { id: 'Eksplorasi konsep ruangan pop-art biru', en: 'Pop-art blue studio experience' },
+    title: 'Supermarket Creative Session',
+    subtitle: 'Eksplorasi konsep ruangan pop-art biru',
     src: '/gallery/sticker-supermarket.png',
     tag: 'Creative'
   },
   {
     id: 'profile',
-    title: { id: 'Rendgra Agrida', en: 'Rendgra Agrida' },
-    subtitle: { id: 'Senior Software Engineer & Tech Lead', en: 'Senior Software Engineer & Tech Lead' },
+    title: 'Rendgra Agrida',
+    subtitle: 'Senior Software Engineer & Tech Lead',
     src: '/gallery/sticker-profile.png',
     tag: 'Tech Lead'
   }
 ];
 
+const STORAGE_KEY = 'rendgra_gallery_stickers_v1';
+
 export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) => {
   const showGallery = useStore($showGallery);
-  const [activeImage, setActiveImage] = useState<ContourSticker | null>(null);
+  const [stickers, setStickers] = useState<ContourStickerItem[]>(DEFAULT_STICKERS);
+  const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progressText, setProgressText] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load persisted custom stickers on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setStickers(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn('Gagal membaca localStorage stickers:', e);
+    }
+  }, []);
+
+  const saveStickers = (items: ContourStickerItem[]) => {
+    setStickers(items);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (e) {
+      console.warn('Gagal menyimpan localStorage stickers:', e);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsProcessing(true);
+    setProgressText(lang === 'id' ? 'Memulai ekstraksi kontur...' : 'Starting contour extraction...');
+
+    try {
+      const stickerDataUrl = await processImageToContourSticker(file, (step) => {
+        setProgressText(step);
+      });
+
+      const newSticker: ContourStickerItem = {
+        id: `custom-${Date.now()}`,
+        title: file.name.replace(/\.[^/.]+$/, '').slice(0, 30) || (lang === 'id' ? 'Stiker Baru' : 'New Sticker'),
+        subtitle: lang === 'id' ? 'Stiker die-cut kontur otomatis' : 'Auto contour die-cut sticker',
+        src: stickerDataUrl,
+        tag: 'New Sticker',
+        isCustom: true
+      };
+
+      const updated = [newSticker, ...stickers];
+      saveStickers(updated);
+      setActiveImage(newSticker); // Automatically open preview of newly uploaded sticker
+    } catch (err) {
+      console.error('Gagal memproses stiker:', err);
+      alert(lang === 'id' ? 'Gagal memproses gambar menjadi stiker. Silakan coba gambar lain.' : 'Failed to process image into sticker.');
+    } finally {
+      setIsProcessing(false);
+      setProgressText('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleDeleteSticker = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(lang === 'id' ? 'Apakah Anda yakin ingin menghapus stiker ini dari galeri?' : 'Are you sure you want to delete this sticker?')) {
+      const updated = stickers.filter(s => s.id !== id);
+      saveStickers(updated);
+      if (activeImage?.id === id) {
+        setActiveImage(null);
+      }
+    }
+  };
+
+  const handleResetDefaults = () => {
+    if (confirm(lang === 'id' ? 'Kembalikan stiker ke koleksi default?' : 'Reset to default sticker presets?')) {
+      saveStickers(DEFAULT_STICKERS);
+    }
+  };
 
   if (!showGallery) return null;
 
@@ -63,28 +153,62 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/55 backdrop-blur-md animate-fade-in">
       <div className="paper-card rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl animate-fade-in max-h-[92vh] flex flex-col">
         
-        {/* Header with Title and Close Button */}
+        {/* Header with Title, Upload Trigger and Close Button */}
         <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
             <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
               <Camera size={16} />
             </div>
-            <span>{lang === 'id' ? 'Galeri Stiker Kontur Personil (Tanpa Background)' : 'Personnel Contour Sticker Gallery (Transparent)'}</span>
+            <span>{lang === 'id' ? 'Galeri Stiker Kontur Personil' : 'Personnel Contour Sticker Gallery'}</span>
           </div>
 
-          <button
-            onClick={toggleGallery}
-            className="paper-btn w-8 h-8 rounded-xl flex items-center justify-center text-earth-700 hover:text-brand-brown focus:outline-none"
-            title="Tutup (Esc)"
-          >
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Upload Button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isProcessing}
+              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
+              title={lang === 'id' ? 'Unggah Foto Baru & Potong Kontur Otomatis' : 'Upload & Auto Cutout'}
+            >
+              {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
+              <span>{lang === 'id' ? 'Upload Foto Stiker' : 'Upload Sticker'}</span>
+            </button>
+
+            {/* Hidden File Input */}
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*" 
+              className="hidden" 
+            />
+
+            {/* Close Modal */}
+            <button
+              onClick={toggleGallery}
+              className="paper-btn w-8 h-8 rounded-xl flex items-center justify-center text-earth-700 hover:text-brand-brown focus:outline-none ml-1"
+              title="Tutup (Esc)"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
+
+        {/* Processing Indicator Banner */}
+        {isProcessing && (
+          <div className="bg-brand-brown/10 px-6 py-3 border-b border-brand-brown/20 flex items-center justify-between animate-pulse">
+            <div className="flex items-center gap-2.5 text-brand-brown text-xs md:text-sm font-bold">
+              <Loader2 size={16} className="animate-spin" />
+              <span>{progressText || (lang === 'id' ? 'Sedang memproses pemotongan kontur & garis putih...' : 'Processing contour & white outline...')}</span>
+            </div>
+            <span className="text-[11px] font-semibold text-earth-600">AI Background Removal &amp; Dilation</span>
+          </div>
+        )}
 
         {/* Scrollable Gallery Area */}
         <div className="p-6 md:p-8 overflow-y-auto bg-[#F4F1EA] space-y-8">
           
-          {/* SECTION 1: MASTER UNIFIED STICKER BANNER (Ala Tuku Banner) */}
+          {/* SECTION 1: MASTER UNIFIED STICKER BANNER */}
           <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
             <div className="flex items-center justify-between mb-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black">
@@ -97,18 +221,15 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
             </div>
 
             {/* Wide Master Collage Image */}
-            <div 
-              onClick={() => setActiveImage(individualStickers[0])}
-              className="w-full h-48 sm:h-64 md:h-72 flex items-end justify-center cursor-pointer group bg-gradient-to-b from-[#EFEBE4]/60 to-[#ECE7DF] rounded-2xl p-4 transition-all duration-300 hover:shadow-inner"
-            >
+            <div className="w-full h-48 sm:h-64 md:h-72 flex items-end justify-center bg-gradient-to-b from-[#EFEBE4]/60 to-[#ECE7DF] rounded-2xl p-4 transition-all duration-300">
               <img
                 src="/gallery/sticker-collage.png"
                 alt="Rendgra Agrida & Family Sticker Collage"
-                className="max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 transition-transform duration-400"
+                className="max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] hover:scale-105 transition-transform duration-400"
               />
             </div>
 
-            {/* Sticker Pill Label Underneath Banner */}
+            {/* Banner Description */}
             <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#ECE7DF]">
               <span className="text-xs font-bold text-earth-800">
                 {lang === 'id' 
@@ -116,46 +237,64 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
                   : 'Individual human contours precisely cut and unified side-by-side with zero background.'}
               </span>
               <button
-                onClick={() => setActiveImage(individualStickers[0])}
+                onClick={() => fileInputRef.current?.click()}
                 className="paper-btn px-3 py-1 rounded-xl text-xs font-extrabold text-brand-brown flex items-center gap-1.5"
               >
-                <Maximize2 size={12} />
-                <span>{lang === 'id' ? 'Lihat Resolusi Penuh' : 'View Full Res'}</span>
+                <UploadCloud size={13} />
+                <span>{lang === 'id' ? 'Tambah Foto Anda' : 'Add Your Photo'}</span>
               </button>
             </div>
           </div>
 
           {/* SECTION 2: INDIVIDUAL DIE-CUT CONTOUR STICKERS */}
           <div>
-            <div className="text-center max-w-lg mx-auto mb-6">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black mb-1.5">
-                <Sparkles size={12} />
-                <span>{lang === 'id' ? 'Potongan Stiker Personil' : 'Individual Cutout Stickers'}</span>
-              </span>
-              <p className="text-earth-700 text-xs leading-relaxed">
-                {lang === 'id' ? 'Klik stiker di bawah untuk memperbesar dan melihat detail kontur stiker.' : 'Click any sticker below to enlarge.'}
-              </p>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-1.5">
+                <Sparkles size={14} className="text-brand-brown" />
+                <h3 className="text-sm md:text-base font-black text-earth-900">
+                  {lang === 'id' ? 'Koleksi Stiker Kontur' : 'Contour Sticker Collection'} ({stickers.length})
+                </h3>
+              </div>
+
+              {stickers.length !== DEFAULT_STICKERS.length && (
+                <button
+                  onClick={handleResetDefaults}
+                  className="paper-btn px-3 py-1 rounded-xl text-[11px] font-bold text-earth-700 hover:text-brand-brown flex items-center gap-1"
+                >
+                  <RotateCcw size={11} />
+                  <span>{lang === 'id' ? 'Reset Stiker' : 'Reset Defaults'}</span>
+                </button>
+              )}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-              {individualStickers.slice(1).map((item) => (
+              {stickers.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setActiveImage(item)}
-                  className="paper-card p-4 rounded-3xl flex flex-col items-center text-center cursor-pointer group hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 select-none"
+                  className="paper-card p-4 rounded-3xl flex flex-col items-center text-center cursor-pointer group hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 select-none relative"
                 >
-                  {/* Contour Sticker Container (Transparent bg with drop shadow) */}
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => handleDeleteSticker(item.id, e)}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-80 hover:opacity-100 z-10"
+                    title={lang === 'id' ? 'Hapus stiker ini' : 'Delete this sticker'}
+                  >
+                    <Trash2 size={12} />
+                  </button>
+
+                  {/* Contour Sticker Container */}
                   <div className="w-full h-40 sm:h-48 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden">
                     <img
                       src={item.src}
-                      alt={item.title[lang]}
+                      alt={item.title}
                       className="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] group-hover:scale-110 group-hover:rotate-2 transition-transform duration-300"
                       loading="lazy"
                     />
                   </div>
 
                   <h4 className="font-extrabold text-xs md:text-sm text-earth-900 leading-tight mb-1 group-hover:text-brand-brown transition-colors">
-                    {item.title[lang]}
+                    {item.title}
                   </h4>
 
                   <span className="mt-auto text-[10px] font-black uppercase tracking-wider text-brand-brown bg-white px-2.5 py-0.5 rounded-full shadow-sm border border-[#ECE7DF]">
@@ -207,12 +346,21 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
             <div className="paper-card p-6 md:p-8 rounded-3xl max-h-[80vh] flex flex-col items-center justify-center overflow-hidden bg-[#F4F1EA]">
               <img 
                 src={activeImage.src} 
-                alt={activeImage.title[lang]} 
+                alt={activeImage.title} 
                 className="max-h-[60vh] max-w-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.3)]"
               />
-              <div className="pt-4 text-center">
-                <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title[lang]}</h4>
-                <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle[lang]}</p>
+              <div className="pt-4 text-center flex items-center gap-4">
+                <div>
+                  <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title}</h4>
+                  <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle}</p>
+                </div>
+                <button
+                  onClick={(e) => handleDeleteSticker(activeImage.id, e)}
+                  className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
+                >
+                  <Trash2 size={13} />
+                  <span>{lang === 'id' ? 'Hapus' : 'Delete'}</span>
+                </button>
               </div>
             </div>
 
