@@ -7,10 +7,7 @@ import {
   $showPortfolioGen,
   $showContact,
   selectProfTab,
-  selectPersonalTab,
-  setNavigationMode,
-  type ProfessionalTab,
-  type PersonalTab
+  selectPersonalTab
 } from '../stores/navigation';
 import { ExperienceTimeline } from './ExperienceTimeline';
 import { ProjectSlider } from './ProjectSlider';
@@ -24,12 +21,9 @@ import {
   Briefcase, 
   FolderGit2, 
   Cpu, 
-  Sparkles, 
-  Mail, 
   User, 
   Compass, 
-  Camera,
-  Heart
+  Camera
 } from 'lucide-react';
 
 interface MainTabViewerProps {
@@ -64,36 +58,9 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
         </div>
       )}
 
-      {/* MASTER SEGMENTED TABS NAVIGATOR */}
+      {/* MASTER SEGMENTED TABS NAVIGATOR (Clean without redundant pill buttons) */}
       <div className="flex flex-col items-center mb-10">
         
-        {/* Mode Indicator & Switcher */}
-        <div className="flex items-center gap-2 mb-4">
-          <button
-            onClick={() => setNavigationMode('professional')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-1.5 transition-all ${
-              navMode === 'professional'
-                ? 'paper-card bg-brand-brown text-white shadow-md'
-                : 'paper-btn text-earth-700 hover:text-brand-brown'
-            }`}
-          >
-            <Briefcase size={13} />
-            <span>{lang === 'id' ? 'Karier & Engineering' : 'Professional Engineering'}</span>
-          </button>
-
-          <button
-            onClick={() => setNavigationMode('personal')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-1.5 transition-all ${
-              navMode === 'personal'
-                ? 'paper-card bg-brand-brown text-white shadow-md'
-                : 'paper-btn text-earth-700 hover:text-brand-brown'
-            }`}
-          >
-            <User size={13} />
-            <span>{lang === 'id' ? 'Personal & Galeri' : 'Personal & Gallery'}</span>
-          </button>
-        </div>
-
         {/* PAPER SEGMENTED CONTROL TABS */}
         <div className="paper-well p-1.5 rounded-2xl flex items-center gap-1 w-full max-w-2xl border border-[#E6E0D5]">
           {navMode === 'professional' ? (
@@ -182,14 +149,12 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
       {/* TAB CONTENT AREA */}
       <div className="transition-all duration-300">
         {navMode === 'professional' ? (
-          // Professional Tab Views
           <>
             {activeProfTab === 'experience' && <ExperienceTimeline lang={lang} />}
             {activeProfTab === 'projects' && <ProjectSlider lang={lang} />}
             {activeProfTab === 'stack' && <TechGrid lang={lang} />}
           </>
         ) : (
-          // Personal Tab Views
           <>
             {activePersonalTab === 'personality' && <PersonalityView lang={lang} />}
             {activePersonalTab === 'hobbies' && <HobbiesView lang={lang} />}

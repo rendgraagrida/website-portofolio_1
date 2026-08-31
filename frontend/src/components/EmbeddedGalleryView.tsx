@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { processImageToContourSticker } from '../utils/stickerProcessor';
 import { StickerEditorModal } from './StickerEditorModal';
 import { 
-  Camera, 
-  Sparkles, 
   Plus, 
   Trash2, 
   RotateCcw, 
@@ -16,7 +14,11 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Move
+  Save,
+  Check,
+  Tag,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface EmbeddedGalleryViewProps {
@@ -30,6 +32,7 @@ export interface ContourStickerItem {
   src: string;
   rawSrc?: string;
   tag: string;
+  showLabel?: boolean; // Toggle to hide or show label
   isCustom?: boolean;
 }
 
@@ -49,7 +52,8 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     subtitle: 'Momen penuh tawa dan kehangatan keluarga',
     src: '/gallery/sticker-studio.png',
     rawSrc: '/gallery/photo-studio.jpg',
-    tag: 'Family'
+    tag: 'Family',
+    showLabel: true
   },
   {
     id: 'bromo',
@@ -57,7 +61,8 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     subtitle: 'Sunrise dan petualangan alam terbuka',
     src: '/gallery/sticker-bromo.png',
     rawSrc: '/gallery/photo-bromo.jpg',
-    tag: 'Adventure'
+    tag: 'Adventure',
+    showLabel: true
   },
   {
     id: 'supermarket',
@@ -65,7 +70,8 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     subtitle: 'Eksplorasi konsep ruangan pop-art biru',
     src: '/gallery/sticker-supermarket.png',
     rawSrc: '/gallery/photo-supermarket.jpg',
-    tag: 'Creative'
+    tag: 'Creative',
+    showLabel: true
   },
   {
     id: 'profile',
@@ -73,16 +79,21 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
     subtitle: 'Senior Software Engineer & Tech Lead',
     src: '/gallery/sticker-profile.png',
     rawSrc: '/gallery/photo-profile.png',
-    tag: 'Tech Lead'
+    tag: 'Tech Lead',
+    showLabel: true
   }
 ];
 
-const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v6';
+const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v7';
+const STORAGE_DRAG_KEY = 'rendgra_gallery_drag_positions_v7';
 
 export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }) => {
   const [stickers, setStickers] = useState<ContourStickerItem[]>(DEFAULT_STICKERS);
   const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
   
+  // EDIT MODE TOGGLE (Default is clean / normal view)
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
   // Interactive Draggable & Transform Board State
   const [dragStates, setDragStates] = useState<Record<string, DraggableStickerState>>({});
   const [maxZIndex, setMaxZIndex] = useState(10);
@@ -114,7 +125,21 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize interactive positions & scale across the canvas
-  const initDraggablePositions = (items: ContourStickerItem[]) => {
+  const initDraggablePositions = (items: ContourStickerItem[], forceNew: boolean = false) => {
+    // Check if saved drag layout exists
+    if (!forceNew) {
+      try {
+        const savedLayout = localStorage.getItem(STORAGE_DRAG_KEY);
+        if (savedLayout) {
+          const parsed = JSON.parse(savedLayout);
+          if (parsed && typeof parsed === 'object') {
+            setDragStates(parsed);
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+
     const states: Record<string, DraggableStickerState> = {};
     const count = items.length;
     items.forEach((item, index) => {
@@ -146,7 +171,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
           setStickers(parsed);
         }
       }
-      initDraggablePositions(currentItems);
+      initDraggablePositions(currentItems, false);
     } catch (e) {
       console.warn('Gagal membaca localStorage stickers:', e);
     }
@@ -154,11 +179,28 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
 
   const saveStickers = (items: ContourStickerItem[]) => {
     setStickers(items);
-    initDraggablePositions(items);
     try {
       localStorage.setItem(STORAGE_STICKERS_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.warn('Gagal menyimpan localStorage stickers:', e);
+    } catch (e) {}
+  };
+
+  const saveDragLayout = (states: Record<string, DraggableStickerState>) => {
+    setDragStates(states);
+    try {
+      localStorage.setItem(STORAGE_DRAG_KEY, JSON.stringify(states));
+    } catch (e) {}
+  };
+
+  // Toggle Edit Mode & Save
+  const handleToggleEditMode = () => {
+    if (isEditMode) {
+      // Save current layout to localStorage and exit edit mode
+      saveDragLayout(dragStates);
+      saveStickers(stickers);
+      setSelectedStickerId(null);
+      setIsEditMode(false);
+    } else {
+      setIsEditMode(true);
     }
   };
 
@@ -167,7 +209,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     if (stickers.length === 0) return;
     setIsSyncing(true);
     const shuffled = [...stickers].sort(() => Math.random() - 0.5);
-    initDraggablePositions(shuffled);
+    initDraggablePositions(shuffled, true);
     setTimeout(() => setIsSyncing(false), 250);
   };
 
@@ -202,15 +244,48 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     });
   };
 
+  // Toggle label visibility per sticker
+  const handleToggleLabel = (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const updated = stickers.map((s) => {
+      if (s.id === id) {
+        return { ...s, showLabel: s.showLabel === false ? true : false };
+      }
+      return s;
+    });
+    saveStickers(updated);
+  };
+
+  // Edit label title inline
+  const handleEditLabelTitle = (id: string, newTitle: string) => {
+    const updated = stickers.map((s) => {
+      if (s.id === id) {
+        return { ...s, title: newTitle };
+      }
+      return s;
+    });
+    saveStickers(updated);
+  };
+
   // ==========================================
   // MULTI-TOUCH & GESTURE INTERACTION ENGINE
   // ==========================================
   
   const handleTouchStart = (id: string, e: React.TouchEvent) => {
+    if (!isEditMode) {
+      // In clean mode, touch just brings it forward or click opens lightbox
+      const nextZ = maxZIndex + 1;
+      setMaxZIndex(nextZ);
+      setDragStates((prev) => ({
+        ...prev,
+        [id]: { ...prev[id], zIndex: nextZ }
+      }));
+      return;
+    }
+
     const board = boardRef.current;
     if (!board) return;
 
-    // Bring sticker to top
     const nextZ = maxZIndex + 1;
     setMaxZIndex(nextZ);
     setSelectedStickerId(id);
@@ -223,7 +298,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     const current = dragStates[id] || { id, x: 20, y: 20, rotation: 0, scale: 1, zIndex: nextZ };
 
     if (e.touches.length === 1) {
-      // 1 Finger Drag
       dragModeRef.current = 'move';
       initialTouchRef.current = {
         startX: e.touches[0].clientX,
@@ -234,7 +308,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         initScale: current.scale
       };
     } else if (e.touches.length >= 2) {
-      // 2 Fingers Pinch-to-Zoom + Rotate Gesture!
       dragModeRef.current = 'rotate';
       const t1 = e.touches[0];
       const t2 = e.touches[1];
@@ -255,6 +328,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isEditMode) return;
     const id = activeStickerRef.current;
     const init = initialTouchRef.current;
     const board = boardRef.current;
@@ -263,11 +337,9 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     const boardRect = board.getBoundingClientRect();
 
     if (e.touches.length === 1 && dragModeRef.current === 'move') {
-      // 1 Finger Move
       const dxPx = e.touches[0].clientX - init.startX;
       const dyPx = e.touches[0].clientY - init.startY;
       const dxPercent = (dxPx / boardRect.width) * 100;
-
       const nextX = Math.max(2, Math.min(80, init.initX + dxPercent));
       const nextY = Math.max(0, Math.min(220, init.initY + dyPx));
 
@@ -276,17 +348,13 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         [id]: { ...prev[id], x: nextX, y: nextY }
       }));
     } else if (e.touches.length >= 2 && init.initDist && init.initAngle !== undefined) {
-      // 2 Fingers: Pinch Zoom + Two-Finger Rotation
       const t1 = e.touches[0];
       const t2 = e.touches[1];
       const currentDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
       const currentAngle = (Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * 180) / Math.PI;
 
-      // Scale ratio
       const scaleFactor = currentDist / init.initDist;
       const nextScale = Math.max(0.5, Math.min(2.2, parseFloat((init.initScale * scaleFactor).toFixed(2))));
-
-      // Angle delta
       const deltaAngle = currentAngle - init.initAngle;
       const nextRotation = Math.round((init.initRot + deltaAngle + 360) % 360);
 
@@ -312,6 +380,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   // ==========================================
 
   const startPointerDrag = (id: string, mode: 'move' | 'rotate' | 'resize', e: React.PointerEvent) => {
+    if (!isEditMode) return;
     e.preventDefault();
     e.stopPropagation();
 
@@ -331,7 +400,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
 
     const current = dragStates[id] || { id, x: 20, y: 20, rotation: 0, scale: 1, zIndex: nextZ };
     
-    // Find center of sticker element for rotation knob calculations
     const targetEl = (e.currentTarget.closest('.sticker-item-wrapper') as HTMLElement);
     const rect = targetEl ? targetEl.getBoundingClientRect() : e.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -352,6 +420,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   };
 
   const handleGlobalPointerMove = (e: React.PointerEvent) => {
+    if (!isEditMode) return;
     const id = activeStickerRef.current;
     const init = initialTouchRef.current;
     const board = boardRef.current;
@@ -371,7 +440,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         [id]: { ...prev[id], x: nextX, y: nextY }
       }));
     } else if (dragModeRef.current === 'rotate' && init.centerX && init.centerY) {
-      // Rotate by calculating angle between pointer and sticker center
       const angleRad = Math.atan2(e.clientY - init.centerY, e.clientX - init.centerX);
       const angleDeg = Math.round((angleRad * 180) / Math.PI + 90);
       const nextRot = (angleDeg + 360) % 360;
@@ -381,7 +449,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         [id]: { ...prev[id], rotation: nextRot }
       }));
     } else if (dragModeRef.current === 'resize') {
-      // Resize by dragging corner outward/inward
       const dy = e.clientY - init.startY;
       const scaleDelta = dy / 150;
       const nextScale = Math.max(0.5, Math.min(2.2, parseFloat((init.initScale + scaleDelta).toFixed(2))));
@@ -404,14 +471,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     }
   };
 
-  // Mouse wheel on sticker to zoom in / out
-  const handleWheelOnSticker = (id: string, e: React.WheelEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.08 : -0.08;
-    handleScaleSinglePhoto(id, delta);
-  };
-
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -432,6 +491,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         src: stickerDataUrl,
         rawSrc: rawUrl,
         tag: 'New Sticker',
+        showLabel: true,
         isCustom: true
       };
 
@@ -462,17 +522,12 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
 
   const handleSaveEditedSticker = (newStickerSrc: string) => {
     if (!editingSticker) return;
-
     const updated = stickers.map((item) => {
       if (item.id === editingSticker.id) {
-        return {
-          ...item,
-          src: newStickerSrc
-        };
+        return { ...item, src: newStickerSrc };
       }
       return item;
     });
-
     saveStickers(updated);
     setEditingSticker(null);
   };
@@ -480,274 +535,285 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   const handleResetDefaults = () => {
     if (confirm(lang === 'id' ? 'Kembalikan stiker ke koleksi default?' : 'Reset to default sticker presets?')) {
       saveStickers(DEFAULT_STICKERS);
+      initDraggablePositions(DEFAULT_STICKERS, true);
       try {
         localStorage.removeItem(STORAGE_STICKERS_KEY);
+        localStorage.removeItem(STORAGE_DRAG_KEY);
       } catch {}
     }
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 animate-fade-in select-none">
       
-      {/* SECTION 1: MASTER CANVAS WITH MULTI-TOUCH & GESTURE CONTROLS */}
-      <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
-        
-        {/* Toolbar with Non-Duplicated Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[#ECE7DF]">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
-              <Camera size={16} />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-sm md:text-base text-earth-900 leading-tight">
-                {lang === 'id' ? 'Papan Stiker Interaktif' : 'Interactive Sticker Canvas'}
-              </h3>
-              <p className="text-[11px] text-earth-600 font-medium">
-                {lang === 'id' ? 'Geser, putar dengan 2 jari, dan perbesar/perkecil foto bebas' : 'Drag, pinch/2-finger rotate, & zoom freely'}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* SINGLE Sync & Acak Button */}
-            <button
-              onClick={handleSingleSync}
-              disabled={isSyncing}
-              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
-              title={lang === 'id' ? 'Acak Posisi & Saling Menimpa Ulang' : 'Shuffle & Overlap Positions'}
-            >
-              <Shuffle size={13} className={isSyncing ? 'animate-spin' : ''} />
-              <span>{lang === 'id' ? 'Sync & Acak' : 'Sync & Shuffle'}</span>
-            </button>
-
-            {/* SINGLE Upload Button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isProcessing}
-              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
-              title={lang === 'id' ? 'Unggah Foto Baru & Potong Kontur Otomatis' : 'Upload & Auto Cutout'}
-            >
-              {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
-              <span>{lang === 'id' ? 'Upload Foto' : 'Upload'}</span>
-            </button>
-
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              accept="image/*" 
-              className="hidden" 
-            />
-          </div>
+      {/* SEAMLESS CANVAS TOP CONTROLS */}
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-2">
+          {isEditMode && (
+            <span className="text-xs font-black text-brand-brown uppercase tracking-wider bg-[#ECE7DF] px-3 py-1 rounded-full shadow-inner animate-pulse">
+              {lang === 'id' ? 'Mode Edit Aktif' : 'Edit Mode Active'}
+            </span>
+          )}
         </div>
 
-        {/* Processing Indicator Banner */}
-        {isProcessing && (
-          <div className="bg-brand-brown/10 px-4 py-2.5 rounded-2xl mb-4 border border-brand-brown/20 flex items-center justify-between animate-pulse">
-            <div className="flex items-center gap-2 text-brand-brown text-xs font-bold">
-              <Loader2 size={15} className="animate-spin" />
-              <span>{progressText || (lang === 'id' ? 'Sedang memproses pemotongan kontur...' : 'Processing contour...')}</span>
-            </div>
-            <span className="text-[10px] font-semibold text-earth-600">AI Background Removal &amp; Dilation</span>
-          </div>
-        )}
-
-        {/* Interactive Canvas Board with Multi-Touch & Gesture Support */}
-        <div
-          ref={boardRef}
-          onPointerMove={handleGlobalPointerMove}
-          onPointerUp={handleGlobalPointerUp}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          className="w-full h-80 sm:h-96 md:h-[420px] relative bg-gradient-to-b from-[#EFEBE4]/70 to-[#ECE7DF] rounded-2xl p-4 overflow-hidden border border-[#E6E0D5] shadow-inner select-none touch-none"
-        >
-          {stickers.map((item) => {
-            const pos = dragStates[item.id] || { id: item.id, x: 20, y: 20, rotation: 0, scale: 1.0, zIndex: 1 };
-            const isSelected = selectedStickerId === item.id;
-
-            return (
-              <div
-                key={item.id}
-                onTouchStart={(e) => handleTouchStart(item.id, e)}
-                onWheel={(e) => handleWheelOnSticker(item.id, e)}
-                style={{
-                  left: `${pos.x}%`,
-                  top: `${pos.y}px`,
-                  transform: `rotate(${pos.rotation}deg) scale(${pos.scale})`,
-                  zIndex: pos.zIndex
-                }}
-                className={`sticker-item-wrapper absolute transition-transform duration-75 select-none touch-none ${
-                  isSelected ? 'ring-2 ring-brand-brown/60 rounded-3xl' : ''
-                }`}
+        <div className="flex items-center gap-2">
+          {/* Controls visible only during Edit Mode */}
+          {isEditMode && (
+            <>
+              {/* Single Sync & Acak Button */}
+              <button
+                onClick={handleSingleSync}
+                disabled={isSyncing}
+                className="paper-btn px-3 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
+                title="Acak Posisi"
               >
-                {/* 1. Circular Rotation Knob (Drag to rotate freely on desktop) */}
-                <div
-                  onPointerDown={(e) => startPointerDrag(item.id, 'rotate', e)}
-                  className="absolute -top-7 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white shadow-md border border-brand-brown text-brand-brown flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-125 transition-transform z-20"
-                  title={lang === 'id' ? 'Tahan & putar kursor untuk memutar foto' : 'Drag to rotate'}
-                >
-                  <RotateCw size={11} />
-                </div>
+                <Shuffle size={13} className={isSyncing ? 'animate-spin' : ''} />
+                <span className="hidden sm:inline">{lang === 'id' ? 'Acak Posisi' : 'Shuffle'}</span>
+              </button>
 
-                {/* Main Sticker Image (Drag to move) */}
-                <div
-                  onPointerDown={(e) => startPointerDrag(item.id, 'move', e)}
-                  onDoubleClick={() => handleScaleSinglePhoto(item.id, pos.scale > 1.2 ? -0.4 : 0.4)}
-                  className="cursor-grab active:cursor-grabbing relative"
-                >
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    draggable={false}
-                    className="h-44 sm:h-52 md:h-60 max-w-none object-contain pointer-events-none filter drop-shadow-[0_12px_22px_rgba(0,0,0,0.25)]"
-                  />
-                </div>
+              {/* Upload Button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isProcessing}
+                className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
+                title="Upload Foto Stiker"
+              >
+                {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
+                <span>{lang === 'id' ? 'Upload' : 'Upload'}</span>
+              </button>
 
-                {/* 2. Corner Resize / Scale Handle (Drag to minimize/maximize) */}
-                <div
-                  onPointerDown={(e) => startPointerDrag(item.id, 'resize', e)}
-                  className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-white shadow-md border border-brand-brown text-brand-brown flex items-center justify-center cursor-nwse-resize hover:scale-125 transition-transform z-20"
-                  title={lang === 'id' ? 'Tahan & tarik untuk memperbesar / memperkecil' : 'Drag to resize'}
-                >
-                  <Maximize2 size={10} />
-                </div>
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept="image/*" 
+                className="hidden" 
+              />
+            </>
+          )}
 
-                {/* 3. Interactive Quick Controls Badge */}
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/95 px-2.5 py-0.5 rounded-full text-[10px] font-black text-brand-brown shadow-md border border-[#ECE7DF] z-20 whitespace-nowrap">
-                  <span>{item.title.split(' ')[0]}</span>
-                  
-                  {/* Minimize / Zoom Out */}
-                  <button
-                    onClick={(e) => handleScaleSinglePhoto(item.id, -0.15, e)}
-                    className="p-0.5 hover:bg-[#ECE7DF] rounded text-earth-700 hover:text-brand-brown transition-colors"
-                    title={lang === 'id' ? 'Perkecil Foto' : 'Minimize'}
-                  >
-                    <ZoomOut size={11} />
-                  </button>
-
-                  {/* Maximize / Zoom In */}
-                  <button
-                    onClick={(e) => handleScaleSinglePhoto(item.id, 0.15, e)}
-                    className="p-0.5 hover:bg-[#ECE7DF] rounded text-earth-700 hover:text-brand-brown transition-colors"
-                    title={lang === 'id' ? 'Perbesar Foto' : 'Maximize'}
-                  >
-                    <ZoomIn size={11} />
-                  </button>
-
-                  {/* Rotate +15° */}
-                  <button
-                    onClick={(e) => handleRotateSinglePhoto(item.id, 15, e)}
-                    className="p-0.5 hover:bg-[#ECE7DF] rounded text-earth-700 hover:text-brand-brown transition-colors"
-                    title={lang === 'id' ? 'Putar +15°' : 'Rotate +15°'}
-                  >
-                    <RotateCw size={11} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+          {/* EDIT & SAVE TOGGLE BUTTON */}
+          <button
+            onClick={handleToggleEditMode}
+            className={`px-4 py-2 rounded-2xl text-xs md:text-sm font-extrabold flex items-center gap-2 shadow-md transition-all ${
+              isEditMode
+                ? 'bg-emerald-700 hover:bg-emerald-800 text-white transform scale-[1.03]'
+                : 'paper-btn text-brand-brown hover:text-earth-900'
+            }`}
+          >
+            {isEditMode ? (
+              <>
+                <Check size={15} />
+                <span>{lang === 'id' ? 'Simpan Tata Letak' : 'Save Layout'}</span>
+              </>
+            ) : (
+              <>
+                <Edit3 size={15} />
+                <span>{lang === 'id' ? 'Edit Galeri Stiker' : 'Edit Stickers'}</span>
+              </>
+            )}
+          </button>
         </div>
-
-        {/* Tip Bar */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-earth-700">
-          <span className="flex items-center gap-1.5">
-            <Hand size={13} className="text-brand-brown" />
-            <span>{lang === 'id' ? '🖐️ Sentuh 2 jari di HP untuk memutar & zoom (pinch). Di desktop: gunakan tombol putar/knob atas & sudut bawah.' : '🖐️ 2 fingers on mobile to pinch & rotate. Desktop: use top knob & corner handle.'}</span>
-          </span>
-          <span className="text-[11px] text-brand-brown font-bold">
-            {lang === 'id' ? 'Double-click foto untuk zoom cepat' : 'Double click to zoom'}
-          </span>
-        </div>
-
       </div>
 
-      {/* SECTION 2: INDIVIDUAL STICKER COLLECTION WITH ROTATE, ZOOM, & MANUAL CLEAN */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1.5">
-            <Sparkles size={14} className="text-brand-brown" />
-            <h3 className="text-sm md:text-base font-black text-earth-900">
-              {lang === 'id' ? 'Koleksi Stiker' : 'Sticker Collection'} ({stickers.length})
-            </h3>
+      {/* Processing Indicator */}
+      {isProcessing && (
+        <div className="bg-brand-brown/10 px-4 py-2.5 rounded-2xl border border-brand-brown/20 flex items-center justify-between animate-pulse">
+          <div className="flex items-center gap-2 text-brand-brown text-xs font-bold">
+            <Loader2 size={15} className="animate-spin" />
+            <span>{progressText || (lang === 'id' ? 'Sedang memproses pemotongan kontur...' : 'Processing contour...')}</span>
           </div>
+          <span className="text-[10px] font-semibold text-earth-600">AI Background Removal &amp; Dilation</span>
+        </div>
+      )}
 
-          {stickers.length !== DEFAULT_STICKERS.length && (
+      {/* SEAMLESS CANVAS BOARD (No heavy box, seamless paper integration) */}
+      <div
+        ref={boardRef}
+        onPointerMove={handleGlobalPointerMove}
+        onPointerUp={handleGlobalPointerUp}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`w-full h-80 sm:h-96 md:h-[440px] relative rounded-3xl p-4 overflow-hidden select-none touch-none transition-all duration-300 ${
+          isEditMode
+            ? 'bg-[#ECE7DF]/60 border-2 border-dashed border-brand-brown/40 shadow-inner'
+            : 'bg-transparent border-0'
+        }`}
+      >
+        {stickers.map((item) => {
+          const pos = dragStates[item.id] || { id: item.id, x: 20, y: 20, rotation: 0, scale: 1.0, zIndex: 1 };
+          const isSelected = selectedStickerId === item.id;
+          const showItemLabel = item.showLabel !== false;
+
+          return (
+            <div
+              key={item.id}
+              onTouchStart={(e) => handleTouchStart(item.id, e)}
+              onClick={() => {
+                if (!isEditMode) {
+                  setActiveImage(item);
+                }
+              }}
+              style={{
+                left: `${pos.x}%`,
+                top: `${pos.y}px`,
+                transform: `rotate(${pos.rotation}deg) scale(${pos.scale})`,
+                zIndex: pos.zIndex
+              }}
+              className={`sticker-item-wrapper absolute transition-transform duration-75 select-none touch-none ${
+                isEditMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer hover:scale-105'
+              } ${isEditMode && isSelected ? 'ring-2 ring-brand-brown/60 rounded-3xl' : ''}`}
+            >
+              {/* EDIT CONTROLS: Only visible when in Edit Mode */}
+              {isEditMode && (
+                <>
+                  {/* Circular Rotation Knob */}
+                  <div
+                    onPointerDown={(e) => startPointerDrag(item.id, 'rotate', e)}
+                    className="absolute -top-7 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white shadow-md border border-brand-brown text-brand-brown flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-125 transition-transform z-30"
+                    title={lang === 'id' ? 'Tahan & putar kursor untuk memutar foto' : 'Drag to rotate'}
+                  >
+                    <RotateCw size={11} />
+                  </div>
+
+                  {/* Corner Resize / Scale Handle */}
+                  <div
+                    onPointerDown={(e) => startPointerDrag(item.id, 'resize', e)}
+                    className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-white shadow-md border border-brand-brown text-brand-brown flex items-center justify-center cursor-nwse-resize hover:scale-125 transition-transform z-30"
+                    title={lang === 'id' ? 'Tahan & tarik untuk memperbesar / memperkecil' : 'Drag to resize'}
+                  >
+                    <Maximize2 size={10} />
+                  </div>
+                </>
+              )}
+
+              {/* Main Sticker Image */}
+              <div
+                onPointerDown={(e) => {
+                  if (isEditMode) {
+                    startPointerDrag(item.id, 'move', e);
+                  }
+                }}
+                className="relative"
+              >
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  draggable={false}
+                  className="h-44 sm:h-52 md:h-60 max-w-none object-contain pointer-events-none filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.22)]"
+                />
+              </div>
+
+              {/* STICKER LABEL (Can be toggled or edited in Edit Mode) */}
+              {showItemLabel && (
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/95 px-3 py-1 rounded-full text-xs font-black text-brand-brown shadow-md border border-[#ECE7DF] z-20 whitespace-nowrap">
+                  {isEditMode ? (
+                    <>
+                      <input
+                        type="text"
+                        value={item.title}
+                        onChange={(e) => handleEditLabelTitle(item.id, e.target.value)}
+                        className="bg-transparent border-b border-brand-brown/40 max-w-[100px] text-xs font-black text-brand-brown focus:outline-none px-0.5"
+                      />
+                      {/* Button to hide label */}
+                      <button
+                        onClick={(e) => handleToggleLabel(item.id, e)}
+                        className="text-earth-500 hover:text-rose-600 ml-1"
+                        title="Sembunyikan label ini"
+                      >
+                        <EyeOff size={11} />
+                      </button>
+                    </>
+                  ) : (
+                    <span>{item.title}</span>
+                  )}
+                </div>
+              )}
+
+              {/* Show "Restore Label" button if label was hidden during edit mode */}
+              {isEditMode && !showItemLabel && (
+                <button
+                  onClick={(e) => handleToggleLabel(item.id, e)}
+                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/90 px-2 py-0.5 rounded-full text-[10px] font-bold text-earth-600 hover:text-brand-brown shadow-sm border border-[#ECE7DF] z-20 whitespace-nowrap"
+                  title="Tampilkan kembali label"
+                >
+                  <Eye size={10} />
+                  <span>{lang === 'id' ? 'Beri Label' : 'Show Label'}</span>
+                </button>
+              )}
+
+            </div>
+          );
+        })}
+      </div>
+
+      {/* SECTION 2: STICKER COLLECTION & TOOLS (ONLY VISIBLE IN EDIT MODE) */}
+      {isEditMode && (
+        <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] border border-white/90 shadow-md animate-fade-in mt-8">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#ECE7DF]">
+            <div className="flex items-center gap-2">
+              <Edit3 size={15} className="text-brand-brown" />
+              <h3 className="text-sm md:text-base font-black text-earth-900">
+                {lang === 'id' ? 'Koreksi & Kelola Koleksi Stiker' : 'Sticker Collection & Tools'}
+              </h3>
+            </div>
+
             <button
               onClick={handleResetDefaults}
               className="paper-btn px-3 py-1 rounded-xl text-[11px] font-bold text-earth-700 hover:text-brand-brown flex items-center gap-1"
             >
               <RotateCcw size={11} />
-              <span>{lang === 'id' ? 'Reset Stiker' : 'Reset Defaults'}</span>
+              <span>{lang === 'id' ? 'Reset Stiker Default' : 'Reset Defaults'}</span>
             </button>
-          )}
-        </div>
+          </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-          {stickers.map((item) => (
-            <div
-              key={item.id}
-              className="paper-card p-4 rounded-3xl flex flex-col items-center text-center cursor-pointer group hover:paper-btn transition-all duration-300 transform hover:-translate-y-1 select-none relative"
-            >
-              {/* Top Action Buttons */}
-              <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
-                {/* Rotate Single Photo Button */}
-                <button
-                  onClick={(e) => handleRotateSinglePhoto(item.id, 15, e)}
-                  className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
-                  title={lang === 'id' ? 'Putar foto ini (+15°)' : 'Rotate photo (+15°)'}
-                >
-                  <RotateCw size={12} />
-                </button>
-
-                {/* Manual Clean & Restore Edit Brush Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingSticker(item);
-                  }}
-                  className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
-                  title={lang === 'id' ? 'Koreksi & Bersihkan Stiker Manual' : 'Manual Clean & Restore'}
-                >
-                  <Edit3 size={12} />
-                </button>
-
-                {/* Delete Button */}
-                <button
-                  onClick={(e) => handleDeleteSticker(item.id, e)}
-                  className="w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
-                  title={lang === 'id' ? 'Hapus stiker ini' : 'Delete this sticker'}
-                >
-                  <Trash2 size={12} />
-                </button>
-              </div>
-
-              {/* Contour Sticker Container */}
-              <div 
-                onClick={() => setActiveImage(item)}
-                className="w-full h-40 sm:h-48 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden"
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stickers.map((item) => (
+              <div
+                key={item.id}
+                className="paper-card p-4 rounded-3xl flex flex-col items-center text-center relative group"
               >
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  className="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] group-hover:scale-110 group-hover:rotate-2 transition-transform duration-300"
-                  loading="lazy"
-                />
+                {/* Action Buttons: Manual Brush & Delete */}
+                <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+                  <button
+                    onClick={() => setEditingSticker(item)}
+                    className="w-7 h-7 rounded-xl bg-white/90 hover:bg-brand-brown hover:text-white text-earth-700 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
+                    title={lang === 'id' ? 'Koreksi Kuas Manual (Hapus / Pulihkan)' : 'Manual Brush Clean'}
+                  >
+                    <Edit3 size={12} />
+                  </button>
+
+                  <button
+                    onClick={(e) => handleDeleteSticker(item.id, e)}
+                    className="w-7 h-7 rounded-xl bg-white/90 hover:bg-rose-600 hover:text-white text-earth-600 shadow-sm border border-[#ECE7DF] flex items-center justify-center transition-all opacity-85 hover:opacity-100"
+                    title="Hapus Stiker"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+
+                {/* Sticker Thumbnail */}
+                <div className="w-full h-36 flex items-center justify-center p-2 rounded-2xl bg-[#ECE7DF]/50 shadow-inner mb-3 overflow-hidden">
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="max-h-full max-w-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)]"
+                    loading="lazy"
+                  />
+                </div>
+
+                <h4 className="font-extrabold text-xs text-earth-900 leading-tight mb-1">
+                  {item.title}
+                </h4>
+
+                <span className="mt-auto text-[10px] font-black uppercase tracking-wider text-brand-brown bg-white px-2.5 py-0.5 rounded-full shadow-sm border border-[#ECE7DF]">
+                  {item.tag}
+                </span>
               </div>
-
-              <h4 
-                onClick={() => setActiveImage(item)}
-                className="font-extrabold text-xs md:text-sm text-earth-900 leading-tight mb-1 group-hover:text-brand-brown transition-colors"
-              >
-                {item.title}
-              </h4>
-
-              <span className="mt-auto text-[10px] font-black uppercase tracking-wider text-brand-brown bg-white px-2.5 py-0.5 rounded-full shadow-sm border border-[#ECE7DF]">
-                {item.tag}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* FULLSCREEN LIGHTBOX PREVIEW */}
       {activeImage && (
@@ -772,38 +838,9 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                 alt={activeImage.title} 
                 className="max-h-[60vh] max-w-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.3)]"
               />
-              <div className="pt-4 text-center flex flex-wrap items-center justify-center gap-3">
-                <div>
-                  <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title}</h4>
-                  <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle}</p>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleRotateSinglePhoto(activeImage.id, 15)}
-                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-800 flex items-center gap-1.5"
-                  >
-                    <RotateCw size={13} />
-                    <span>{lang === 'id' ? 'Putar Foto' : 'Rotate'}</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingSticker(activeImage);
-                      setActiveImage(null);
-                    }}
-                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-brand-brown flex items-center gap-1.5"
-                  >
-                    <Edit3 size={13} />
-                    <span>{lang === 'id' ? 'Koreksi Kuas' : 'Manual Brush'}</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSticker(activeImage.id)}
-                    className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-600 hover:text-white flex items-center gap-1.5"
-                  >
-                    <Trash2 size={13} />
-                    <span>{lang === 'id' ? 'Hapus' : 'Delete'}</span>
-                  </button>
-                </div>
+              <div className="pt-4 text-center">
+                <h4 className="font-extrabold text-lg text-earth-900">{activeImage.title}</h4>
+                <p className="text-xs text-earth-600 mt-0.5">{activeImage.subtitle}</p>
               </div>
             </div>
 
