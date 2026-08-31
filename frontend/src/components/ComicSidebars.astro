@@ -1,0 +1,185 @@
+---
+// 8 Indonesian Presidents Comic Data
+const leftPresidents = [
+  {
+    name: 'Soekarno',
+    title: 'Presiden ke-1 RI',
+    quote: 'BERI AKU 10 PEMUDA!',
+    bg: 'bg-yellow-400',
+    tag: '#PROKLAMASI',
+    rotation: '-rotate-2'
+  },
+  {
+    name: 'Soeharto',
+    title: 'Presiden ke-2 RI',
+    quote: 'PIYE KABARE? PENAK JAMANKU THO?',
+    bg: 'bg-cyan-400',
+    tag: '#PEMBANGUNAN',
+    rotation: 'rotate-1'
+  },
+  {
+    name: 'B.J. Habibie',
+    title: 'Presiden ke-3 RI',
+    quote: 'MASA DEPAN MILIK KITA!',
+    bg: 'bg-pink-500',
+    tag: '#DIRGANTARA',
+    rotation: '-rotate-1'
+  },
+  {
+    name: 'Gus Dur',
+    title: 'Presiden ke-4 RI',
+    quote: 'GITU AJA KOK REPOT!',
+    bg: 'bg-lime-400',
+    tag: '#PLURALISME',
+    rotation: 'rotate-2'
+  }
+];
+
+const rightPresidents = [
+  {
+    name: 'Megawati',
+    title: 'Presiden ke-5 RI',
+    quote: 'MERDEKA!',
+    bg: 'bg-yellow-400',
+    tag: '#REFORMASI',
+    rotation: 'rotate-2'
+  },
+  {
+    name: 'SBY',
+    title: 'Presiden ke-6 RI',
+    quote: 'SAYA PRIHATIN...',
+    bg: 'bg-cyan-400',
+    tag: '#DEMOKRASI',
+    rotation: '-rotate-1'
+  },
+  {
+    name: 'Jokowi',
+    title: 'Presiden ke-7 RI',
+    quote: 'WI WOK DE TOK NOT ONLE TOK DE TOK',
+    bg: 'bg-pink-500',
+    tag: '#INFRASTRUKTUR',
+    rotation: 'rotate-1'
+  },
+  {
+    name: 'Prabowo',
+    title: 'Presiden ke-8 RI',
+    quote: 'SAYA AKAN LAWAN!',
+    bg: 'bg-lime-400',
+    tag: '#PATRIOTIK',
+    rotation: '-rotate-2'
+  }
+];
+---
+
+<!-- LEFT SIDEBAR -->
+<div class="comic-sidebar fixed inset-y-0 left-0 w-64 xl:w-72 hidden flex-col gap-8 p-6 overflow-y-auto z-20 pb-32 pointer-events-auto">
+  <div class="bg-black text-white px-3 py-1.5 border-4 border-black shadow-[4px_4px_0px_0px_#FFE600] font-comic text-xl text-center uppercase tracking-wider -rotate-2">
+    ★ HISTORICAL COMIC #1 ★
+  </div>
+
+  {leftPresidents.map((pres) => (
+    <div class={`border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${pres.bg} p-3 flex flex-col gap-3 relative transform hover:scale-105 transition-transform duration-200`}>
+      
+      <!-- Speech Bubble Overlapping with Tail -->
+      <div class={`relative bg-white border-4 border-black p-3 font-black text-black uppercase text-xs leading-tight transform ${pres.rotation} shadow-[4px_4px_0px_0px_#000] z-10`}>
+        <span>"{pres.quote}"</span>
+        <!-- Speech Bubble Tail pointing down -->
+        <div class="absolute -bottom-3 left-6 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-black"></div>
+        <div class="absolute -bottom-2 left-6 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"></div>
+      </div>
+
+      <!-- Image / Portrait Box Placeholder -->
+      <div class="h-44 bg-white border-4 border-black rounded-lg flex flex-col items-center justify-between p-3 text-center shadow-inner relative overflow-hidden">
+        <div class="text-[10px] font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 rounded shadow-sm self-start">
+          {pres.tag}
+        </div>
+
+        <div class="my-auto flex flex-col items-center">
+          <div class="w-14 h-14 rounded-full border-3 border-black bg-yellow-300 flex items-center justify-center font-comic text-2xl font-black shadow-[3px_3px_0px_0px_#000] mb-2">
+            {pres.name.charAt(0)}
+          </div>
+          <span class="font-comic text-xl font-black text-black tracking-wide leading-none">
+            IMG: {pres.name.toUpperCase()}
+          </span>
+          <span class="text-[10px] font-bold text-gray-700 mt-0.5">
+            {pres.title}
+          </span>
+        </div>
+
+        <!-- Halftone dots accent at bottom of card -->
+        <div class="w-full h-2 bg-black/10 rounded"></div>
+      </div>
+
+    </div>
+  ))}
+</div>
+
+<!-- RIGHT SIDEBAR -->
+<div class="comic-sidebar fixed inset-y-0 right-0 w-64 xl:w-72 hidden flex-col gap-8 p-6 overflow-y-auto z-20 pb-32 pointer-events-auto">
+  <div class="bg-black text-white px-3 py-1.5 border-4 border-black shadow-[4px_4px_0px_0px_#00F0FF] font-comic text-xl text-center uppercase tracking-wider rotate-2">
+    ★ HISTORICAL COMIC #2 ★
+  </div>
+
+  {rightPresidents.map((pres) => (
+    <div class={`border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${pres.bg} p-3 flex flex-col gap-3 relative transform hover:scale-105 transition-transform duration-200`}>
+      
+      <!-- Speech Bubble Overlapping with Tail -->
+      <div class={`relative bg-white border-4 border-black p-3 font-black text-black uppercase text-xs leading-tight transform ${pres.rotation} shadow-[4px_4px_0px_0px_#000] z-10`}>
+        <span>"{pres.quote}"</span>
+        <!-- Speech Bubble Tail pointing down -->
+        <div class="absolute -bottom-3 right-6 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-black"></div>
+        <div class="absolute -bottom-2 right-6 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"></div>
+      </div>
+
+      <!-- Image / Portrait Box Placeholder -->
+      <div class="h-44 bg-white border-4 border-black rounded-lg flex flex-col items-center justify-between p-3 text-center shadow-inner relative overflow-hidden">
+        <div class="text-[10px] font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 rounded shadow-sm self-start">
+          {pres.tag}
+        </div>
+
+        <div class="my-auto flex flex-col items-center">
+          <div class="w-14 h-14 rounded-full border-3 border-black bg-cyan-300 flex items-center justify-center font-comic text-2xl font-black shadow-[3px_3px_0px_0px_#000] mb-2">
+            {pres.name.charAt(0)}
+          </div>
+          <span class="font-comic text-xl font-black text-black tracking-wide leading-none">
+            IMG: {pres.name.toUpperCase()}
+          </span>
+          <span class="text-[10px] font-bold text-gray-700 mt-0.5">
+            {pres.title}
+          </span>
+        </div>
+
+        <!-- Halftone dots accent at bottom of card -->
+        <div class="w-full h-2 bg-black/10 rounded"></div>
+      </div>
+
+    </div>
+  ))}
+</div>
+
+<style>
+  /* Custom scrollbar hiding */
+  .comic-sidebar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .comic-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Only display when data-theme is personal and screen size is 2xl (1536px+) */
+  :global(html[data-theme="personal"]) .comic-sidebar {
+    display: flex !important;
+  }
+
+  /* Hidden by default in professional mode */
+  :global(html:not([data-theme="personal"])) .comic-sidebar {
+    display: none !important;
+  }
+
+  @media (max-width: 1535px) {
+    .comic-sidebar {
+      display: none !important;
+    }
+  }
+</style>
