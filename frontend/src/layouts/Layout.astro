@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import { getLangFromUrl } from '../i18n/utils';
 import { personalProfile } from '../data/resume';
-import ComicSidebars from '../components/ComicSidebars.astro';
+import ComicBackground from '../components/ComicBackground.astro';
 
 interface Props {
   title?: string;
@@ -63,8 +63,8 @@ const ogImage = Astro.props.image || '/og-image.svg';
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   </head>
   <body class="flex flex-col min-h-screen bg-brand-cream text-earth-900 font-sans antialiased relative">
-    <!-- Pop Art Comic Sidebars (8 Indonesian Presidents on 2xl+ screens in Personal Mode) -->
-    <ComicSidebars />
+    <!-- Full-screen Pop Art Comic Background -->
+    <ComicBackground />
 
     <!-- Main Application Slot -->
     <slot />

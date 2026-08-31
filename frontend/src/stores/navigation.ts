@@ -82,3 +82,25 @@ export const closeOverlays = () => {
   $showPortfolioGen.set(false);
   $showContact.set(false);
 };
+
+// --- Local Storage Persistence ---
+if (typeof window !== 'undefined') {
+  const savedMode = localStorage.getItem('navMode');
+  if (savedMode === 'personal' || savedMode === 'professional') {
+    $navMode.set(savedMode);
+  }
+
+  const savedProfTab = localStorage.getItem('activeProfTab');
+  if (savedProfTab === 'experience' || savedProfTab === 'projects' || savedProfTab === 'stack') {
+    $activeProfTab.set(savedProfTab);
+  }
+
+  const savedPersonalTab = localStorage.getItem('activePersonalTab');
+  if (savedPersonalTab === 'personality' || savedPersonalTab === 'hobbies' || savedPersonalTab === 'gallery') {
+    $activePersonalTab.set(savedPersonalTab);
+  }
+
+  $navMode.listen((val) => localStorage.setItem('navMode', val));
+  $activeProfTab.listen((val) => localStorage.setItem('activeProfTab', val));
+  $activePersonalTab.listen((val) => localStorage.setItem('activePersonalTab', val));
+}

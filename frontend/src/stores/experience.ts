@@ -14,36 +14,53 @@ export interface ExperienceItemData {
 export const DEFAULT_EXPERIENCES: ExperienceItemData[] = [
   {
     id: 'exp-1',
-    role: 'Senior Application & Database Engineer / Tech Lead',
-    company: 'PT. Sigma Cipta Caraka (Telkomsigma)',
-    period: '2018 - Sekarang (8+ Tahun)',
-    location: 'BSD & Jakarta, Indonesia',
-    summary: 'Bertanggung jawab penuh atas keandalan, pemeliharaan tingkat lanjut (L3/L4), serta rekayasa otomasi pada ekosistem mission-critical Telkom Group.',
+    role: 'Tech Lead',
+    company: 'PT. SIGMA CIPTA CARAKA (TELKOMSIGMA)',
+    period: 'Agustus 2025 - Desember 2026',
+    location: 'Bandung / Jakarta, Indonesia',
+    summary: 'Mengarahkan perencanaan teknis, koordinasi tim, dan tinjauan desain solusi untuk implementasi proyek IT skala enterprise dan peningkatan infrastruktur.',
     bullets: [
-      'Memimpin operasional dan manajemen ketersediaan tinggi arsitektur Oracle Database Enterprise berskala multi-terabyte dengan rekam jejak Zero Fatal Downtime.',
-      'Melakukan SQL Performance Tuning dan query refactoring ekstensif, mempercepat response time batch processing hingga lebih dari 60%.',
-      'Merancang dan mengeksekusi pipeline otomatisasi pemeliharaan, monitoring, dan backup menggunakan Python, Bash, dan Linux Crontab.',
-      'Mengelola integrasi ekosistem CRM Siebel Enterprise lintas platform dengan tingkat reliabilitas 99.98% SLA.'
+      'Menganalisis kebutuhan bisnis dan teknis untuk menentukan solusi teknologi dan pendekatan implementasi yang tepat.',
+      'Mengoordinasikan aktivitas teknis di seluruh tim IT untuk mendukung implementasi proyek dan aktivitas operasional.',
+      'Meninjau solusi teknis yang diusulkan terhadap kebutuhan bisnis, infrastruktur yang ada, dan lingkungan aplikasi.',
+      'Menyiapkan rencana sumber daya IT, dokumentasi teknis, dan pedoman tata kelola.',
+      'Mengidentifikasi risiko teknis, ketergantungan, kendala, dan potensi masalah selama perencanaan proyek.'
     ],
-    skills: ['Oracle DB', 'SQL Tuning', 'Linux RedHat', 'Python', 'Siebel CRM', 'Bash Automation', 'CI/CD']
+    skills: ['Technical Leadership', 'Solution Design', 'Requirement Management', 'Resource Planning', 'Risk Management']
   },
   {
     id: 'exp-2',
-    role: 'System Implementation & Software Engineer',
-    company: 'PT. Prawathiya Sumber Insani (PSI)',
-    period: '2016 - 2018',
-    location: 'Bandung & Jakarta, Indonesia',
-    summary: 'Mengembangkan sistem perangkat lunak kustom dan integrasi database untuk klien institusional dan korporasi.',
+    role: 'Dev-Ops',
+    company: 'PT. SIGMA CIPTA CARAKA (TELKOMSIGMA)',
+    period: 'Agustus 2017 - Agustus 2025',
+    location: 'Bandung / Jakarta, Indonesia',
+    summary: 'Mengelola operasi DevOps end-to-end, pemeliharaan Oracle Database & Siebel CRM, otomatisasi skrip Python/Bash, serta migrasi data berskala besar.',
     bullets: [
-      'Mengembangkan backend modul web dan API integrasi database dengan penekanan pada keamanan data dan konkurensi transaksi.',
-      'Melakukan deployment, konfigurasi server Linux, serta instalasi database relasional untuk klien korporasi.',
-      'Menyusun dokumentasi teknis, standard operating procedures (SOP), dan memberikan pelatihan pengguna teknis.'
+      'Mengelola lingkungan Oracle Database dan Oracle Siebel CRM yang mendukung operasi bisnis enterprise.',
+      'Mengembangkan skrip Python dan Shell/Bash untuk mengotomatisasi administrasi sistem dan aktivitas pemrosesan data.',
+      'Melakukan migrasi data skala besar dan validasi antara platform enterprise (Telkom Tcares, IndiHome, Wholesale).',
+      'Memantau server Linux, database Oracle, dan aplikasi menggunakan alat monitoring (Splunk, AppDynamics).',
+      'Mengimplementasikan dan memelihara prosedur backup database, pemulihan (recovery), dan keamanan sistem.'
     ],
-    skills: ['Web Backend', 'Database Design', 'Linux Server', 'REST API', 'SQL Scripting']
+    skills: ['Oracle Database', 'Siebel CRM', 'Python Automation', 'Bash Scripting', 'Data Migration', 'System Monitoring', 'Backup & Recovery']
+  },
+  {
+    id: 'exp-3',
+    role: 'Engineer',
+    company: 'PT. PUTRA SEJATI INDOMAKMUR',
+    period: 'Juli 2016 - Juli 2017',
+    location: 'Bandung, Indonesia',
+    summary: 'Bertanggung jawab atas otomatisasi ekstraksi data menggunakan Python, perbaikan proses akuisisi data, dan instalasi sensor otomasi industri.',
+    bullets: [
+      'Mengembangkan skrip Python untuk mengotomatisasi ekstraksi, pembersihan, analisis, dan pelaporan data Data Acquisition Unit (DAU).',
+      'Berkolaborasi dengan tim engineering untuk menganalisis data DAU dan meningkatkan alur kerja akuisisi data.',
+      'Memasang, mengonfigurasi, dan mengkalibrasi sensor industri Autonics untuk sistem produksi dan otomasi.'
+    ],
+    skills: ['Python Data Analysis', 'Data Automation', 'Industrial Sensors', 'Data Acquisition (DAU)']
   }
 ];
 
-const STORAGE_EXP_KEY = 'rendgra_experience_data_v1';
+const STORAGE_EXP_KEY = 'rendgra_experience_data_v2';
 
 const getInitialExperiences = (): ExperienceItemData[] => {
   if (typeof window === 'undefined') return DEFAULT_EXPERIENCES;

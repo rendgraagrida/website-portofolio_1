@@ -118,7 +118,9 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
                 }`}
               >
                 <User size={16} />
-                <span className="font-comic text-base tracking-wider uppercase">Personality</span>
+                <span className="font-comic text-base tracking-wider uppercase">
+                  {lang === 'id' ? 'Kepribadian' : 'Personality'}
+                </span>
               </button>
 
               <button
@@ -130,7 +132,9 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
                 }`}
               >
                 <Compass size={16} />
-                <span className="font-comic text-base tracking-wider uppercase">Hobbies</span>
+                <span className="font-comic text-base tracking-wider uppercase">
+                  {lang === 'id' ? 'Hobi' : 'Hobbies'}
+                </span>
               </button>
 
               <button
@@ -142,7 +146,9 @@ export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
                 }`}
               >
                 <Camera size={16} />
-                <span className="font-comic text-base tracking-wider uppercase">Gallery</span>
+                <span className="font-comic text-base tracking-wider uppercase">
+                  {lang === 'id' ? 'Galeri' : 'Gallery'}
+                </span>
               </button>
             </>
           )}

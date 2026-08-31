@@ -7,8 +7,8 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<footer class="bg-[#2D251F] text-[#EFEBE4] py-16 mt-auto border-t border-[#44382F]">
-  <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<footer class="bg-[#2D251F] text-[#EFEBE4] py-16 mt-auto border-t border-[#44382F] personal:bg-transparent personal:border-t-0 personal:py-6 relative z-10">
+  <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 personal:hidden">
     
     <div>
       <h3 class="text-2xl font-bold text-white mb-2">{t('footer.title')}</h3>
@@ -68,7 +68,7 @@ const t = useTranslations(lang);
 
   </div>
 
-  <div class="max-w-5xl mx-auto px-6 mt-12 pt-8 border-t border-[#44382F] text-center">
+  <div class="max-w-5xl mx-auto px-6 mt-12 pt-8 border-t border-[#44382F] text-center personal:mt-0 personal:pt-0 personal:border-t-0">
     <FooterTrigger client:load lang={lang} />
   </div>
 </footer>

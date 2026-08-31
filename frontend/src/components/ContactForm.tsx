@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { ui } from '../i18n/ui';
 import { api } from '../lib/eden';
+import { useStore } from '@nanostores/react';
+import { $cvUrl, $cvFileName, setCustomCv } from '../stores/cv';
+import { $isGlobalEditMode } from '../stores/editMode';
 import { 
   Send, 
   CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
-  MessageSquareQuote 
+  MessageSquareQuote,
+  FileDown,
+  UploadCloud
 } from 'lucide-react';
 
 interface ContactProps {
@@ -23,6 +28,43 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const cvUrl = useStore($cvUrl);
+  const cvFileName = useStore($cvFileName);
+  const isEditMode = useStore($isGlobalEditMode);
+  const cvFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleDownloadCv = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (cvUrl.startsWith('data:')) {
+      const link = document.createElement('a');
+      link.href = cvUrl;
+      link.download = cvFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(lang === 'id' ? '/cv' : '/en/cv', '_blank');
+    }
+  };
+
+  const handleCvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      alert(lang === 'id' ? 'Mohon unggah file berformat PDF.' : 'Please upload a PDF file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setCustomCv(dataUrl, file.name);
+      alert(lang === 'id' ? `File CV berhasil diunggah: ${file.name}` : `CV uploaded successfully: ${file.name}`);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,23 +187,58 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
             ></textarea>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="w-full py-4 mt-2 paper-btn bg-[#FAF8F5] text-earth-900 hover:text-brand-brown font-extrabold rounded-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base select-none"
-          >
-            {isSubmitting ? (
-              <>
-                <RefreshCw size={18} className="animate-spin" />
-                <span>{lang === 'id' ? 'Mengirim Pesan...' : 'Sending Message...'}</span>
-              </>
-            ) : (
-              <>
-                <Send size={17} className="text-brand-brown" />
-                <span>{t['contact.send']}</span>
-              </>
-            )}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 mt-2">
+            
+            <div className="flex flex-1 items-center gap-1">
+              <button 
+                type="button"
+                onClick={handleDownloadCv}
+                className="flex-1 py-4 paper-btn bg-brand-brown text-white hover:bg-earth-900 font-extrabold rounded-2xl transition-all flex items-center justify-center gap-2 text-sm select-none"
+              >
+                <FileDown size={17} />
+                <span>{lang === 'id' ? 'Unduh CV / Resume' : 'Download CV'}</span>
+              </button>
+
+              {/* Upload CV button in Edit Mode */}
+              {isEditMode && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => cvFileInputRef.current?.click()}
+                    className="paper-btn p-4 h-full rounded-2xl text-xs font-bold bg-[#ECE7DF] text-brand-brown hover:text-earth-900 shadow-sm"
+                    title="Upload CV PDF Baru"
+                  >
+                    <UploadCloud size={16} />
+                  </button>
+                  <input
+                    type="file"
+                    ref={cvFileInputRef}
+                    onChange={handleCvFileUpload}
+                    accept=".pdf,application/pdf"
+                    className="hidden"
+                  />
+                </>
+              )}
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="flex-1 py-4 paper-btn bg-[#FAF8F5] text-earth-900 hover:text-brand-brown font-extrabold rounded-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm select-none"
+            >
+              {isSubmitting ? (
+                <>
+                  <RefreshCw size={17} className="animate-spin" />
+                  <span>{lang === 'id' ? 'Mengirim...' : 'Sending...'}</span>
+                </>
+              ) : (
+                <>
+                  <Send size={17} className="text-brand-brown" />
+                  <span>{t['contact.send']}</span>
+                </>
+              )}
+            </button>
+          </div>
         </form>
       )}
     </section>

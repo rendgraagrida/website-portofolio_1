@@ -1,0 +1,113 @@
+---
+// frontend/src/components/ComicBackground.astro
+// Wallpaper Komik 8 Presiden RI (Irregular Slanted Grid dengan Clip-Path)
+---
+
+<div class="fixed inset-0 z-0 pointer-events-none w-full h-screen hidden personal:flex justify-between overflow-hidden opacity-95">
+  
+  <!-- ================= KOLOM KIRI (4 Presiden) ================= -->
+  <div class="w-[22vw] xl:w-[24vw] h-full bg-black border-r-[8px] md:border-r-[12px] border-black flex flex-col shadow-[12px_0_0_rgba(0,0,0,0.3)] z-10">
+    
+    <!-- 1. Soekarno -->
+    <div class="relative w-full h-[28vh] shrink-0">
+      <div class="absolute inset-0" style="clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);">
+        <img src="/images/presiden-1.jpg" alt="Soekarno" class="w-full h-full object-cover object-center scale-[1.15]" />
+      </div>
+      <div class="absolute bottom-6 right-[-2vw] -rotate-[6deg] skew-x-3 bg-yellow-400 border-[4px] md:border-[5px] border-black rounded-xl px-4 py-3 font-bangers text-black text-center text-xl md:text-2xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Beri aku 10<br/>pemuda!"
+        <div class="absolute -bottom-3 left-8 w-0 h-0 border-l-[10px] border-l-transparent border-t-[18px] border-t-black border-r-[10px] border-r-transparent rotate-[15deg]"></div>
+        <div class="absolute -bottom-[6px] left-[34px] w-0 h-0 border-l-[6px] border-l-transparent border-t-[12px] border-t-yellow-400 border-r-[6px] border-r-transparent rotate-[15deg]"></div>
+      </div>
+    </div>
+
+    <!-- 2. Soeharto -->
+    <div class="relative w-full h-[28vh] shrink-0 -mt-[3.6vh]">
+      <div class="absolute inset-0" style="clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 85%);">
+        <img src="/images/presiden-2.jpg" alt="Soeharto" class="w-full h-full object-cover object-top scale-[1.15]" />
+      </div>
+      <div class="absolute top-[20%] left-[-2vw] rotate-[4deg] bg-[#00F0FF] border-[4px] md:border-[5px] border-black rounded-[40%] px-5 py-4 font-bangers text-black text-center text-lg md:text-xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Piye kabare?<br/>Penak jamanku tho?"
+        <div class="absolute top-1/2 -right-[14px] w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-black border-b-[10px] border-b-transparent"></div>
+        <div class="absolute top-1/2 -right-[8px] -mt-[6px] w-0 h-0 border-t-[6px] border-t-transparent border-l-[12px] border-l-[#00F0FF] border-b-[6px] border-b-transparent"></div>
+      </div>
+    </div>
+
+    <!-- 3. B.J. Habibie -->
+    <div class="relative w-full h-[28vh] shrink-0 -mt-[3.6vh]">
+      <div class="absolute inset-0" style="clip-path: polygon(0 0, 100% 15%, 100% 85%, 0 100%);">
+        <img src="/images/presiden-3.jpg" alt="B.J. Habibie" class="w-full h-full object-cover object-top scale-[1.15]" />
+      </div>
+      <div class="absolute bottom-10 left-[-1vw] -rotate-[3deg] rounded-[35%] bg-[#FF007F] text-white border-[4px] md:border-[5px] border-black px-5 py-4 font-bangers text-center text-lg md:text-xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Masa depan<br/>milik kita!"
+        <div class="absolute -top-[14px] right-10 w-0 h-0 border-l-[10px] border-l-transparent border-b-[18px] border-b-black border-r-[10px] border-r-transparent -rotate-12"></div>
+        <div class="absolute -top-[6px] right-[42px] w-0 h-0 border-l-[6px] border-l-transparent border-b-[12px] border-b-[#FF007F] border-r-[6px] border-r-transparent -rotate-12"></div>
+      </div>
+    </div>
+
+    <!-- 4. Gus Dur -->
+    <div class="relative w-full h-[28vh] shrink-0 -mt-[3.6vh]">
+      <div class="absolute inset-0" style="clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);">
+        <img src="/images/presiden-4.jpg" alt="Gus Dur" class="w-full h-full object-cover object-top scale-[1.15]" />
+      </div>
+      <div class="absolute top-8 right-[-1vw] rotate-[5deg] bg-[#00FF66] border-[4px] md:border-[5px] border-black rounded-lg px-4 py-3 font-bangers text-black text-center text-lg md:text-xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Gitu aja kok<br/>repot!"
+        <div class="absolute top-1/2 -left-[14px] w-0 h-0 border-t-[10px] border-t-transparent border-r-[18px] border-r-black border-b-[10px] border-b-transparent"></div>
+        <div class="absolute top-1/2 -left-[8px] -mt-[6px] w-0 h-0 border-t-[6px] border-t-transparent border-r-[12px] border-r-[#00FF66] border-b-[6px] border-b-transparent"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= KOLOM KANAN (4 Presiden) ================= -->
+  <div class="w-[22vw] xl:w-[24vw] h-full bg-black border-l-[8px] md:border-l-[12px] border-black flex flex-col shadow-[-12px_0_0_rgba(0,0,0,0.3)] z-10">
+    
+    <!-- 5. Megawati -->
+    <div class="relative w-full h-[30vh] shrink-0">
+      <div class="absolute inset-0" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 80%);">
+        <img src="/images/presiden-5.jpg" alt="Megawati" class="w-full h-full object-cover object-top scale-[1.15]" />
+      </div>
+      <div class="absolute bottom-10 left-[-2vw] -rotate-[8deg] rounded-full bg-red-600 text-white border-[4px] md:border-[5px] border-black px-6 py-4 font-bangers text-center text-xl md:text-3xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "MERDEKA!"
+        <div class="absolute -top-[14px] left-8 w-0 h-0 border-r-[10px] border-r-transparent border-b-[18px] border-b-black border-l-[10px] border-l-transparent rotate-[25deg]"></div>
+        <div class="absolute -top-[6px] left-[34px] w-0 h-0 border-r-[6px] border-r-transparent border-b-[12px] border-b-red-600 border-l-[6px] border-l-transparent rotate-[25deg]"></div>
+      </div>
+    </div>
+
+    <!-- 6. SBY -->
+    <div class="relative w-full h-[30vh] shrink-0 -mt-[5.4vh]">
+      <div class="absolute inset-0" style="clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%);">
+        <img src="/images/presiden-6.jpg" alt="SBY" class="w-full h-full object-cover object-top scale-[1.15]" />
+      </div>
+      <div class="absolute top-1/4 right-[-1vw] rotate-[6deg] bg-blue-500 text-white border-[4px] md:border-[5px] border-black rounded-[45%] px-5 py-3 font-bangers text-center text-lg md:text-xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Saya prihatin..."
+        <div class="absolute -bottom-[14px] left-8 w-0 h-0 border-l-[10px] border-l-transparent border-t-[18px] border-t-black border-r-[10px] border-r-transparent -rotate-[15deg]"></div>
+        <div class="absolute -bottom-[6px] left-[34px] w-0 h-0 border-l-[6px] border-l-transparent border-t-[12px] border-t-blue-500 border-r-[6px] border-r-transparent -rotate-[15deg]"></div>
+      </div>
+    </div>
+
+    <!-- 7. Jokowi -->
+    <div class="relative w-full h-[30vh] shrink-0 -mt-[5.4vh]">
+      <div class="absolute inset-0" style="clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 80%);">
+        <img src="/images/presiden-7.jpg" alt="Jokowi" class="w-full h-full object-cover object-top scale-[1.15]" />
+      </div>
+      <div class="absolute bottom-8 right-[-1vw] -rotate-[3deg] bg-yellow-400 border-[4px] md:border-[5px] border-black rounded-xl px-4 py-3 font-bangers text-black text-center text-xs md:text-sm uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Wi wok de tok<br/>not onle tok de tok"
+        <div class="absolute top-1/2 -left-[14px] w-0 h-0 border-t-[10px] border-t-transparent border-r-[18px] border-r-black border-b-[10px] border-b-transparent"></div>
+        <div class="absolute top-1/2 -left-[8px] -mt-[6px] w-0 h-0 border-t-[6px] border-t-transparent border-r-[12px] border-r-yellow-400 border-b-[6px] border-b-transparent"></div>
+      </div>
+    </div>
+
+    <!-- 8. Prabowo -->
+    <div class="relative w-full h-[30vh] shrink-0 -mt-[5.4vh]">
+      <div class="absolute inset-0" style="clip-path: polygon(0 0, 100% 20%, 100% 100%, 0 100%);">
+        <img src="/images/presiden-8.jpg" alt="Prabowo" class="w-full h-full object-cover object-center scale-[1.15]" />
+      </div>
+      <div class="absolute top-10 left-[1vw] rotate-[5deg] bg-[#FF007F] text-white border-[4px] md:border-[5px] border-black rounded-[50%] px-5 py-4 font-bangers text-center text-lg md:text-2xl uppercase z-20 shadow-[6px_6px_0_#000]">
+        "Saya akan<br/>lawan!"
+        <div class="absolute -bottom-[14px] right-8 w-0 h-0 border-l-[10px] border-l-transparent border-t-[18px] border-t-black border-r-[10px] border-r-transparent -rotate-[10deg]"></div>
+        <div class="absolute -bottom-[6px] right-[34px] w-0 h-0 border-l-[6px] border-l-transparent border-t-[12px] border-t-[#FF007F] border-r-[6px] border-r-transparent -rotate-[10deg]"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
