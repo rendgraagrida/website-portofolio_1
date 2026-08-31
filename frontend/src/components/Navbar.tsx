@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $showPortfolioGen, $showContact, togglePortfolioGen, toggleContact } from '../stores/navigation';
-import { Terminal, Sparkles, Send, X } from 'lucide-react';
+import { $isGlobalEditMode } from '../stores/editMode';
+import { $cvUrl, $cvFileName, setCustomCv } from '../stores/cv';
+import { Terminal, Sparkles, Send, X, FileDown, UploadCloud } from 'lucide-react';
 import { ui } from '../i18n/ui';
 
 interface NavbarProps {
@@ -12,7 +14,44 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
   const t = ui[lang];
   const isPortfolioGenOpen = useStore($showPortfolioGen);
   const isContactOpen = useStore($showContact);
+  const isEditMode = useStore($isGlobalEditMode);
+  const cvUrl = useStore($cvUrl);
+  const cvFileName = useStore($cvFileName);
+
+  const cvFileInputRef = useRef<HTMLInputElement>(null);
   const toggleUrl = lang === 'id' ? '/en/' : '/';
+
+  const handleDownloadCv = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (cvUrl.startsWith('data:')) {
+      const link = document.createElement('a');
+      link.href = cvUrl;
+      link.download = cvFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(lang === 'id' ? '/cv' : '/en/cv', '_blank');
+    }
+  };
+
+  const handleCvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      alert(lang === 'id' ? 'Mohon unggah file berformat PDF.' : 'Please upload a PDF file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setCustomCv(dataUrl, file.name);
+      alert(lang === 'id' ? `File CV berhasil diunggah: ${file.name}` : `CV uploaded successfully: ${file.name}`);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-[#F4F1EA]/90 backdrop-blur-md border-b border-[#E6E0D5]">
@@ -48,13 +87,45 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
           </span>
         </button>
 
-        {/* Right Actions: Hubungi Saya + Language Switcher */}
-        <div className="flex items-center gap-3 md:gap-4">
+        {/* Right Actions: Download CV + Hubungi Saya + Language Switcher */}
+        <div className="flex items-center gap-2 md:gap-3">
           
+          {/* Download CV Bar (Positioned with / under Hubungi Saya) */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleDownloadCv}
+              className="paper-btn px-3 md:px-3.5 py-2 rounded-2xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 shadow-sm select-none"
+              title={lang === 'id' ? 'Unduh Resume / CV (PDF)' : 'Download Resume / CV (PDF)'}
+            >
+              <FileDown size={14} />
+              <span>{lang === 'id' ? 'Unduh CV' : 'Download CV'}</span>
+            </button>
+
+            {/* Upload CV button in Edit Mode */}
+            {isEditMode && (
+              <>
+                <button
+                  onClick={() => cvFileInputRef.current?.click()}
+                  className="paper-btn p-2 rounded-xl text-xs font-bold text-brand-brown hover:text-earth-900 shadow-sm"
+                  title="Upload CV PDF Baru"
+                >
+                  <UploadCloud size={13} />
+                </button>
+                <input
+                  type="file"
+                  ref={cvFileInputRef}
+                  onChange={handleCvFileUpload}
+                  accept=".pdf,application/pdf"
+                  className="hidden"
+                />
+              </>
+            )}
+          </div>
+
           {/* Hubungi Saya Toggle Button */}
           <button
             onClick={toggleContact}
-            className={`px-4 md:px-5 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 focus:outline-none select-none ${
+            className={`px-3.5 md:px-4 py-2 rounded-2xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 focus:outline-none select-none ${
               isContactOpen
                 ? 'paper-well text-brand-brown font-extrabold scale-[0.98]'
                 : 'paper-btn text-earth-900 hover:text-brand-brown'
@@ -62,13 +133,13 @@ export const Navbar: React.FC<NavbarProps> = ({ lang }) => {
             title={lang === 'id' ? 'Klik untuk Buka / Tutup Form Kontak' : 'Click to Toggle Contact Form'}
           >
             {isContactOpen ? <X size={15} /> : <Send size={15} className="text-brand-brown" />}
-            <span>{isContactOpen ? (lang === 'id' ? 'Tutup Kontak' : 'Close Contact') : t['nav.contact']}</span>
+            <span className="hidden sm:inline">{isContactOpen ? (lang === 'id' ? 'Tutup Kontak' : 'Close Contact') : t['nav.contact']}</span>
           </button>
 
           {/* Paper Language Toggle */}
           <a
             href={toggleUrl}
-            className="flex items-center px-3 py-1.5 paper-btn rounded-xl text-xs font-extrabold select-none text-earth-700 hover:text-brand-brown"
+            className="flex items-center px-2.5 md:px-3 py-1.5 paper-btn rounded-xl text-xs font-extrabold select-none text-earth-700 hover:text-brand-brown"
           >
             <span className={lang === 'id' ? 'text-brand-brown font-black' : 'text-earth-400'}>ID</span>
             <span className="mx-1 text-earth-300">|</span>

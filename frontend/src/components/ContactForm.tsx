@@ -1,20 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { useStore } from '@nanostores/react';
+import React, { useState } from 'react';
 import { ui } from '../i18n/ui';
 import { api } from '../lib/eden';
-import { $isGlobalEditMode } from '../stores/editMode';
-import { $cvUrl, $cvFileName, setCustomCv, resetCv } from '../stores/cv';
 import { 
   Send, 
   CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
-  MessageSquareQuote,
-  FileDown,
-  UploadCloud,
-  FileText,
-  RotateCcw,
-  Sparkles
+  MessageSquareQuote 
 } from 'lucide-react';
 
 interface ContactProps {
@@ -23,9 +15,6 @@ interface ContactProps {
 
 export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   const t = ui[lang];
-  const isEditMode = useStore($isGlobalEditMode);
-  const cvUrl = useStore($cvUrl);
-  const cvFileName = useStore($cvFileName);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -34,42 +23,6 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
-
-  const cvFileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleCvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      alert(lang === 'id' ? 'Mohon unggah file berformat PDF.' : 'Please upload a PDF file.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      setCustomCv(dataUrl, file.name);
-      setUploadNotice(lang === 'id' ? `File CV berhasil diperbarui: ${file.name} ✅` : `CV updated successfully: ${file.name} ✅`);
-      setTimeout(() => setUploadNotice(null), 4000);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDownloadCv = () => {
-    if (cvUrl.startsWith('data:')) {
-      const link = document.createElement('a');
-      link.href = cvUrl;
-      link.download = cvFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // Direct navigate to /cv or /en/cv
-      window.open(lang === 'id' ? '/cv' : '/en/cv', '_blank');
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,84 +54,9 @@ export const ContactForm: React.FC<ContactProps> = ({ lang }) => {
   };
 
   return (
-    <section id="kontak" className="max-w-2xl mx-auto px-6 py-10 select-none">
+    <section id="kontak" className="max-w-2xl mx-auto px-6 py-8 select-none">
       
-      {/* SECTION 1: RESUME & CV DOWNLOAD / UPLOAD BANNER */}
-      <div className="paper-card p-6 rounded-3xl bg-[#FAF8F5] mb-8 border border-white/90 shadow-md">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          
-          <div className="flex items-center gap-3.5 text-center sm:text-left">
-            <div className="w-12 h-12 rounded-2xl bg-brand-brown text-white shadow-md flex items-center justify-center flex-shrink-0">
-              <FileText size={24} />
-            </div>
-            <div>
-              <h4 className="font-extrabold text-base text-earth-900 leading-tight">
-                {lang === 'id' ? 'Curriculum Vitae (CV) Resmi' : 'Official Resume / CV'}
-              </h4>
-              <p className="text-xs text-earth-700 mt-0.5">
-                {lang === 'id' 
-                  ? 'Unduh ringkasan profesional, keahlian, dan riwayat karier lengkap (PDF).' 
-                  : 'Download full career summary, tech stacks, and track record (PDF).'}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Download CV Button */}
-            <button
-              onClick={handleDownloadCv}
-              className="bg-brand-brown hover:bg-earth-900 text-white px-4 py-2.5 rounded-2xl text-xs font-extrabold shadow-md flex items-center gap-2 transition-all transform hover:scale-105"
-              title={lang === 'id' ? 'Unduh CV PDF' : 'Download CV PDF'}
-            >
-              <FileDown size={15} />
-              <span>{lang === 'id' ? 'Unduh CV' : 'Download CV'}</span>
-            </button>
-
-            {/* Upload CV Button (Only visible in Edit Mode) */}
-            {isEditMode && (
-              <>
-                <button
-                  onClick={() => cvFileInputRef.current?.click()}
-                  className="paper-btn px-3 py-2 rounded-2xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5"
-                  title="Upload / Ganti File CV"
-                >
-                  <UploadCloud size={14} />
-                  <span>{lang === 'id' ? 'Upload CV' : 'Upload CV'}</span>
-                </button>
-
-                <input
-                  type="file"
-                  ref={cvFileInputRef}
-                  onChange={handleCvFileUpload}
-                  accept=".pdf,application/pdf"
-                  className="hidden"
-                />
-
-                <button
-                  onClick={() => {
-                    resetCv();
-                    setUploadNotice(lang === 'id' ? 'CV direset ke default.' : 'CV reset to default.');
-                    setTimeout(() => setUploadNotice(null), 3000);
-                  }}
-                  className="paper-btn p-2 rounded-xl text-xs text-earth-600 hover:text-brand-brown"
-                  title="Reset CV Default"
-                >
-                  <RotateCcw size={13} />
-                </button>
-              </>
-            )}
-          </div>
-
-        </div>
-
-        {uploadNotice && (
-          <div className="mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-bold text-center animate-fade-in">
-            {uploadNotice}
-          </div>
-        )}
-      </div>
-
-      {/* SECTION 2: CONTACT FORM HEADER */}
+      {/* CONTACT FORM HEADER (Pure & Clean without extra bar) */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full paper-btn text-earth-800 text-xs font-extrabold mb-3">
           <MessageSquareQuote size={14} className="text-brand-brown" />
