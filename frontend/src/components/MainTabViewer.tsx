@@ -1,166 +1,203 @@
 import React from 'react';
 import { useStore } from '@nanostores/react';
 import { 
-  $activeTab, 
-  $showPortfolioGen, 
-  $showContact, 
-  selectMainTab, 
-  closeOverlays,
-  type MainTabType 
+  $navMode,
+  $activeProfTab,
+  $activePersonalTab,
+  $showPortfolioGen,
+  $showContact,
+  selectProfTab,
+  selectPersonalTab,
+  setNavigationMode,
+  type ProfessionalTab,
+  type PersonalTab
 } from '../stores/navigation';
-import { ui } from '../i18n/ui';
 import { ExperienceTimeline } from './ExperienceTimeline';
 import { ProjectSlider } from './ProjectSlider';
 import { TechGrid } from './TechGrid';
+import { PersonalityView } from './PersonalityView';
+import { HobbiesView } from './HobbiesView';
+import { EmbeddedGalleryView } from './EmbeddedGalleryView';
 import { CoverLetterGenerator } from './CoverLetterGenerator';
 import { ContactForm } from './ContactForm';
-import { Briefcase, FolderGit2, Cpu, X, Sparkles, MessageSquareQuote } from 'lucide-react';
+import { 
+  Briefcase, 
+  FolderGit2, 
+  Cpu, 
+  Sparkles, 
+  Mail, 
+  User, 
+  Compass, 
+  Camera,
+  Heart
+} from 'lucide-react';
 
 interface MainTabViewerProps {
   lang: 'id' | 'en';
 }
 
 export const MainTabViewer: React.FC<MainTabViewerProps> = ({ lang }) => {
-  const t = ui[lang];
-  const activeTab = useStore($activeTab);
+  const navMode = useStore($navMode);
+  const activeProfTab = useStore($activeProfTab);
+  const activePersonalTab = useStore($activePersonalTab);
   const showPortfolioGen = useStore($showPortfolioGen);
   const showContact = useStore($showContact);
 
-  const tabs: { key: MainTabType; label: string; icon: React.ReactNode; badge?: string }[] = [
-    {
-      key: 'experience',
-      label: lang === 'id' ? 'Jejak Profesional' : 'Professional Journey',
-      icon: <Briefcase size={17} />,
-      badge: '8+ Thn'
-    },
-    {
-      key: 'projects',
-      label: lang === 'id' ? 'Showcase Repositori' : 'GitHub Projects',
-      icon: <FolderGit2 size={17} />,
-      badge: '5 Repo'
-    },
-    {
-      key: 'stack',
-      label: lang === 'id' ? 'Core Tech Stack' : 'Core Tech Stack',
-      icon: <Cpu size={17} />,
-      badge: '16 Tools'
-    }
-  ];
-
   return (
-    <div id="main-tab-navigator" className="w-full pt-4 pb-20 scroll-mt-20">
+    <section id="main-tab-navigator" className="max-w-5xl mx-auto px-6 py-8 select-none">
       
-      {/* CASE 1: PORTFOLIO GENERATOR OVERLAY (Paper Card) */}
+      {/* OVERLAY 1: Portfolio Generator (Active when Rendgra.Dev clicked) */}
       {showPortfolioGen && (
-        <div className="max-w-6xl mx-auto px-4 md:px-6 mb-12 animate-fade-in">
-          <div className="paper-card rounded-3xl overflow-hidden">
-            {/* Overlay Header with Close Button */}
-            <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between">
-              <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
-                <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
-                  <Sparkles size={16} />
-                </div>
-                <span>{lang === 'id' ? 'Portofolio & Cover Letter Generator' : 'Portfolio & Cover Letter Generator'}</span>
-              </div>
-              <button
-                onClick={closeOverlays}
-                className="paper-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-800"
-              >
-                <X size={14} />
-                <span>{lang === 'id' ? 'Tutup (Esc)' : 'Close'}</span>
-              </button>
-            </div>
-
+        <div className="mb-12 animate-fade-in">
+          <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-xl">
             <CoverLetterGenerator lang={lang} />
           </div>
         </div>
       )}
 
-      {/* CASE 2: CONTACT FORM OVERLAY (Paper Card) */}
+      {/* OVERLAY 2: Contact Form (Active when Hubungi Saya clicked) */}
       {showContact && (
-        <div className="max-w-4xl mx-auto px-4 md:px-6 mb-12 animate-fade-in">
-          <div className="paper-card rounded-3xl overflow-hidden">
-            {/* Overlay Header with Close Button */}
-            <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between">
-              <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
-                <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
-                  <MessageSquareQuote size={16} />
-                </div>
-                <span>{lang === 'id' ? 'Mari Berbincang & Berkolaborasi' : "Let's Connect & Collaborate"}</span>
-              </div>
-              <button
-                onClick={closeOverlays}
-                className="paper-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-800"
-              >
-                <X size={14} />
-                <span>{lang === 'id' ? 'Tutup (Esc)' : 'Close'}</span>
-              </button>
-            </div>
-
+        <div className="mb-12 animate-fade-in">
+          <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-xl">
             <ContactForm lang={lang} />
           </div>
         </div>
       )}
 
-      {/* PAPER-BASED SEGMENTED TAB BAR */}
-      <div className="max-w-5xl mx-auto px-4 md:px-6 mb-8">
-        <div className="paper-well p-2 rounded-2xl md:rounded-full flex flex-wrap md:flex-nowrap items-center justify-between gap-2 overflow-x-auto">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.key && !showPortfolioGen && !showContact;
-            return (
+      {/* MASTER SEGMENTED TABS NAVIGATOR */}
+      <div className="flex flex-col items-center mb-10">
+        
+        {/* Mode Indicator & Switcher */}
+        <div className="flex items-center gap-2 mb-4">
+          <button
+            onClick={() => setNavigationMode('professional')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-1.5 transition-all ${
+              navMode === 'professional'
+                ? 'paper-card bg-brand-brown text-white shadow-md'
+                : 'paper-btn text-earth-700 hover:text-brand-brown'
+            }`}
+          >
+            <Briefcase size={13} />
+            <span>{lang === 'id' ? 'Karier & Engineering' : 'Professional Engineering'}</span>
+          </button>
+
+          <button
+            onClick={() => setNavigationMode('personal')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-black flex items-center gap-1.5 transition-all ${
+              navMode === 'personal'
+                ? 'paper-card bg-brand-brown text-white shadow-md'
+                : 'paper-btn text-earth-700 hover:text-brand-brown'
+            }`}
+          >
+            <User size={13} />
+            <span>{lang === 'id' ? 'Personal & Galeri' : 'Personal & Gallery'}</span>
+          </button>
+        </div>
+
+        {/* PAPER SEGMENTED CONTROL TABS */}
+        <div className="paper-well p-1.5 rounded-2xl flex items-center gap-1 w-full max-w-2xl border border-[#E6E0D5]">
+          {navMode === 'professional' ? (
+            // PROFESSIONAL TABS: Jejak Profesional, Showcase, Core Tech
+            <>
               <button
-                key={tab.key}
-                onClick={() => selectMainTab(tab.key)}
-                className={`flex-1 min-w-[150px] md:min-w-0 py-3.5 px-4 md:px-6 rounded-xl md:rounded-full font-bold text-xs md:text-sm transition-all duration-300 flex items-center justify-center gap-2.5 focus:outline-none select-none ${
-                  isActive
-                    ? 'paper-btn text-brand-brown font-extrabold scale-[1.02]'
-                    : 'text-earth-700 hover:text-earth-900 hover:bg-white/40'
+                onClick={() => selectProfTab('experience')}
+                className={`flex-1 py-3 px-2 rounded-xl text-xs md:text-sm font-extrabold flex items-center justify-center gap-2 transition-all duration-300 ${
+                  activeProfTab === 'experience'
+                    ? 'paper-card bg-[#FAF8F5] text-brand-brown shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900'
                 }`}
               >
-                <span className={isActive ? 'text-brand-brown' : 'text-earth-500'}>
-                  {tab.icon}
-                </span>
-                <span className="truncate">{tab.label}</span>
-                {tab.badge && (
-                  <span
-                    className={`hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                      isActive
-                        ? 'bg-brand-brown/10 text-brand-brown'
-                        : 'bg-white/60 text-earth-600'
-                    }`}
-                  >
-                    {tab.badge}
-                  </span>
-                )}
+                <Briefcase size={16} className={activeProfTab === 'experience' ? 'text-brand-brown' : 'text-earth-500'} />
+                <span>{lang === 'id' ? 'Jejak Profesional' : 'Experience'}</span>
               </button>
-            );
-          })}
+
+              <button
+                onClick={() => selectProfTab('projects')}
+                className={`flex-1 py-3 px-2 rounded-xl text-xs md:text-sm font-extrabold flex items-center justify-center gap-2 transition-all duration-300 ${
+                  activeProfTab === 'projects'
+                    ? 'paper-card bg-[#FAF8F5] text-brand-brown shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900'
+                }`}
+              >
+                <FolderGit2 size={16} className={activeProfTab === 'projects' ? 'text-brand-brown' : 'text-earth-500'} />
+                <span>{lang === 'id' ? 'Showcase Repositori' : 'Projects'}</span>
+              </button>
+
+              <button
+                onClick={() => selectProfTab('stack')}
+                className={`flex-1 py-3 px-2 rounded-xl text-xs md:text-sm font-extrabold flex items-center justify-center gap-2 transition-all duration-300 ${
+                  activeProfTab === 'stack'
+                    ? 'paper-card bg-[#FAF8F5] text-brand-brown shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900'
+                }`}
+              >
+                <Cpu size={16} className={activeProfTab === 'stack' ? 'text-brand-brown' : 'text-earth-500'} />
+                <span>{lang === 'id' ? 'Core Tech Stack' : 'Tech Stack'}</span>
+              </button>
+            </>
+          ) : (
+            // PERSONAL TABS: Personality, Hobbies, Gallery
+            <>
+              <button
+                onClick={() => selectPersonalTab('personality')}
+                className={`flex-1 py-3 px-2 rounded-xl text-xs md:text-sm font-extrabold flex items-center justify-center gap-2 transition-all duration-300 ${
+                  activePersonalTab === 'personality'
+                    ? 'paper-card bg-[#FAF8F5] text-brand-brown shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900'
+                }`}
+              >
+                <User size={16} className={activePersonalTab === 'personality' ? 'text-brand-brown' : 'text-earth-500'} />
+                <span>Personality</span>
+              </button>
+
+              <button
+                onClick={() => selectPersonalTab('hobbies')}
+                className={`flex-1 py-3 px-2 rounded-xl text-xs md:text-sm font-extrabold flex items-center justify-center gap-2 transition-all duration-300 ${
+                  activePersonalTab === 'hobbies'
+                    ? 'paper-card bg-[#FAF8F5] text-brand-brown shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900'
+                }`}
+              >
+                <Compass size={16} className={activePersonalTab === 'hobbies' ? 'text-brand-brown' : 'text-earth-500'} />
+                <span>Hobbies</span>
+              </button>
+
+              <button
+                onClick={() => selectPersonalTab('gallery')}
+                className={`flex-1 py-3 px-2 rounded-xl text-xs md:text-sm font-extrabold flex items-center justify-center gap-2 transition-all duration-300 ${
+                  activePersonalTab === 'gallery'
+                    ? 'paper-card bg-[#FAF8F5] text-brand-brown shadow-md transform scale-[1.02]'
+                    : 'text-earth-700 hover:text-earth-900'
+                }`}
+              >
+                <Camera size={16} className={activePersonalTab === 'gallery' ? 'text-brand-brown' : 'text-earth-500'} />
+                <span>Gallery</span>
+              </button>
+            </>
+          )}
         </div>
+
       </div>
 
-      {/* DYNAMIC CONTENT CONTAINER */}
-      {!showPortfolioGen && !showContact && (
-        <div className="min-h-[500px]">
-          {activeTab === 'experience' && (
-            <div className="animate-fade-in">
-              <ExperienceTimeline lang={lang} />
-            </div>
-          )}
+      {/* TAB CONTENT AREA */}
+      <div className="transition-all duration-300">
+        {navMode === 'professional' ? (
+          // Professional Tab Views
+          <>
+            {activeProfTab === 'experience' && <ExperienceTimeline lang={lang} />}
+            {activeProfTab === 'projects' && <ProjectSlider lang={lang} />}
+            {activeProfTab === 'stack' && <TechGrid lang={lang} />}
+          </>
+        ) : (
+          // Personal Tab Views
+          <>
+            {activePersonalTab === 'personality' && <PersonalityView lang={lang} />}
+            {activePersonalTab === 'hobbies' && <HobbiesView lang={lang} />}
+            {activePersonalTab === 'gallery' && <EmbeddedGalleryView lang={lang} />}
+          </>
+        )}
+      </div>
 
-          {activeTab === 'projects' && (
-            <div className="animate-fade-in">
-              <ProjectSlider lang={lang} />
-            </div>
-          )}
-
-          {activeTab === 'stack' && (
-            <div className="animate-fade-in">
-              <TechGrid lang={lang} />
-            </div>
-          )}
-        </div>
-      )}
-
-    </div>
+    </section>
   );
 };

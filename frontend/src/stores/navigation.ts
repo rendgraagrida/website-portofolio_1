@@ -1,17 +1,61 @@
 import { atom } from 'nanostores';
 
-export type MainTabType = 'experience' | 'projects' | 'stack';
+export type NavigationMode = 'professional' | 'personal';
+export type ProfessionalTab = 'experience' | 'projects' | 'stack';
+export type PersonalTab = 'personality' | 'hobbies' | 'gallery';
 
-export const $activeTab = atom<MainTabType>('experience');
+export const $navMode = atom<NavigationMode>('professional');
+export const $activeProfTab = atom<ProfessionalTab>('experience');
+export const $activePersonalTab = atom<PersonalTab>('gallery');
+
 export const $showPortfolioGen = atom<boolean>(false);
 export const $showContact = atom<boolean>(false);
 export const $showGallery = atom<boolean>(false);
+
+// Toggle between Professional Mode and Personal Mode when clicking "Halo saya Rendgra"
+export const togglePersonalMode = () => {
+  const currentMode = $navMode.get();
+  $showPortfolioGen.set(false);
+  $showContact.set(false);
+
+  if (currentMode === 'professional') {
+    $navMode.set('personal');
+    $activePersonalTab.set('gallery');
+  } else {
+    $navMode.set('professional');
+  }
+
+  setTimeout(() => {
+    document.getElementById('main-tab-navigator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
+};
+
+export const toggleGallery = togglePersonalMode;
+
+export const setNavigationMode = (mode: NavigationMode) => {
+  $showPortfolioGen.set(false);
+  $showContact.set(false);
+  $navMode.set(mode);
+};
+
+export const selectProfTab = (tab: ProfessionalTab) => {
+  $showPortfolioGen.set(false);
+  $showContact.set(false);
+  $navMode.set('professional');
+  $activeProfTab.set(tab);
+};
+
+export const selectPersonalTab = (tab: PersonalTab) => {
+  $showPortfolioGen.set(false);
+  $showContact.set(false);
+  $navMode.set('personal');
+  $activePersonalTab.set(tab);
+};
 
 export const togglePortfolioGen = () => {
   const current = $showPortfolioGen.get();
   if (!current) {
     $showContact.set(false);
-    $showGallery.set(false);
     $showPortfolioGen.set(true);
     setTimeout(() => {
       document.getElementById('main-tab-navigator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -25,7 +69,6 @@ export const toggleContact = () => {
   const current = $showContact.get();
   if (!current) {
     $showPortfolioGen.set(false);
-    $showGallery.set(false);
     $showContact.set(true);
     setTimeout(() => {
       document.getElementById('main-tab-navigator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -35,26 +78,7 @@ export const toggleContact = () => {
   }
 };
 
-export const toggleGallery = () => {
-  const current = $showGallery.get();
-  if (!current) {
-    $showPortfolioGen.set(false);
-    $showContact.set(false);
-    $showGallery.set(true);
-  } else {
-    $showGallery.set(false);
-  }
-};
-
-export const selectMainTab = (tab: MainTabType) => {
-  $showPortfolioGen.set(false);
-  $showContact.set(false);
-  $showGallery.set(false);
-  $activeTab.set(tab);
-};
-
 export const closeOverlays = () => {
   $showPortfolioGen.set(false);
   $showContact.set(false);
-  $showGallery.set(false);
 };
