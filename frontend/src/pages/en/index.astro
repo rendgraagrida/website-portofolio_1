@@ -4,14 +4,16 @@ import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import { Hero } from '../../components/Hero';
 import { MainTabViewer } from '../../components/MainTabViewer';
+import { DynamicBackground } from '../../components/DynamicBackground';
 import { getLangFromUrl } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 ---
 
 <Layout title="Rendgra Agrida - Software Engineer & Tech Lead Portfolio">
+  <DynamicBackground client:load />
   <Navbar />
-  <main class="flex-grow">
+  <main class="flex-grow relative z-10">
     <Hero lang={lang} client:load />
     <MainTabViewer lang={lang} client:load />
   </main>

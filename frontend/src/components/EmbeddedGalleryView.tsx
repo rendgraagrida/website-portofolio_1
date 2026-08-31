@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
-import { $isGlobalEditMode, toggleGlobalEditMode } from '../stores/editMode';
+import { $isGlobalEditMode } from '../stores/editMode';
 import { processImageToContourSticker } from '../utils/stickerProcessor';
 import { StickerEditorModal } from './StickerEditorModal';
 import { 
@@ -8,17 +8,11 @@ import {
   Trash2, 
   RotateCcw, 
   Loader2, 
-  Hand, 
   RotateCw, 
   Shuffle, 
   Edit3, 
   X,
-  ZoomIn,
-  ZoomOut,
   Maximize2,
-  Save,
-  Check,
-  Tag,
   Eye,
   EyeOff
 } from 'lucide-react';
@@ -34,7 +28,7 @@ export interface ContourStickerItem {
   src: string;
   rawSrc?: string;
   tag: string;
-  showLabel?: boolean; // Toggle to hide or show label
+  showLabel?: boolean;
   isCustom?: boolean;
 }
 
@@ -191,17 +185,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     } catch (e) {}
   };
 
-  // Toggle Edit Mode & Save
-  const handleToggleEditMode = () => {
-    if (isEditMode) {
-      saveDragLayout(dragStates);
-      saveStickers(stickers);
-      setSelectedStickerId(null);
-    }
-    toggleGlobalEditMode();
-  };
-
-  // SINGLE Sync & Acak Button Handler
+  // SINGLE Sync & Acak Button Handler (Only during edit mode)
   const handleSingleSync = () => {
     if (stickers.length === 0) return;
     setIsSyncing(true);
@@ -210,34 +194,20 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     setTimeout(() => setIsSyncing(false), 250);
   };
 
-  // Scale (Minimize / Maximize) helper per sticker
-  const handleScaleSinglePhoto = (id: string, delta: number, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setDragStates((prev) => {
-      const current = prev[id] || { id, x: 20, y: 20, rotation: 0, scale: 1, zIndex: 1 };
-      const nextScale = Math.max(0.5, Math.min(2.0, parseFloat((current.scale + delta).toFixed(2))));
-      return {
-        ...prev,
-        [id]: {
-          ...current,
-          scale: nextScale
-        }
-      };
-    });
-  };
-
   // Rotate single photo helper
   const handleRotateSinglePhoto = (id: string, deltaDegrees: number = 15, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setDragStates((prev) => {
       const current = prev[id] || { id, x: 20, y: 20, rotation: 0, scale: 1, zIndex: 1 };
-      return {
+      const updated = {
         ...prev,
         [id]: {
           ...current,
           rotation: (current.rotation + deltaDegrees + 360) % 360
         }
       };
+      saveDragLayout(updated);
+      return updated;
     });
   };
 
@@ -264,10 +234,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
     saveStickers(updated);
   };
 
-  // ==========================================
-  // MULTI-TOUCH & GESTURE INTERACTION ENGINE
-  // ==========================================
-  
+  // Multi-Touch & Pointer Drag Handlers
   const handleTouchStart = (id: string, e: React.TouchEvent) => {
     if (!isEditMode) {
       const nextZ = maxZIndex + 1;
@@ -366,14 +333,13 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   };
 
   const handleTouchEnd = () => {
+    if (activeStickerRef.current) {
+      saveDragLayout(dragStates);
+    }
     activeStickerRef.current = null;
     initialTouchRef.current = null;
     dragModeRef.current = null;
   };
-
-  // ==========================================
-  // DESKTOP POINTER & HANDLE DRAG INTERACTION
-  // ==========================================
 
   const startPointerDrag = (id: string, mode: 'move' | 'rotate' | 'resize', e: React.PointerEvent) => {
     if (!isEditMode) return;
@@ -461,6 +427,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
       try {
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
       } catch {}
+      saveDragLayout(dragStates);
       activeStickerRef.current = null;
       initialTouchRef.current = null;
       dragModeRef.current = null;
@@ -542,75 +509,46 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
   return (
     <div className="space-y-6 animate-fade-in select-none">
       
-      {/* SEAMLESS CANVAS TOP CONTROLS */}
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-2">
-          {isEditMode && (
-            <span className="text-xs font-black text-brand-brown uppercase tracking-wider bg-[#ECE7DF] px-3 py-1 rounded-full shadow-inner animate-pulse">
-              {lang === 'id' ? 'Mode Edit Aktif' : 'Edit Mode Active'}
-            </span>
-          )}
+      {/* CONTROLS (ONLY VISIBLE IN GLOBAL EDIT MODE) */}
+      {isEditMode && (
+        <div className="flex items-center justify-between px-2">
+          <span className="text-xs font-black text-brand-brown uppercase tracking-wider bg-[#ECE7DF] px-3 py-1 rounded-full shadow-inner animate-pulse">
+            {lang === 'id' ? 'Mode Edit Galeri Aktif' : 'Gallery Edit Mode'}
+          </span>
+
+          <div className="flex items-center gap-2">
+            {/* Single Sync & Acak Button */}
+            <button
+              onClick={handleSingleSync}
+              disabled={isSyncing}
+              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
+              title="Acak Posisi"
+            >
+              <Shuffle size={13} className={isSyncing ? 'animate-spin' : ''} />
+              <span className="hidden sm:inline">{lang === 'id' ? 'Acak Posisi' : 'Shuffle'}</span>
+            </button>
+
+            {/* Upload Button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isProcessing}
+              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
+              title="Upload Foto Stiker"
+            >
+              {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
+              <span>{lang === 'id' ? 'Upload' : 'Upload'}</span>
+            </button>
+
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*" 
+              className="hidden" 
+            />
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          {/* Controls visible only during Edit Mode */}
-          {isEditMode && (
-            <>
-              {/* Single Sync & Acak Button */}
-              <button
-                onClick={handleSingleSync}
-                disabled={isSyncing}
-                className="paper-btn px-3 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
-                title="Acak Posisi"
-              >
-                <Shuffle size={13} className={isSyncing ? 'animate-spin' : ''} />
-                <span className="hidden sm:inline">{lang === 'id' ? 'Acak Posisi' : 'Shuffle'}</span>
-              </button>
-
-              {/* Upload Button */}
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isProcessing}
-                className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
-                title="Upload Foto Stiker"
-              >
-                {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
-                <span>{lang === 'id' ? 'Upload' : 'Upload'}</span>
-              </button>
-
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                accept="image/*" 
-                className="hidden" 
-              />
-            </>
-          )}
-
-          {/* EDIT & SAVE TOGGLE BUTTON */}
-          <button
-            onClick={handleToggleEditMode}
-            className={`px-4 py-2 rounded-2xl text-xs md:text-sm font-extrabold flex items-center gap-2 shadow-md transition-all ${
-              isEditMode
-                ? 'bg-emerald-700 hover:bg-emerald-800 text-white transform scale-[1.03]'
-                : 'paper-btn text-brand-brown hover:text-earth-900'
-            }`}
-          >
-            {isEditMode ? (
-              <>
-                <Check size={15} />
-                <span>{lang === 'id' ? 'Simpan Tata Letak' : 'Save Layout'}</span>
-              </>
-            ) : (
-              <>
-                <Edit3 size={15} />
-                <span>{lang === 'id' ? 'Edit Galeri Stiker' : 'Edit Stickers'}</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Processing Indicator */}
       {isProcessing && (
@@ -623,7 +561,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         </div>
       )}
 
-      {/* SEAMLESS CANVAS BOARD (No heavy box, seamless paper integration) */}
+      {/* SEAMLESS CANVAS BOARD */}
       <div
         ref={boardRef}
         onPointerMove={handleGlobalPointerMove}
@@ -700,7 +638,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                 />
               </div>
 
-              {/* STICKER LABEL (Can be toggled or edited in Edit Mode) */}
+              {/* STICKER LABEL */}
               {showItemLabel && (
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/95 px-3 py-1 rounded-full text-xs font-black text-brand-brown shadow-md border border-[#ECE7DF] z-20 whitespace-nowrap">
                   {isEditMode ? (
@@ -711,7 +649,6 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                         onChange={(e) => handleEditLabelTitle(item.id, e.target.value)}
                         className="bg-transparent border-b border-brand-brown/40 max-w-[100px] text-xs font-black text-brand-brown focus:outline-none px-0.5"
                       />
-                      {/* Button to hide label */}
                       <button
                         onClick={(e) => handleToggleLabel(item.id, e)}
                         className="text-earth-500 hover:text-rose-600 ml-1"
@@ -726,7 +663,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
                 </div>
               )}
 
-              {/* Show "Restore Label" button if label was hidden during edit mode */}
+              {/* Restore Label in Edit Mode if hidden */}
               {isEditMode && !showItemLabel && (
                 <button
                   onClick={(e) => handleToggleLabel(item.id, e)}
@@ -743,7 +680,7 @@ export const EmbeddedGalleryView: React.FC<EmbeddedGalleryViewProps> = ({ lang }
         })}
       </div>
 
-      {/* SECTION 2: STICKER COLLECTION & TOOLS (ONLY VISIBLE IN EDIT MODE) */}
+      {/* SECTION 2: STICKER COLLECTION & TOOLS (ONLY VISIBLE IN GLOBAL EDIT MODE) */}
       {isEditMode && (
         <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] border border-white/90 shadow-md animate-fade-in mt-8">
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#ECE7DF]">
