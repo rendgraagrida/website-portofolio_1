@@ -13,7 +13,8 @@ import {
   Loader2, 
   Maximize2,
   Layers,
-  RefreshCw,
+  Shuffle,
+  Hand,
   Check
 } from 'lucide-react';
 
@@ -28,6 +29,15 @@ export interface ContourStickerItem {
   src: string;
   tag: string;
   isCustom?: boolean;
+}
+
+interface DraggableStickerState {
+  id: string;
+  x: number; // percentage (0 - 100)
+  y: number; // px from top
+  rotation: number; // deg
+  zIndex: number;
+  scale: number;
 }
 
 const DEFAULT_STICKERS: ContourStickerItem[] = [
@@ -61,8 +71,8 @@ const DEFAULT_STICKERS: ContourStickerItem[] = [
   }
 ];
 
-const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v2';
-const STORAGE_COLLAGE_KEY = 'rendgra_gallery_collage_v2';
+const STORAGE_STICKERS_KEY = 'rendgra_gallery_stickers_v3';
+const STORAGE_COLLAGE_KEY = 'rendgra_gallery_collage_v3';
 
 export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) => {
   const showGallery = useStore($showGallery);
@@ -70,22 +80,56 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
   const [collageUrl, setCollageUrl] = useState<string>('/gallery/sticker-collage.png');
   const [activeImage, setActiveImage] = useState<ContourStickerItem | null>(null);
   
+  // Interactive Draggable Board State
+  const [isInteractiveMode, setIsInteractiveMode] = useState(true);
+  const [dragStates, setDragStates] = useState<Record<string, DraggableStickerState>>({});
+  const [maxZIndex, setMaxZIndex] = useState(10);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const dragStartRef = useRef<{ startX: number; startY: number; initX: number; initY: number } | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressText, setProgressText] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load persisted stickers & custom collage on mount
+  // Initialize interactive positions across the canvas
+  const initDraggablePositions = (items: ContourStickerItem[]) => {
+    const states: Record<string, DraggableStickerState> = {};
+    const count = items.length;
+    items.forEach((item, index) => {
+      const step = count > 1 ? 70 / (count - 1) : 0;
+      const x = 12 + index * step + (Math.random() * 6 - 3); // Overlapping horizontal spread
+      const y = Math.round(15 + Math.random() * 30);
+      const rotation = Math.round(Math.random() * 12 - 6);
+      states[item.id] = {
+        id: item.id,
+        x: Math.max(5, Math.min(75, x)),
+        y,
+        rotation,
+        zIndex: index + 1,
+        scale: 1
+      };
+    });
+    setDragStates(states);
+    setMaxZIndex(count + 5);
+  };
+
+  // Load persisted stickers on mount
   useEffect(() => {
     try {
       const savedStickers = localStorage.getItem(STORAGE_STICKERS_KEY);
+      let currentItems = DEFAULT_STICKERS;
       if (savedStickers) {
         const parsed = JSON.parse(savedStickers);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          currentItems = parsed;
           setStickers(parsed);
         }
       }
+      initDraggablePositions(currentItems);
+
       const savedCollage = localStorage.getItem(STORAGE_COLLAGE_KEY);
       if (savedCollage) {
         setCollageUrl(savedCollage);
@@ -97,6 +141,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
 
   const saveStickers = (items: ContourStickerItem[]) => {
     setStickers(items);
+    initDraggablePositions(items);
     try {
       localStorage.setItem(STORAGE_STICKERS_KEY, JSON.stringify(items));
     } catch (e) {
@@ -104,22 +149,26 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     }
   };
 
-  // Reconstruct unified collage from all current stored stickers
-  const handleSyncCollage = async (currentItems = stickers) => {
+  // Sync / Shuffle Positions & Layering Overlap
+  const handleShuffleAndSync = async (currentItems = stickers) => {
     if (currentItems.length === 0) return;
     setIsSyncing(true);
+    
+    // 1. Randomize interactive drag board positions & layering
+    const shuffledItems = [...currentItems].sort(() => Math.random() - 0.5);
+    initDraggablePositions(shuffledItems);
+
+    // 2. Generate new composite collage image with deep overlap
     try {
-      const srcs = currentItems.map((s) => s.src);
-      const newCollage = await reconstructStickerCollage(srcs);
+      const srcs = shuffledItems.map((s) => s.src);
+      const newCollage = await reconstructStickerCollage(srcs, true);
       if (newCollage) {
         setCollageUrl(newCollage);
         try {
           localStorage.setItem(STORAGE_COLLAGE_KEY, newCollage);
-        } catch (e) {
-          console.warn('LocalStorage limit reached for collage, keeping in memory:', e);
-        }
+        } catch (e) {}
         setSyncSuccess(true);
-        setTimeout(() => setSyncSuccess(false), 3000);
+        setTimeout(() => setSyncSuccess(false), 2500);
       }
     } catch (err) {
       console.error('Gagal merekonstruksi kolase:', err);
@@ -128,12 +177,71 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     }
   };
 
+  // Drag & Drop Handlers for Manual Manipulation
+  const handlePointerDown = (id: string, e: React.PointerEvent) => {
+    e.preventDefault();
+    const board = boardRef.current;
+    if (!board) return;
+
+    const boardRect = board.getBoundingClientRect();
+    const current = dragStates[id] || { x: 20, y: 20, rotation: 0, zIndex: maxZIndex + 1, scale: 1 };
+    
+    // Bring dragged sticker to top layer (menimpa stiker lain)
+    const nextZ = maxZIndex + 1;
+    setMaxZIndex(nextZ);
+    setDragStates(prev => ({
+      ...prev,
+      [id]: { ...prev[id], zIndex: nextZ }
+    }));
+
+    setDraggingId(id);
+    dragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initX: current.x,
+      initY: current.y
+    };
+
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!draggingId || !dragStartRef.current || !boardRef.current) return;
+    
+    const boardRect = boardRef.current.getBoundingClientRect();
+    const dxPx = e.clientX - dragStartRef.current.startX;
+    const dyPx = e.clientY - dragStartRef.current.startY;
+
+    const dxPercent = (dxPx / boardRect.width) * 100;
+    const nextX = Math.max(2, Math.min(80, dragStartRef.current.initX + dxPercent));
+    const nextY = Math.max(0, Math.min(180, dragStartRef.current.initY + dyPx));
+
+    setDragStates(prev => ({
+      ...prev,
+      [draggingId]: {
+        ...prev[draggingId],
+        x: nextX,
+        y: nextY
+      }
+    }));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (draggingId) {
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {}
+      setDraggingId(null);
+      dragStartRef.current = null;
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsProcessing(true);
-    setProgressText(lang === 'id' ? 'Memulai ekstraksi kontur...' : 'Starting contour extraction...');
+    setProgressText(lang === 'id' ? 'Memotong kontur stiker...' : 'Cutting sticker contour...');
 
     try {
       const stickerDataUrl = await processImageToContourSticker(file, (step) => {
@@ -151,13 +259,10 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
 
       const updated = [newSticker, ...stickers];
       saveStickers(updated);
-      setActiveImage(newSticker);
-
-      // Auto trigger sync collage with the newly added sticker
-      handleSyncCollage(updated);
+      handleShuffleAndSync(updated);
     } catch (err) {
       console.error('Gagal memproses stiker:', err);
-      alert(lang === 'id' ? 'Gagal memproses gambar menjadi stiker. Silakan coba gambar lain.' : 'Failed to process image into sticker.');
+      alert(lang === 'id' ? 'Gagal memproses gambar menjadi stiker.' : 'Failed to process image into sticker.');
     } finally {
       setIsProcessing(false);
       setProgressText('');
@@ -169,14 +274,13 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
 
   const handleDeleteSticker = (id: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (confirm(lang === 'id' ? 'Apakah Anda yakin ingin menghapus stiker ini dari galeri?' : 'Are you sure you want to delete this sticker?')) {
+    if (confirm(lang === 'id' ? 'Hapus stiker ini dari galeri?' : 'Delete this sticker?')) {
       const updated = stickers.filter((s) => s.id !== id);
       saveStickers(updated);
       if (activeImage?.id === id) {
         setActiveImage(null);
       }
-      // Reconstruct collage after deleting
-      handleSyncCollage(updated);
+      handleShuffleAndSync(updated);
     }
   };
 
@@ -196,36 +300,34 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/55 backdrop-blur-md animate-fade-in">
       <div className="paper-card rounded-3xl max-w-5xl w-full overflow-hidden shadow-2xl animate-fade-in max-h-[92vh] flex flex-col">
         
-        {/* Header with Title, Sync, Upload & Close */}
+        {/* Header with Title, Sync & Acak, Upload & Close */}
         <div className="bg-[#ECE7DF] px-6 py-4 border-b border-[#E6E0D5] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 font-extrabold text-earth-900 text-sm md:text-base">
             <div className="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-brown">
               <Camera size={16} />
             </div>
-            <span>{lang === 'id' ? 'Galeri Stiker Kontur Personil' : 'Personnel Contour Sticker Gallery'}</span>
+            <span>{lang === 'id' ? 'Papan Stiker Interaktif & Geser Manual' : 'Interactive Drag & Drop Sticker Board'}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Sync / Reconstruct Button */}
+            {/* Sync & Acak Posisi Button */}
             <button
-              onClick={() => handleSyncCollage()}
+              onClick={() => handleShuffleAndSync()}
               disabled={isSyncing}
-              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
-              title={lang === 'id' ? 'Sinkronisasi & Rekonstruksi Kolase dari Semua Foto' : 'Sync & Reconstruct Collage'}
+              className="paper-btn px-3 py-1.5 rounded-xl text-xs font-extrabold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
+              title={lang === 'id' ? 'Acak Posisi & Saling Menimpa Ulang' : 'Shuffle & Overlap Positions'}
             >
               {isSyncing ? (
-                <Loader2 size={13} className="animate-spin text-brand-brown" />
+                <Loader2 size={13} className="animate-spin" />
               ) : syncSuccess ? (
                 <Check size={13} className="text-emerald-700" />
               ) : (
-                <RefreshCw size={13} className="text-brand-brown" />
+                <Shuffle size={13} />
               )}
               <span>
                 {isSyncing
-                  ? (lang === 'id' ? 'Menyinkronkan...' : 'Syncing...')
-                  : syncSuccess
-                  ? (lang === 'id' ? 'Tersinkronisasi! ✅' : 'Synced! ✅')
-                  : (lang === 'id' ? 'Sync Kolase' : 'Sync Collage')}
+                  ? (lang === 'id' ? 'Mengacak...' : 'Shuffling...')
+                  : (lang === 'id' ? 'Sync & Acak Posisi' : 'Sync & Shuffle')}
               </span>
             </button>
 
@@ -233,11 +335,11 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-brand-brown hover:text-earth-900 flex items-center gap-1.5 disabled:opacity-50"
+              className="paper-btn px-3.5 py-1.5 rounded-xl text-xs font-bold text-earth-900 hover:text-brand-brown flex items-center gap-1.5 disabled:opacity-50"
               title={lang === 'id' ? 'Unggah Foto Baru & Potong Kontur Otomatis' : 'Upload & Auto Cutout'}
             >
-              {isProcessing ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
-              <span>{lang === 'id' ? 'Upload Foto' : 'Upload Photo'}</span>
+              {isProcessing ? <Loader2 size={13} className="animate-spin text-brand-brown" /> : <Plus size={13} />}
+              <span>{lang === 'id' ? 'Upload Foto' : 'Upload'}</span>
             </button>
 
             {/* Hidden File Input */}
@@ -271,74 +373,83 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
           </div>
         )}
 
-        {/* Scrollable Gallery Area */}
+        {/* Scrollable Content */}
         <div className="p-6 md:p-8 overflow-y-auto bg-[#F4F1EA] space-y-8">
           
-          {/* SECTION 1: DYNAMIC RECONSTRUCTED MASTER COLLAGE BANNER */}
-          <div className="paper-card p-6 md:p-8 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
-            <div className="flex items-center justify-between mb-4">
+          {/* SECTION 1: INTERACTIVE DRAGGABLE & OVERLAPPING STICKER BOARD */}
+          <div className="paper-card p-4 md:p-6 rounded-3xl bg-[#FAF8F5] relative overflow-hidden border border-white/80 shadow-md">
+            
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full paper-btn text-brand-brown text-xs font-black">
-                <Layers size={13} />
-                <span>{lang === 'id' ? 'Kolase Bersatu (Dynamic Collage)' : 'Unified Reconstructed Banner'}</span>
+                <Hand size={13} />
+                <span>{lang === 'id' ? 'Papan Geser Bebas (Bisa Saling Menimpa)' : 'Interactive Drag & Overlap Canvas'}</span>
               </div>
-              
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleSyncCollage()}
-                  disabled={isSyncing}
-                  className="paper-btn px-3 py-1 rounded-xl text-[11px] font-extrabold text-brand-brown flex items-center gap-1.5"
-                >
-                  <RefreshCw size={11} className={isSyncing ? 'animate-spin' : ''} />
-                  <span>{lang === 'id' ? 'Rekonstruksi Kolase' : 'Reconstruct Collage'}</span>
-                </button>
-                <span className="text-[11px] font-bold text-earth-600 bg-[#ECE7DF] px-2.5 py-1 rounded-full shadow-inner hidden sm:inline-block">
-                  {lang === 'id' ? 'Die-Cut White Outline' : 'Die-Cut White Outline'}
-                </span>
-              </div>
+
+              <span className="text-[11px] font-bold text-earth-600 bg-[#ECE7DF] px-3 py-1 rounded-full shadow-inner flex items-center gap-1">
+                <Sparkles size={11} className="text-brand-brown" />
+                <span>{lang === 'id' ? 'Tahan & geser stiker dengan kursor/jari Anda' : 'Click & drag stickers freely'}</span>
+              </span>
             </div>
 
-            {/* Wide Master Collage Image */}
-            <div 
-              onClick={() => setActiveImage({
-                id: 'active-collage',
-                title: lang === 'id' ? 'Kolase Stiker Bersatu' : 'Unified Sticker Collage',
-                subtitle: lang === 'id' ? 'Gabungan seluruh stiker yang tersimpan tanpa latar belakang' : 'All stored stickers merged seamlessly without background',
-                src: collageUrl,
-                tag: 'Master Banner'
-              })}
-              className="w-full h-48 sm:h-64 md:h-72 flex items-end justify-center bg-gradient-to-b from-[#EFEBE4]/60 to-[#ECE7DF] rounded-2xl p-4 transition-all duration-300 cursor-pointer group hover:shadow-inner"
+            {/* Interactive Canvas Board */}
+            <div
+              ref={boardRef}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              className="w-full h-72 sm:h-80 md:h-96 relative bg-gradient-to-b from-[#EFEBE4]/70 to-[#ECE7DF] rounded-2xl p-4 overflow-hidden border border-[#E6E0D5] shadow-inner select-none touch-none"
             >
-              <img
-                src={collageUrl}
-                alt="Rendgra Agrida & Family Sticker Collage"
-                className="max-h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.18)] group-hover:scale-105 transition-transform duration-400"
-              />
+              {stickers.map((item) => {
+                const pos = dragStates[item.id] || { x: 20, y: 20, rotation: 0, zIndex: 1 };
+                const isBeingDragged = draggingId === item.id;
+
+                return (
+                  <div
+                    key={item.id}
+                    onPointerDown={(e) => handlePointerDown(item.id, e)}
+                    style={{
+                      left: `${pos.x}%`,
+                      top: `${pos.y}px`,
+                      transform: `rotate(${pos.rotation}deg) scale(${isBeingDragged ? 1.08 : 1})`,
+                      zIndex: pos.zIndex
+                    }}
+                    className={`absolute cursor-grab active:cursor-grabbing transition-transform duration-75 select-none ${
+                      isBeingDragged ? 'filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.35)]' : 'filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.2)]'
+                    }`}
+                  >
+                    <img
+                      src={item.src}
+                      alt={item.title}
+                      draggable={false}
+                      className="h-44 sm:h-52 md:h-60 max-w-none object-contain pointer-events-none"
+                    />
+
+                    {/* Subtle Sticker Tag */}
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white/95 px-2.5 py-0.5 rounded-full text-[10px] font-black text-brand-brown shadow-md border border-[#ECE7DF] pointer-events-none">
+                      {item.title.split(' ')[0]}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Banner Footer Info */}
+            {/* Canvas Bottom Toolbar */}
             <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#ECE7DF]">
               <span className="text-xs font-bold text-earth-800">
                 {lang === 'id' 
-                  ? `Kolase otomatis disinkronkan dari ${stickers.length} foto stiker yang tersimpan.`
-                  : `Collage dynamically synced from all ${stickers.length} stored contour stickers.`}
+                  ? '💡 Tips: Klik stiker untuk membawanya ke lapisan paling depan (menimpa stiker lain).'
+                  : '💡 Tip: Click any sticker to bring it to the front layer over others.'}
               </span>
               <button
-                onClick={() => setActiveImage({
-                  id: 'active-collage',
-                  title: lang === 'id' ? 'Kolase Stiker Bersatu' : 'Unified Sticker Collage',
-                  subtitle: lang === 'id' ? 'Gabungan seluruh stiker yang tersimpan tanpa latar belakang' : 'All stored stickers merged seamlessly without background',
-                  src: collageUrl,
-                  tag: 'Master Banner'
-                })}
+                onClick={() => handleShuffleAndSync()}
                 className="paper-btn px-3 py-1 rounded-xl text-xs font-extrabold text-brand-brown flex items-center gap-1.5"
               >
-                <Maximize2 size={12} />
-                <span>{lang === 'id' ? 'Lihat Ukuran Penuh' : 'View Full Size'}</span>
+                <Shuffle size={12} />
+                <span>{lang === 'id' ? 'Acak Tata Letak' : 'Shuffle Layout'}</span>
               </button>
             </div>
           </div>
 
-          {/* SECTION 2: INDIVIDUAL DIE-CUT CONTOUR STICKERS */}
+          {/* SECTION 2: INDIVIDUAL DIE-CUT CONTOUR STICKERS GRID */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-1.5">
@@ -403,7 +514,7 @@ export const PhotoGalleryModal: React.FC<PhotoGalleryModalProps> = ({ lang }) =>
         <div className="px-6 py-3.5 bg-[#FAF8F5] border-t border-[#ECE7DF] flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-earth-600">
             <Heart size={14} className="text-rose-500 fill-rose-500" />
-            <span>Rendgra Agrida • Die-Cut Contour Sticker Collection</span>
+            <span>Rendgra Agrida • Interactive Sticker Playground</span>
           </div>
 
           <button

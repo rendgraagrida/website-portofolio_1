@@ -1,7 +1,7 @@
 /**
  * Utility untuk memproses foto menjadi stiker kontur transparan
  * dengan garis luar putih tebal (die-cut contour stroke) langsung di browser,
- * serta merekonstruksi kolase stiker bersatu secara dinamis.
+ * serta merekonstruksi dan mengacak kolase stiker bersatu secara dinamis.
  */
 
 export async function processImageToContourSticker(
@@ -97,11 +97,13 @@ export async function processImageToContourSticker(
 }
 
 /**
- * Merekonstruksi ulang seluruh stiker yang tersimpan menjadi satu
- * kolase banner bersatu (side-by-side overlapping collage) secara dinamis di browser.
+ * Merekonstruksi ulang seluruh stiker menjadi kolase bersatu
+ * dengan pengacakan posisi (*random shuffle*), tumpukan saling menimpa (*deep overlap*),
+ * dan kemiringan stiker (*random rotation angle*).
  */
 export async function reconstructStickerCollage(
-  stickerSrcs: string[]
+  stickerSrcs: string[],
+  shuffleOrder: boolean = true
 ): Promise<string> {
   if (!stickerSrcs || stickerSrcs.length === 0) return '';
 
@@ -118,20 +120,30 @@ export async function reconstructStickerCollage(
     )
   );
 
-  const validImages = loadedImages.filter(
+  let validImages = loadedImages.filter(
     (img) => img.naturalWidth > 0 && img.naturalHeight > 0
   );
 
   if (validImages.length === 0) return '';
 
-  const targetHeight = 450;
+  // Randomize / shuffle the layering order when requested
+  if (shuffleOrder && validImages.length > 1) {
+    validImages = [...validImages].sort(() => Math.random() - 0.5);
+  }
+
+  const targetHeight = 460;
   const scaled = validImages.map((img) => {
     const ratio = targetHeight / img.naturalHeight;
     const w = img.naturalWidth * ratio;
-    return { img, w, h: targetHeight };
+    // Random tilt angle between -6deg and +6deg
+    const angle = (Math.random() * 12 - 6) * (Math.PI / 180);
+    // Random height variation
+    const yOffset = Math.round(Math.random() * 30 - 15);
+    return { img, w, h: targetHeight, angle, yOffset };
   });
 
-  const overlapFactor = 0.75;
+  // Overlap factor (0.58 = deep overlapping / saling menimpa)
+  const overlapFactor = validImages.length > 3 ? 0.60 : 0.68;
   let totalWidth = 0;
   scaled.forEach((s, idx) => {
     if (idx === 0) {
@@ -140,21 +152,37 @@ export async function reconstructStickerCollage(
       totalWidth += s.w * overlapFactor;
     }
   });
-  totalWidth += 80;
+  totalWidth += 120; // extra padding
 
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(900, Math.round(totalWidth));
-  canvas.height = targetHeight + 60;
+  canvas.width = Math.max(960, Math.round(totalWidth));
+  canvas.height = targetHeight + 100;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas not supported');
 
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  let currentX = 40;
-  scaled.forEach((item, idx) => {
-    const y = canvas.height - item.h - 15 + (idx % 2 === 0 ? 0 : 10);
-    ctx.drawImage(item.img, currentX, y, item.w, item.h);
+  let currentX = 60;
+  scaled.forEach((item) => {
+    ctx.save();
+    
+    // Position center of image
+    const centerX = currentX + item.w / 2;
+    const centerY = canvas.height - item.h / 2 - 25 + item.yOffset;
+    
+    ctx.translate(centerX, centerY);
+    ctx.rotate(item.angle);
+    
+    // Draw with slight shadow for depth between overlapping layers
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 8;
+    
+    ctx.drawImage(item.img, -item.w / 2, -item.h / 2, item.w, item.h);
+    ctx.restore();
+
     currentX += item.w * overlapFactor;
   });
 
