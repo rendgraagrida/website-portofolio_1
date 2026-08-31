@@ -10,5 +10,6 @@ Bird's-Eye View:
 - [x] Tahap 9: Master Tab Switcher (Segmented Control UI)
 - [x] Tahap 10: Optimasi SEO & Social Share Preview (OpenGraph)
 - [x] Tahap 11: Production Deployment Guide & Setup (Vercel & Koyeb)
+- [x] Tahap 12: Testing Architecture & AI Skills Standardization
 
 *SOP: Centang di sini jika satu file milestone utuh telah selesai dikerjakan.*
